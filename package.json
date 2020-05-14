@@ -1,0 +1,48 @@
+{
+  "name": "test-equip",
+  "description": "A Vue.js project for tracking the work of test equipment",
+  "version": "1.0.0",
+  "author": "Elena Polyakova",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+  },
+  "dependencies": {
+    "@innologica/vue-stackable-modal": "^0.1.9",
+    "v-datatable-light": "^0.8.0",
+    "vue": "^2.5.11",
+    "vue-dynamic-select": "^1.0.16",
+    "vue-gallery-slideshow": "^1.5.0",
+    "vue-loading-overlay": "^3.3.2",
+    "vue-runtime-helpers": "^1.1.2",
+    "vue-sidebar-menu": "^4.5.3",
+    "vue2-datepicker": "^3.5.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "devDependencies": {
+    "axios": "^0.19.2",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-3": "^6.24.1",
+    "cross-env": "^5.0.5",
+    "css-loader": "^0.28.7",
+    "file-loader": "^1.1.4",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.6",
+    "vue-loader": "^13.0.5",
+    "vue-meta": "^2.3.3",
+    "vue-router": "^3.1.6",
+    "vue-template-compiler": "^2.4.4",
+    "vuex": "^3.2.0",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.9.1"
+  }
+}
