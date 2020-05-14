@@ -46,7 +46,7 @@
                 @close="closeModal"
                 :modal-class="{[modalClass]: true}"
                 :saveButton= "{title: 'Сохранить'}"
-                :cancelButton= "{title: 'Отмена'}"
+                :cancelButton= "{title: 'Отмена11'}"
                 >
            <div slot="modal-header">
               <div class="eq-card-header">
