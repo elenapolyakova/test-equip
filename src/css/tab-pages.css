@@ -14,7 +14,7 @@
 .content
 {
     display: block;
-    height: 75vh;
+    height: 65vh;
     overflow-y: auto;
 }
 
@@ -75,3 +75,16 @@
 {
   height: 80vh !important;
 } 
+.vgs__close{
+    font-size: 14pt  !important;
+    width: 200px  !important;
+    border: 1px solid #ced4da !important;;
+    -moz-border-radius: .25em !important;
+    -webkit-border-radius:  .25em !important;
+    border-radius: .25em !important;
+    cursor: pointer !important;
+}
+.vgs__close:hover{
+    color: #337ab7 !important;
+    border-color: #337ab7 !important;
+}

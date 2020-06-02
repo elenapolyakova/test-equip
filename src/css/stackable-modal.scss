@@ -30,10 +30,12 @@ $modal-90per: 90%;
 
   .modal-content {
     height: 100%;
+    overflow: auto;
   }
 
   &.aside .modal-content {
     height: auto;
+    overflow: auto;
   }
 
   &.modal-dialog.aside.modal-stack1 .modal-content {
@@ -72,4 +74,9 @@ $modal-90per: 90%;
   .modal-content{
     overflow: auto;
   }
+}
+
+.modal-open .modal {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
 }

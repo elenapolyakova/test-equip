@@ -4,9 +4,9 @@ import store  from '../../store'
   const getFunRight = funShortName =>
   {
       let funList = getFunList();
-      let fun = funList.find(fun => fun.shotName === funShortName);
+      let fun = funList.find(fun => fun.shortName === funShortName);
       let funId = fun ? fun.id : -1;
-      let userRights = (store.getters.userRights);
+      let userRights = store.getters.userRights;
       let rgt = parseInt(userRights[funId], 16);
       let rights = {};
       rights.add = (rgt&1) > 0 //  добавление
@@ -19,9 +19,10 @@ import store  from '../../store'
 
   const hasRight = funShortName => { 
     let funList = getFunList();
-    let fun = funList.find(fun => fun.shotName === funShortName);
+    let fun = funList.find(fun => fun.shortName === funShortName);
     let funId = fun ? fun.id : -1;
-    return parseInt(localStorage.getItem('user-rights')[funId], 16) > 0
+    let userRights = (store.getters.userRights);
+    return parseInt(userRights[funId], 16) > 0
   }
 
   

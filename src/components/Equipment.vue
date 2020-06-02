@@ -14,7 +14,8 @@
                   :eqProducerList="eqProducerList"
                   :eqReadinessList="eqReadinessList"
                    :responsibleList="responsibleList"
-                  :lang="lang">
+                  :lang="lang"
+                  :hasExtended="true">
    </filter-equipment> 
       <div class="eqContent">
         <div v-if="rights.add">
@@ -27,7 +28,7 @@
             :css="datatableCss"
             @on-update="dtUpdateSort"> 
           <template v-slot:actionsView="props">
-              <button class="btn btn-act" @click="actionViewClick(props);" title='просмотреть карточки'><i class = 'fa fa-search'></i></button>
+              <button class="btn btn-act" @click="actionViewClick(props);" title='просмотр карточки'><i class = 'fa fa-search'></i></button>
           </template>
           <template v-slot:actionsEdit="props">
               <button class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
@@ -49,21 +50,33 @@
                 :cancelButton= "{title: 'Отмена'}"
                 >
            <div slot="modal-header">
-              <div class="eq-card-header">
-                <div class="label"><label for="cardNum">Карточка №</label></div>
-                <div class="div-15">
+              <div class="eq-card-header eq-card-header-container">
+                <div class="eq-card-col-25">
+                  <label for="cardNum">Карточка №</label>
                     <input name="cardNum" v-model="eqCard.cardNum" v-if="activetab === 0 && actionMode !=='view'"></input>
                     <p name="cardNum" v-if="actionMode =='view' || activetab !== 0 ">{{eqCard.cardNum}}</p>
                 </div>
-                <div class="label"><label for="invNum">Инвентарный №</label></div>
-                <div class="div-15">
+                <div class="eq-card-col-25">
+                  <label for="invNum">Инвентарный №</label>
                     <input name="invNum" v-model="eqCard.invNum" v-if="activetab === 0 && actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
                     <p name="invNum" v-if="actionMode =='view' || activetab !== 0 ">{{eqCard.invNum}}</p>
                 </div>
-                <div class="label"><label for="factNum">Заводской №</label></div>
-                <div class="div-15">
-                    <input name="factNum" v-model="eqCard.factNum" v-if="activetab === 0 && actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
-                    <p name="factNum" v-if="actionMode =='view' || activetab !== 0 ">{{eqCard.factNum}}</p>
+                 <div class="eq-card-col-25">
+                  <label for="invNum">Подразделение</label>
+                    <div class="eq-card-dyn-select"  v-if="activetab === 0 && actionMode !=='view'">
+                      <dynamic-select 
+                        :options="eqDevisionList"
+                        option-value="id"
+                        option-text="name"
+                        placeholder=''
+                        v-model="eqCard.devision" />
+                    </div>
+                  <p name="devision" v-if="actionMode =='view' || activetab !== 0">{{eqCard.devision.name}}</p>
+                </div>
+                 <div class="eq-card-col-25">
+                  <label for="invNum">Расположение</label>
+                   <input name="eqLocation" v-if="activetab === 0 && actionMode !=='view'" v-model="eqCard.eqLocation"></input>
+                    <p name="eqLocation" v-if="actionMode =='view' || activetab !== 0">{{eqCard.eqLocation}}</p>
                 </div>
               </div>
            </div>   
@@ -92,18 +105,27 @@
                             :docList="docList"
                             :docTypeList="docTypeList"
                             :orderTimeList="orderTimeList"
+                            :workingModeList="workingModeList"
                             :imagesEq="imagesEq"
                             :imagesLoc="imagesLoc"
                             :lang="lang"/>
                   </div>
                   <div v-if="activetab===1" class='tabcontent'>
-
+                      		<Schedule  :eqId="eqCard.id"
+                                    :workingMode="workingMode"
+                                     @editQuery="editQuery"
+                                     @addQuery="addQuery"
+                                     :updatedQueryData="updatedQueryData"
+                                     @loading="loadingSchedule">
+                          </Schedule>	
                   </div>
                   <div v-if="activetab===2" class='tabcontent'>
                         <repair :idEq="eqCard.id"
-                                    :lang="lang" v-if="false"></repair>
+                                @loading="loading"></repair>
                   </div>
                   <div v-if="activetab===3" class='tabcontent'>
+                      <metrology :idEq="eqCard.id"
+                                @loading="loading"></metrology>
 
                   </div>
               </div>
@@ -148,14 +170,22 @@
             </div>
 
         </stack-modal>
+        <card-query
+                    :queryData="queryData"
+                    :showQueryCard="showQueryCard"
+                     @save="saveCardQuery"
+                     @delete="deleteCardQuery"
+                     @close="closeCardQuery"
+                    @loading="loading"
+          ></card-query>
   </div>
 </template>
 
 <script>
-  var _ = require('lodash');
   import FilterEquipment from './FilterEquipment'
   import CardEquipment from './CardEquipment'
   import Repair from './Repair'
+  import Metrology from './Metrology'
   import Loading from 'vue-loading-overlay'
   import { DataTable } from 'v-datatable-light'
   import StackModal from '@innologica/vue-stackable-modal'
@@ -163,14 +193,19 @@
   import api from "../utils/api";
   import {endpoint} from '../utils/config'
   import {formatDate, dateFromString} from '../utils/date'
-  import {getEqReadiness, getOrderTime, getDocType} from '../utils/dictionary'
-  
+  import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours} from '../utils/dictionary'
+  import Schedule from './Schedule'
+  import CardQuery from './CardQuery'
+  import {toCost, toFloat} from '../utils/commonJS'
+  import DynamicSelect from 'vue-dynamic-select'
 
   import 'vue2-datepicker/index.css'
   import '../css/v-datatable-light.css'
   import '../css/stackable-modal.scss'
   import '../css/tab-pages.css'
   import 'vue-loading-overlay/dist/vue-loading.css'
+
+
   export default {
     name: 'equipment',
     components:  {
@@ -179,7 +214,11 @@
       DataTable,
       StackModal,
       Repair,
-      Loading
+      Metrology,
+      Loading,
+      Schedule, 
+      CardQuery,
+      DynamicSelect
 
     },
     data() {
@@ -194,6 +233,7 @@
         eqProducerList: [],
         eqReadinessList:[],
         orderTimeList:[],
+        workingModeList:[],
         docTypeList: [],
         responsibleList: [],
         
@@ -218,10 +258,10 @@
         eqDataItem: {},
 
         //карточка оборудования
-        eqCard: {},
+        eqCard: {id: -1},
         lang: {
           days: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-          months: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+          monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
           pickers: ['след 7 дней', 'след 30 дней', 'пред 7 дней', 'пред 30 дней'],
           placeholder: {
             date: 'Выберите дату',
@@ -259,6 +299,8 @@
        imagesLocList: [],
        docList: [],
        isLoading: false,
+       isLoadingData: false,
+       isLoadingSchedule: false,
        showEqCard: false,
        modalClass: 'modal-90per',
        modal2Class: 'modal-xl',
@@ -269,7 +311,13 @@
        sort: 'asc',
        showAddDoc: false,
        selectedDocType: '',
-       funShortName: 'eq'
+       funShortName: 'eq',
+       showQueryCard: false,
+       updatedQueryData: {},
+       queryId: -1,
+       orderTimeHours: 0,
+       workingMode: 1,
+       queryData: {}
       }
  
     }, 
@@ -277,7 +325,11 @@
       {
 
     },
+    watch:{
+      
+    },
     computed: {
+     
     },
     methods: {
     
@@ -294,6 +346,7 @@
             this.responsibleList.forEach(item => item.name =`${item.us_surname} ${item.us_name} ${item.us_patname}`);
             this.eqReadinessList = getEqReadiness();
             this.orderTimeList = getOrderTime();
+            this.workingModeList = getWorkingMode();
             this.docTypeList = getDocType();
             api().
               get('/equipment')
@@ -326,16 +379,18 @@
                     eqItem.eqTechState = item.condition ? item.condition.trim() : '';
                     eqItem.regNum = item.reg_num ? item.reg_num.trim() : '';
                     eqItem.eqCalInterval = item.mpi_mai;
-                    eqItem.eqResValue = item.eqprice;
+                    eqItem.eqResValue = toCost(item.eqprice);
                     eqItem.resValueDate = item.price_date ? new Date(item.price_date) : '';
-                    eqItem.costLaborTime = item.hourprice;
+                    eqItem.costLaborTime = toCost(item.hourprice);
                     eqItem.TOInterval = item.totime;
                     eqItem.orderTime = item.minworktime;
-                    eqItem.orderTimeName = this.orderTimeName(eqItem.orderTime)	
+                    eqItem.orderTimeName = this.orderTimeName(eqItem.orderTime);
+                    eqItem.workingMode = 1; //item.workingmode; /todo загружать из базы
+                    eqItem.workingModeName = this.workingModeName(eqItem.workingMode);
                     eqItem.eqLocation = item.eq_place ? item.eq_place.trim() : '';
                     eqItem.eqNote = item.remark ? item.remark.trim() : '';
                     eqItem.repDate = item.repdate ? formatDate(new Date(item.repdate)): '';
-                    eqItem.eqCostKeep = item.eqcostkeep;
+                    eqItem.eqCostKeep = item.eqcostkeep ? + item.eqcostkeep +' ₽' : '0 ₽';
                     eqItem.eqWorkLoad = item.eqworkload;
                     eqItem.eqAtt = item.eqatt ? formatDate(new Date(item.eqatt)): '';
                     item.eqVer = item.eqver ? formatDate(new Date(item.eqver)): '';
@@ -369,6 +424,12 @@
        })
       return list;
      },
+     toFloat: function (val)
+     {
+        if (val && val !== '')
+          return parseFloat(val.toString().replace(',','.'));
+        return null;
+     },
      saveModal: function()
      {
        this.isLoading = true;
@@ -379,35 +440,37 @@
               cardNum: this.eqCard.cardNum,
               invNum: this.eqCard.invNum,
               factNum: this.eqCard.factNum,
-              devision: this.eqCard.devision.id,
-              eqDevisionName: this.eqCard.devision.name,
-              responsible: this.eqCard.responsible.id,
-              responsibleName: this.eqCard.responsible.name,
+              devision: this.eqCard.devision ? this.eqCard.devision.id : 0,
+              eqDevisionName: this.eqCard.devision ? this.eqCard.devision.name : '',
+              responsible: this.eqCard.responsible ? this.eqCard.responsible.id : 0,
+              responsibleName: this.eqCard.responsible.id ? this.eqCard.responsible.name : '',
               eqName: this.eqCard.eqName,
-              eqType: this.eqCard.eqType.id,
-              eqTypeName: this.eqCard.eqType.name,
+              eqType: this.eqCard.eqType ? this.eqCard.eqType.id : 0,
+              eqTypeName: this.eqCard.eqType ? this.eqCard.eqType.name : '',
               eqPurpose: this.eqCard.eqPurpose,
               eqPassport: this.eqCard.eqPassport,
               eqTechState: this.eqCard.eqTechState,
-              eqReadiness: this.eqCard.eqReadiness.id,
-              eqReadinessName: this.eqCard.eqReadiness.name,
+              eqReadiness: this.eqCard.eqReadiness ? this.eqCard.eqReadiness.id : 0,
+              eqReadinessName: this.eqCard.eqReadiness ? this.eqCard.eqReadiness.name : '',
               eqProducer: this.eqCard.eqProducer,
               factDate: this.eqCard.factDate,
               factDateFormat: formatDate(this.eqCard.factDate),
               comDate: this.eqCard.comDate,
               comDateFormat: formatDate(this.eqCard.comDate),
               repDate: this.eqCard.repDate,
-              eqResValue: this.eqCard.eqResValue,
+              eqResValue: toFloat(this.eqCard.eqResValue),
               eqLocation: this.eqCard.eqLocation,
               eqNote: this.eqCard.eqNote, 
               regNum: this.eqCard.regNum,
               eqCalInterval: this.eqCard.eqCalInterval,
               resValueDate: this.eqCard.resValueDate,
               resValueDateFormat: formatDate(this.eqCard.resValueDate),
-              costLaborTime: this.eqCard.costLaborTime,
+              costLaborTime: toFloat(this.eqCard.costLaborTime),
               TOInterval: this.eqCard.TOInterval,
-              orderTime: this.eqCard.orderTime.id,
-              orderTimeName: this.eqCard.orderTime.name,
+              orderTime: this.eqCard.orderTime ? this.eqCard.orderTime.id : 0,
+              orderTimeName: this.eqCard.orderTime ? this.eqCard.orderTime.name: '',
+              workingMode: this.eqCard.workingMode ? this.eqCard.workingMode.id : 0,
+              workingModeName: this.eqCard.workingMode ? this.eqCard.workingMode.name : '',
               eqDocumentation: this.eqCard.eqDocumentation,
               eqCostKeep: this.eqCard.eqCostKeep,
               eqWorkLoad: this.eqCard.eqWorkLoad,
@@ -415,7 +478,7 @@
               eqVer: this.eqCard.eqVer
          }
         
-      
+
          if (this.eqCard.id === -1)
          {
            api().
@@ -459,7 +522,9 @@
                 return;
             });
         }
-
+          let orderTimeParams = this.getOrderTimeParams();
+          this.orderTimeHours = orderTimeParams.hours;
+          this.workingMode = orderTimeParams.workingMode;
        }
        
 
@@ -484,6 +549,10 @@
       orderTimeName: function (_id){
         let orderTime = _.find(this.orderTimeList, {id: _id});
         return orderTime ? orderTime.name : '';
+      },
+      workingModeName: function(_id){
+        let workingMode = _.find(this.workingModeList, {id: _id});
+        return workingMode ? workingMode.name : '';
       },
        responsibleName: function (_id){
 
@@ -573,18 +642,22 @@
             comDate:  params? params.rowData.comDate : '',
             comDateFormat: params?  formatDate(params.rowData.comDate) : '', 
             repDate: params? params.rowData.repDate : '',
-            eqResValue:  params? params.rowData.eqResValue : '',
+            eqResValue:  params? toCost(params.rowData.eqResValue) : '',
             eqLocation: params? params.rowData.eqLocation : '',
             eqNote:  params? params.rowData.eqNote : '',
             regNum:  params? params.rowData.regNum : '',
             eqCalInterval:  params? params.rowData.eqCalInterval : '',
             resValueDate: params? params.rowData.resValueDate : '',
             resValueDateFormat: params?  formatDate(params.rowData.resValueDate) : '', 
-            costLaborTime: params? params.rowData.costLaborTime : '',
+            costLaborTime: params?  toCost(params.rowData.costLaborTime) : '',
             TOInterval:  params? params.rowData.TOInterval : '',
             orderTime: {
               id: params? params.rowData.orderTime : '',
               name: params? params.rowData.orderTimeName : ''
+            },
+            workingMode: {
+              id: params? params.rowData.workingMode : '',
+              name: params? params.rowData.workingModeName : ''
             },
             eqDocumentation: '',
             eqCostKeep: params? params.rowData.eqCostKeep : '',
@@ -592,7 +665,9 @@
             eqAtt:  params? params.rowData.eqAtt : '',
             eqVer:  params? params.rowData.eqVer : ''
          }
-
+        let orderTimeParams = this.getOrderTimeParams();
+        this.orderTimeHours = orderTimeParams.hours;
+        this.workingMode = orderTimeParams.workingMode;
         this.imagesEq =  [];
         this.imagesEqList = [];
         this.imagesLoc = [];
@@ -855,6 +930,49 @@
         this.file ='';
         this.showAddDoc = true;
       },
+      editQuery(params)
+      {
+        this.queryData = params;
+        this.queryData.orderTimeHours = this.orderTimeHours;
+        this.queryData.workingMode = this.workingMode;
+        this.showQueryCard = true;
+      },
+      addQuery(params){
+        this.queryData = params;
+        this.queryData.orderTimeHours = this.orderTimeHours;
+        this.queryData.workingMode = this.workingMode;
+        this.showQueryCard = true;
+      },
+      saveCardQuery(updatedQueryData){
+        this.updatedQueryData=updatedQueryData;
+        this.showQueryCard = false;
+      },
+      deleteCardQuery(updatedQueryData)
+      {
+        this.updatedQueryData=updatedQueryData;
+        this.showQueryCard = false;
+      },
+      closeCardQuery(){
+        this.showQueryCard = false;
+      },
+       getOrderTimeParams(){
+         
+         let orderTime = this.eqCard.orderTime ?  this.eqCard.orderTime.id : 0;
+         let workingMode = this.eqCard.workingMode ?  this.eqCard.workingMode.id :1; 
+         let hours = getOrderTimeHours(orderTime, workingMode );
+
+         return {hours: hours, workingMode:workingMode};
+      },
+      loading(isLoading)
+      {
+        this.isLoadingData = isLoading;
+        this.isLoading = isLoading || this.isLoadingSchedule;
+      },
+      loadingSchedule(isLoading)
+      {
+         this.isLoadingSchedule = isLoading;
+         this.isLoading = isLoading || this.isLoadingData;
+      },
       hasRight: function(funShortName)
       {
         return hasRight(funShortName)
@@ -880,8 +998,8 @@
           this.datatableCss.tbodyTd += ' delete-hide'
           this.datatableCss.theadTh += ' delete-hide'
         }
-
         this.initData();
+      
       }
     
 
@@ -898,7 +1016,9 @@
       border: 1px solid #ced4da;
       position: relative;
       padding: .425em .5em;
-      border-radius: .25em;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
       cursor: pointer;
       width: 10rem;
       margin: 0 .5em;
@@ -907,6 +1027,7 @@
   .add-button:hover
   {
     color: #337ab7;
+    border-color: #337ab7;
   }
   .btn-act{
      color: #337ab7;
@@ -917,6 +1038,8 @@
     border: 1px solid #ced4da;
     position: relative;
     padding: .425em .5em;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
     border-radius: .25em;
     cursor: pointer;
     margin: 10px;
@@ -936,24 +1059,62 @@
     border-bottom: 3px solid #4285f4;
     margin-top: .5rem;
     width: 100%;
-    display: flex;
     text-align: center
 }
-.eq-card-header label {
-   display: inline-flex;
+.eq-card-header-container {
+  display: flex;
+   flex-wrap: wrap;
+   align-items: flex-end;
+   justify-content: center;
 }
-.eq-card-header input,
-.eq-card-header p
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    border-radius: .25em;
-    cursor: text;
-    margin-left: 10px;
-    display: inline-block;
-    text-align: left;
+.eq-card-col-25{
+   display: flex;
+   flex-wrap: nowrap;
+   align-items: flex-start;
+   width: 25%;
+   min-width: 300px;
+   padding-left: 15px;
+   padding-right: 15px;
+   margin-bottom: 10px;
+}
+.eq-card-col-25 label {
+  width: 35%;
+  font-size: 10pt;
+
+}
+.eq-card-col-25 input,
+.eq-card-col-25 p{
+  width: 65%;
+  border: 1px solid #ced4da;
+  -moz-border-radius: .25em;
+  -webkit-border-radius:  .25em;
+  border-radius:  .25em;
+  cursor: text;
+  text-align: left;
+  height: 2.5em;
+}
+.eq-card-dyn-select {
+  width: 65%;
+  height: 2.5em;
+}
+@media screen and (max-width: 1400px) {
+  .eq-card-col-25 {
+    width: 50%;
+  }
+}
+@media screen and (max-width: 600px) {
+  .eq-card-col-25 {
     width: 100%;
   }
+}
+
+// .eq-card-col-25 input:focus {
+//     outline-style: solid;
+//     outline-width: .5px !important;
+//     outline-color: #337ab7 !important;
+// }
+
+
  
   .eq-card-footer,
   .eq-add-doc-footer {
@@ -972,7 +1133,9 @@
       border: 1px solid #ced4da;
       position: relative;
       padding: .425em .5em;
-      border-radius: .25em;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
       cursor: pointer;
       width: 30%;
       margin: 0 .5em;
@@ -986,7 +1149,9 @@
   {
     border: 1px solid #ced4da;
     position: relative;
-    border-radius: .25em;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
     cursor: text;
     margin-left: 10px;
     display: inline-block;

@@ -54,4 +54,31 @@
       width: 5em
     }
 
+    .query-table .edit-hide:nth-child(1),
+    .query-table .delete-hide:nth-child(2){ 
+      display: none;
+    }
+
+    .metrology-table .view-hide:nth-child(1),
+    .metrology-table .edit-hide:nth-child(2),
+    .metrology-table .delete-hide:nth-child(3){ 
+        display: none;
+    }
+
+    .contract-table .edit-hide:nth-child(1),
+    .contract-table .delete-hide:nth-child(2),
+    .contract-table .unite-hide:nth-child(3){ 
+        display: none;
+    }
+    .contract-table td:nth-child(1),
+    .contract-table td:nth-child(2)
+   {
+      width: 5em
+  }
+  .admin-user-table .view-hide:nth-child(1),
+  .admin-user-table .edit-hide:nth-child(2),
+  .admin-user-table .delete-hide:nth-child(3){ 
+      display: none;
+  }
+
      

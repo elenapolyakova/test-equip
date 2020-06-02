@@ -2,30 +2,27 @@
 <div>
    <div class='filter'>
        <table>
-          <tr>
-           <td><span>Номер карточки</span></td>
-           <td><span>Инвентарный номер</span></td>
-           <td><span>Наименование</span></td>
-           <td><span>Подразделение</span></td>
-           <td> <button class="filter-button" @click="$emit('filterData', true)"><i class='fa fa-check' > </i> Применить фильтр</button></td>
-         </tr>
+
          <tr>
-            <td><input v-model="fData.cardNum" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/> </td>
-            <td><input v-model="fData.invNum" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/></td>
-            <td><dynamic-select 
+            <td><label>Номер карточки</label><input v-model="fData.cardNum" type="text"/> </td>
+            <td><label>Инвентарный номер</label><input v-model="fData.invNum" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/></td>
+            <td><label>Наименование</label> <dynamic-select 
                     :options="eqNameList"
                     option-value="id"
                     option-text="name"
                     placeholder=""
                     v-model="fData.eqName" /></td>
-            <td> <dynamic-select 
+            <td><label>Подразделение</label> <dynamic-select 
                     :options="eqDevisionList"
                     option-value="id"
                     option-text="name"
                     placeholder=""
                     v-model="fData.devision" />
                     </td> 
-            <td><button class="filter-button" @click="showExtendedFilter = !showExtendedFilter"><i class='fa fa-filter'> </i> Расширенный фильтр</button></td>
+            <td>
+              <button class="filter-button" @click="$emit('filterData', true)"><i class='fa fa-check' > </i> Применить фильтр</button>
+              <button v-if='hasExtended' class="filter-button" @click="showExtendedFilter = !showExtendedFilter"><i class='fa fa-filter'> </i> Расширенный фильтр</button>
+            </td>
          </tr>
        </table>
     </div> 
@@ -33,48 +30,33 @@
         <div v-if="showExtendedFilter" class='extented-filter'>
           <table>
             <tr>
-              <td><span>Вид/категория</span></td>
-              <td><span>Производитель</span></td>
-              <td><span>Заводской номер</span></td>
-              <td><span>Дата выпуска</span></td>
-                            <td></td>
-            </tr>
-            <tr>
-              <td><dynamic-select 
+              <td><label>Вид/категория</label><dynamic-select 
                     :options="eqTypeList"
                     option-value="id"
                     option-text="name"
                     placeholder=""
                     v-model="fData.eqType" /></td>
-              <td><dynamic-select 
+              <td><label>Производитель</label><dynamic-select 
                     :options="eqProducerList"
                     option-value="id"
                     option-text="name"
                     placeholder=""
                     v-model="fData.eqProducer" /></td>
-              <td><input v-model="fData.factNum" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/> </td>
-              <td><date-picker v-model="fData.factDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' ></date-picker></td>
+              <td><label>Заводской номер</label><input v-model="fData.factNum" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/> </td>
+              <td><label>Дата выпуска</label><date-picker v-model="fData.factDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' ></date-picker></td>
               
             </tr>
             <tr style="height:10px"><td colspan = '5'></td></tr>
             <tr>
-              <td><span>Дата ввода в эксплуатацию</span></td>
-              <td><span>Год последней модернизации</span></td>
-              <td><span>Ответственный</span></td>
-              <td><span>Готовность</span></td>
-              <td></td>
-
-            </tr>
-            <tr>
-              <td><date-picker v-model="fData.comDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' ></date-picker></td>
-              <td><input v-model="fData.repDate" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/></td>
-              <td><dynamic-select 
+              <td><label>Дата ввода в эксплуатацию</label><date-picker v-model="fData.comDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' ></date-picker></td>
+              <td><label>Год последней модернизации</label><input v-model="fData.repDate" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/></td>
+              <td><label>Ответственный</label><dynamic-select 
                     :options="responsibleList"
                     option-value="id"
                     option-text="name"
                     placeholder=""
                     v-model="fData.responsible" /></td>
-               <td><dynamic-select 
+               <td><label>Готовность</label><dynamic-select 
                     :options="eqReadinessList"
                     option-value="id"
                     option-text="name"
@@ -101,7 +83,8 @@
                 eqProducerList: {type: Array},
                 eqReadinessList: {type: Array},
                 responsibleList: {type: Array},
-                lang: {type: Object}
+                lang: {type: Object},
+                hasExtended: {type:Boolean}
     },
     data() { 
             return { 
@@ -147,6 +130,7 @@
   }
     .filter-button:hover{
     color: #337ab7;
+    border-color: #337ab7;
   }
   .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
@@ -160,7 +144,9 @@
     border: 1px solid #ced4da;
     position: relative;
     padding: .425em .5em;
-    border-radius: .25em;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
     cursor: text;
     width: 100%;  
   }
@@ -169,7 +155,10 @@
       border: 1px solid #ced4da;
       position: relative;
       padding: .425em .5em;
-      border-radius: .25em;
+      margin: .5em;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
       cursor: pointer;
       width: 70%
   }

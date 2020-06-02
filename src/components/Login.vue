@@ -2,13 +2,12 @@
  <div>
    <form class="login" @submit.prevent="login">
      <h1>Вход в систему</h1>
-      <label><i class='fa fa-user'></i> Имя пользователя</label>
+      <label class="mb-0"><i class='fa fa-user'></i> Имя пользователя</label>
      <input required v-model="username" type="text" placeholder="Имя пользователя" @keyup="hasError=false" /> 
-     <label><i class='fa fa-key'></i> Пароль</label>
+     <label class="mb-0 mt-2"><i class='fa fa-key'></i> Пароль</label>
      <input required v-model="password" type="password" placeholder="Пароль"  @keyup="hasError=false"/>
-    <br/>
-     <button type="submit">Войти</button>
-     <p class='hasError' v-if="hasError">Не верный имя пользователя или пароль</p>
+     <button type="submit" class="mb-0 mt-4"><i class='fa fa-sign-in-alt'></i>  Войти</button>
+     <p class='hasError' v-if="hasError">Неверное имя пользователя или пароль</p>
    </form>
  </div>
 </template>
@@ -58,6 +57,13 @@ export default {
     cursor: text;
     width: 100%;  
   }
+
+.login button:hover
+  {
+    color: #337ab7;
+    border-color: #337ab7;
+  }
+
   h1 {
     border-bottom: 3px solid #4285f4;
     width: 100%;

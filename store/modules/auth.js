@@ -13,14 +13,16 @@ const state = {
     status: "",
     rights: localStorage.getItem("user-rights") || "",
     username: localStorage.getItem("username") || "",
+    id_user: localStorage.getItem("id_user") || "",
     hasLoadedOnce: false
   };
 
   const getters = {
-    isAuthenticated: state => !!state.username,
+    isAuthenticated: state => !!state.id_user,
     authStatus: state => state.status,
     userRights: state => state.rights,
-    username: state => state.username
+    username: state => state.username,
+    id_user: state => state.id_user,
   };
   const actions = { 
     [AUTH_REQUEST]: ({ commit, dispatch }, user) => {
@@ -32,6 +34,7 @@ const state = {
                let data = resp.data;
                 localStorage.setItem("user-rights", data.rights);
                 localStorage.setItem("username", data.username);
+                localStorage.setItem("id_user", data.id_user);
                 commit(AUTH_SUCCESS, data);
                 resolve(resp);
 
@@ -41,6 +44,7 @@ const state = {
              commit(AUTH_ERROR, error);
              localStorage.removeItem("user-rights");
              localStorage.removeItem("username");
+             localStorage.removeItem("id_user");
              reject(error);
            })
         })
@@ -50,6 +54,7 @@ const state = {
           commit(AUTH_LOGOUT);
           localStorage.removeItem("user-rights");
           localStorage.removeItem("username");
+          localStorage.removeItem("id_user");
           resolve();
         });
       }
@@ -62,6 +67,7 @@ const state = {
           state.status = "success";
           state.rights= resp.rights;
           state.username= resp.username;
+          state.id_user= resp.id_user;
           state.hasLoadedOnce = true;
         },
         [AUTH_ERROR]: state => {
@@ -70,7 +76,8 @@ const state = {
         },
         [AUTH_LOGOUT]: state => {
           state.rights = "";
-          state.username = ""
+          state.username = "";
+          state.id_user = ""
         }
       };
       
