@@ -17,6 +17,13 @@
                   :lang="lang"
                   :hasExtended="true">
    </filter-equipment> 
+
+
+   
+   
+
+
+
       <div class="eqContent">
         <div v-if="rights.add">
             <button class="add-button" @click="actionAddClick"><i class='fa fa-plus'> </i> Добавить оборудование</button></td>
@@ -95,6 +102,7 @@
                             @handleImageUpload="handleImageUpload"
                             @deleteImage="deleteImage"
                             @showAddDoc="showModalDoc"
+                            @handleFileDocUpload="handleFileDocUpload"
                             :eqId="eqCard.id"
                             :eqCard="eqCard"
                             :actionMode="actionMode"
@@ -125,12 +133,35 @@
                   </div>
                   <div v-if="activetab===3" class='tabcontent'>
                       <metrology :idEq="eqCard.id"
-                                @loading="loading"></metrology>
+                                :updatedMetData="updatedMetData"
+                                @loading="loading"
+                                @editMet="editMet"
+                                @addMet="addMet"
+                                @viewMet="viewMet"
+                              ></metrology>
 
                   </div>
               </div>
           </div>  
              <div slot="modal-footer">
+               <div class="eq-card-navigation" v-if="actionMode === 'edit' || actionMode === 'view'">
+                    <div class="eq-card-navigation-item bordered" :class="{disabled: (rowCurrentIndex === 0), clicked:(rowCurrentIndex !== 0)}" @click="firstClick()">
+                        <i class="fa fa-angle-double-left"></i>
+                    </div>
+                    <div class="eq-card-navigation-item bordered" :class="{disabled: (rowCurrentIndex === 0), clicked:(rowCurrentIndex !== 0)}" @click="prevClick()">
+                      <i class="fa fa-angle-left"></i>
+                    </div>
+                    <div class="eq-card-navigation-item">запись</div>
+                    <div class="eq-card-navigation-item">{{rowCurrentIndex + 1}}</div>
+                    <div class="eq-card-navigation-item">из</div>
+                    <div class="eq-card-navigation-item">{{eqData.length}}</div>
+                    <div class="eq-card-navigation-item bordered" :class="{disabled: (rowCurrentIndex === (eqData.length-1)), clicked:(rowCurrentIndex !== (eqData.length-1))}" @click="nextClick()">
+                      <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="eq-card-navigation-item bordered" :class="{disabled: (rowCurrentIndex === (eqData.length-1)), clicked:(rowCurrentIndex !== (eqData.length-1))}" @click="lastClick()">
+                      <i class="fa fa-angle-double-right"></i>
+                      </div>
+               </div>
                <div class ="eq-card-footer">
                 <button class="modal-button"  v-if="actionMode !=='view' && activetab===0" @click = 'saveModal' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
                 <button class="modal-button" @click = "closeModal" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
@@ -141,7 +172,7 @@
          <stack-modal
                     :show="showAddDoc"
                     @close="showAddDoc=false"
-                    :modal-class="{[modal2Class]: true}"
+                    :modal-class="{[modal2Class]: true}" 
                     :saveButton= "{title: 'Сохранить'}"
                     :cancelButton= "{title: 'Отмена'}"
                     >
@@ -164,7 +195,7 @@
             <div slot="modal-footer">
               <div class ="eq-add-doc-footer">
                 <label class='modal-doc-error'></label>
-                <button class="modal-button"  @click='submitFile' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
+                <button class="modal-button"  @click='saveDocument' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
                 <button class="modal-button" @click='showAddDoc=false' title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
               </div>
             </div>
@@ -178,8 +209,18 @@
                      @close="closeCardQuery"
                     @loading="loading"
           ></card-query>
+         <card-metrology
+                            
+                            :metCard="metCard"
+                            :actionMode="actionModeMetrology"
+                            :showMetrologyCard="showMetrologyCard"
+                            @save="saveCardMet"
+                            @close="closeCardMet"
+                            @loading="loading"/>
+        
   </div>
 </template>
+
 
 <script>
   import FilterEquipment from './FilterEquipment'
@@ -196,6 +237,7 @@
   import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours} from '../utils/dictionary'
   import Schedule from './Schedule'
   import CardQuery from './CardQuery'
+  import CardMetrology from './CardMetrology'
   import {toCost, toFloat} from '../utils/commonJS'
   import DynamicSelect from 'vue-dynamic-select'
 
@@ -205,6 +247,8 @@
   import '../css/tab-pages.css'
   import 'vue-loading-overlay/dist/vue-loading.css'
 
+
+   
 
   export default {
     name: 'equipment',
@@ -218,7 +262,8 @@
       Loading,
       Schedule, 
       CardQuery,
-      DynamicSelect
+      DynamicSelect,
+      CardMetrology
 
     },
     data() {
@@ -317,7 +362,12 @@
        queryId: -1,
        orderTimeHours: 0,
        workingMode: 1,
-       queryData: {}
+       queryData: {},
+
+       actionModeMetrology: '',
+       showMetrologyCard: false,
+       metCard: {metId: -1},
+       updatedMetData: {}
       }
  
     }, 
@@ -332,7 +382,8 @@
      
     },
     methods: {
-    
+
+     
       initData: function(){
         this.isLoading = true;
 
@@ -385,11 +436,11 @@
                     eqItem.TOInterval = item.totime;
                     eqItem.orderTime = item.minworktime;
                     eqItem.orderTimeName = this.orderTimeName(eqItem.orderTime);
-                    eqItem.workingMode = 1; //item.workingmode; /todo загружать из базы
+                    eqItem.workingMode = item.eq_worktime; 
                     eqItem.workingModeName = this.workingModeName(eqItem.workingMode);
                     eqItem.eqLocation = item.eq_place ? item.eq_place.trim() : '';
                     eqItem.eqNote = item.remark ? item.remark.trim() : '';
-                    eqItem.repDate = item.repdate ? formatDate(new Date(item.repdate)): '';
+                    eqItem.repDate = item.repdate;
                     eqItem.eqCostKeep = item.eqcostkeep ? + item.eqcostkeep +' ₽' : '0 ₽';
                     eqItem.eqWorkLoad = item.eqworkload;
                     eqItem.eqAtt = item.eqatt ? formatDate(new Date(item.eqatt)): '';
@@ -573,21 +624,21 @@
       },
       actionEditClick: function (params) {
         this.actionMode = 'edit';
-        this.initCard(params);
+        this.initCard(params.rowData);
         this.eqCard.id = params.rowData.id;
         this.rowCurrentIndex = params.rowIndex;
         this.showEqCard = true;
       },
       actionViewClick: function(params){
           this.actionMode = 'view';
-          this.initCard(params);
+          this.initCard(params.rowData);
           this.eqCard.id = params.rowData.id;
           this.rowCurrentIndex = params.rowIndex;
           this.showEqCard = true;
       },
       actionCopyClick: function(params){
           this.actionMode = 'copy';
-          this.initCard(params);
+          this.initCard(params.rowData);
           this.eqCard.id = -1;
           this.rowCurrentIndex = -1;
           this.showEqCard = true;
@@ -612,58 +663,59 @@
       initCard: function(params){
         this.isLoading = true;
           this.eqCard = {
-            cardNum: params? params.rowData.cardNum : '',
-            invNum:  params? params.rowData.invNum : '',
-            factNum: params? params.rowData.factNum : '',
+            id: params ? params.id : -1,
+            cardNum: params? params.cardNum : '',
+            invNum:  params? params.invNum : '',
+            factNum: params? params.factNum : '',
             devision: {
-              id: params? params.rowData.devision : '',
-              name: params? params.rowData.eqDevisionName : ''
+              id: params? params.devision : '',
+              name: params? params.eqDevisionName : ''
             },
             responsible: 
             {
-              id: params? params.rowData.responsible : '',
-              name: params ? params.rowData.responsibleName : ''
+              id: params? params.responsible : '',
+              name: params ? params.responsibleName : ''
             },
-            eqName:  params? params.rowData.eqName : '',
+            eqName:  params? params.eqName : '',
             eqType: {
-              id: params? params.rowData.eqType : '',
-              name:  params? params.rowData.eqTypeName : ''
+              id: params? params.eqType : '',
+              name:  params? params.eqTypeName : ''
             },
-            eqPurpose: params? params.rowData.eqPurpose : '',
-            eqPassport:  params? params.rowData.eqPassport : '',
-            eqTechState: params? params.rowData.eqTechState : '',
+            eqPurpose: params? params.eqPurpose : '',
+            eqPassport:  params? params.eqPassport : '',
+            eqTechState: params? params.eqTechState : '',
             eqReadiness:{
-              id: params? params.rowData.eqReadiness : '',
-              name:  params? params.rowData.eqReadinessName : ''
+              id: params? params.eqReadiness : '',
+              name:  params? params.eqReadinessName : ''
             },
-            eqProducer:  params? params.rowData.eqProducer : '',
-            factDate: params? params.rowData.factDate : '',
-            factDateForma: params?  formatDate(params.rowData.factDate) : '', 
-            comDate:  params? params.rowData.comDate : '',
-            comDateFormat: params?  formatDate(params.rowData.comDate) : '', 
-            repDate: params? params.rowData.repDate : '',
-            eqResValue:  params? toCost(params.rowData.eqResValue) : '',
-            eqLocation: params? params.rowData.eqLocation : '',
-            eqNote:  params? params.rowData.eqNote : '',
-            regNum:  params? params.rowData.regNum : '',
-            eqCalInterval:  params? params.rowData.eqCalInterval : '',
-            resValueDate: params? params.rowData.resValueDate : '',
-            resValueDateFormat: params?  formatDate(params.rowData.resValueDate) : '', 
-            costLaborTime: params?  toCost(params.rowData.costLaborTime) : '',
-            TOInterval:  params? params.rowData.TOInterval : '',
+            eqProducer:  params? params.eqProducer : '',
+            factDate: params? params.factDate : '',
+            factDateFormat: params?  formatDate(params.factDate) : '', 
+            comDate:  params? params.comDate : '',
+            comDateFormat: params?  formatDate(params.comDate) : '', 
+            repDate: params? params.repDate : '',
+            eqResValue:  params? toCost(params.eqResValue) : '',
+            eqLocation: params? params.eqLocation : '',
+            eqNote:  params? params.eqNote : '',
+            regNum:  params? params.regNum : '',
+            eqCalInterval:  params? params.eqCalInterval : '',
+            resValueDate: params? params.resValueDate : '',
+            resValueDateFormat: params?  formatDate(params.resValueDate) : '', 
+            costLaborTime: params?  toCost(params.costLaborTime) : '',
+            TOInterval:  params? params.TOInterval : '',
             orderTime: {
-              id: params? params.rowData.orderTime : '',
-              name: params? params.rowData.orderTimeName : ''
+              id: params? params.orderTime : '',
+              name: params? params.orderTimeName : ''
             },
             workingMode: {
-              id: params? params.rowData.workingMode : '',
-              name: params? params.rowData.workingModeName : ''
+              id: params? params.workingMode : '',
+              name: params? params.workingModeName : ''
             },
             eqDocumentation: '',
-            eqCostKeep: params? params.rowData.eqCostKeep : '',
-            eqWorkLoad:  params? params.rowData.eqWorkLoad : '',
-            eqAtt:  params? params.rowData.eqAtt : '',
-            eqVer:  params? params.rowData.eqVer : ''
+            eqCostKeep: params? params.eqCostKeep : '',
+            eqWorkLoad:  params? params.eqWorkLoad : '',
+            eqAtt:  params? params.eqAtt : '',
+            eqVer:  params? params.eqVer : ''
          }
         let orderTimeParams = this.getOrderTimeParams();
         this.orderTimeHours = orderTimeParams.hours;
@@ -676,7 +728,7 @@
 
         if (this.actionMode === 'edit' ||  this.actionMode === 'view'){
           let hasLoad = 0;
-           let idEq =  params.rowData.id;
+           let idEq =  params.id;
            if (idEq){
               api().
                 get('/equipment/imgList/' + idEq)
@@ -715,10 +767,9 @@
             api().
               get('/equipment/docList/' + idEq)
               .then(response => {
-     
                     this.docList = response.data;
                     this.docList.forEach((item, i) =>{
-                          item.path = `${endpoint}${item.path}`;
+                          item.path = item.path && item.path !== '' ? `${endpoint}${item.path}` : '';
                     })
                     hasLoad++;
                     this.isLoading = (hasLoad < 3)
@@ -836,16 +887,45 @@
         else 
           $label.removeClass('has-file').find('.js-fileName').html('Загрузить файл');
       },
-      submitFile: function(){
-
-          if (!this.file) {
-            $('.modal-doc-error').addClass('has-error').html('Выберите файл');
-            return;
-          }
-          if (this.selectedDocType === ''){
+      saveDocument: function(){
+        if (this.selectedDocType === ''){
              $('.modal-doc-error').addClass('has-error').html('Выберите тип документа');
               return;
           }
+   
+         if (!this.file){
+          this.isLoading = true;
+            api().
+              post('/equipmentDoc', {eqDocData:  
+                  {
+                    idEq: this.eqCard.id,
+                    docTypeId: this.selectedDocType,
+                    funShortName: this.funShortName
+                  }
+                })
+              .then(response => {
+                let idDoc = response.data.idDoc;
+                this.docList.push(
+                    {
+                      idDoc: idDoc, 
+                      path: '',
+                      docTypeId: this.selectedDocType
+                    });
+                  //alert ('Файл добавлен!')
+                  this.showAddDoc = false;
+                  this.isLoading = false;
+                
+              })
+            .catch(error => {
+               this.isLoading = false;
+               alert('Ошибка при сохранении документа: '+ error);
+               return;
+            });
+         }
+         else this.submitFile();
+      },
+      submitFile: function(){
+
           this.isLoading = true;
           let formData = new FormData();
           formData.append('file',  this.file);
@@ -857,6 +937,7 @@
                   params: {
                     idEq: this.eqCard.id,
                     docTypeId: this.selectedDocType,
+                    idDoc: -1,
                     funShortName: this.funShortName
                   }
                 }
@@ -883,7 +964,41 @@
                alert('Ошибка при сохранении документа:  '+ error);
             });
       },
-      
+      handleFileDocUpload: function(params){
+          this.isLoading = true;
+          let fileDoc = params.ref.files[0];
+          let idDoc = params.idDoc;
+          let formData = new FormData();
+          formData.append('file',  fileDoc);
+          api().
+            post('/file',
+              formData,
+                {
+                  headers: {'Content-Type': 'multipart/form-data'},
+                  params: {
+                    idEq: this.eqCard.id,
+                    idDoc: idDoc,
+                    funShortName: this.funShortName
+                  }
+                }
+            ).then(response => {
+                let filename = response.data.filename;
+                alert (filename);
+                if (filename)
+                {
+                  let docItem = _.find(this.docList, {idDoc: idDoc});
+                  if (docItem) docItem.path = `${endpoint}${filename}`;
+                  //alert ('Файл добавлен!')
+                  this.isLoading = false;
+                  
+                }
+                else  this.isLoading = false;
+            })
+            .catch(error => {
+              this.isLoading = false;
+               alert('Ошибка при сохранении документа:  '+ error);
+            });
+      },
       handleImageUpload:  function(params){
          this.isLoading = true;
           let fileImage = params.ref.files[0];
@@ -930,6 +1045,28 @@
         this.file ='';
         this.showAddDoc = true;
       },
+
+      firstClick: function(){
+        if (this.rowCurrentIndex > 0) 
+           this.rowCurrentIndex = 0;
+        this.initCard(this.eqData[this.rowCurrentIndex]);
+      },
+      prevClick: function(){
+        if (this.rowCurrentIndex > 0) 
+          this.rowCurrentIndex--;
+        this.initCard(this.eqData[this.rowCurrentIndex]);
+      },
+      nextClick: function(){
+        if (this.rowCurrentIndex < this.eqData.length-1) 
+          this.rowCurrentIndex++;
+        this.initCard(this.eqData[this.rowCurrentIndex]);
+      },
+      lastClick: function(){
+        if (this.rowCurrentIndex < this.eqData.length-1) 
+          this.rowCurrentIndex =  this.eqData.length-1;
+        this.initCard(this.eqData[this.rowCurrentIndex]);
+      },
+
       editQuery(params)
       {
         this.queryData = params;
@@ -955,6 +1092,7 @@
       closeCardQuery(){
         this.showQueryCard = false;
       },
+      
        getOrderTimeParams(){
          
          let orderTime = this.eqCard.orderTime ?  this.eqCard.orderTime.id : 0;
@@ -962,6 +1100,28 @@
          let hours = getOrderTimeHours(orderTime, workingMode );
 
          return {hours: hours, workingMode:workingMode};
+      },
+      editMet(params){
+        this.actionModeMetrology = 'edit';
+        this.metCard = params;
+        this.showMetrologyCard = true;
+      },
+      addMet(params){
+        this.actionModeMetrology = 'add';
+        this.metCard = params;
+        this.showMetrologyCard = true;
+      },
+       viewMet(params){
+        this.actionModeMetrology = 'view';
+        this.metCard = params;
+        this.showMetrologyCard = true;
+      },
+      saveCardMet(updatedMetData){
+        this.updatedMetData=updatedMetData;
+        this.showMetrologyCard = false;
+      },
+      closeCardMet(){
+         this.showMetrologyCard = false;
       },
       loading(isLoading)
       {
@@ -1101,12 +1261,50 @@
   .eq-card-col-25 {
     width: 50%;
   }
+  .eq-card-navigation{
+    margin-bottom: .5em;
+  }
 }
 @media screen and (max-width: 600px) {
   .eq-card-col-25 {
     width: 100%;
   }
+  
 }
+.eq-card-navigation{
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  
+}
+.eq-card-navigation-item{
+
+   margin: 0 .5em;
+   font-style: italic;
+   color:#337ab7;
+   font-size: 12pt;
+}
+.eq-card-navigation-item.clicked:hover{
+
+   color: #ed9b19;
+   cursor: pointer;
+}
+
+.eq-card-navigation-item.disabled,
+.eq-card-navigation-item.disabled:hover{
+   color:gray;
+   cursor:default;
+}
+
+.eq-card-navigation-item.bordered{
+   border: 1px solid #ced4da;
+  -moz-border-radius: .25em;
+  -webkit-border-radius:  .25em;
+  border-radius:  .25em;
+  padding: 0 1em;
+}
+
 
 // .eq-card-col-25 input:focus {
 //     outline-style: solid;

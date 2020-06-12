@@ -316,7 +316,17 @@
                     <p name="repDate" v-if="actionMode =='view'">{{eqCard.repDate}}</p>
                 </div>
             </div>
-            <div class="eq-card-label"><label class="mb-0">Техническое состояние</label></div>
+           
+        </div>
+        <div class="eq-card-col-50 eq-card-container">
+            <div class="eq-card-label"><label class="mb-0">Паспортные характеристики</label></div>
+            <div class="eq-card-item"> 
+                <textarea name="eqPassport" v-if ="actionMode !=='view'" v-model="eqCard.eqPassport"></textarea>
+                <p name="eqPassport" v-if="actionMode =='view'">{{eqCard.eqPassport}}</p>
+            </div>
+        </div>
+        <div class="eq-card-col-50 eq-card-container">
+             <div class="eq-card-label"><label class="mb-0">Техническое состояние</label></div>
             <div class="eq-card-item">
                  <!-- <input name="eqTechState" v-if ="actionMode !=='view'" v-model="eqCard.eqTechState"></input>
                 <p name="eqTechState" v-if="actionMode =='view'">{{eqCard.eqTechState}}</p> -->
@@ -329,41 +339,42 @@
                         v-if="actionMode !=='view'"/>
                  <p name="eqReadiness" v-if="actionMode =='view'">{{eqCard.eqReadiness.name}}</p>
             </div>
-        </div>
-        <div class="eq-card-col-50 eq-card-container">
-            <div class="eq-card-label"><label class="mb-0">Паспортные характеристики</label></div>
-            <div class="eq-card-item"> 
-                <textarea name="eqPassport" v-if ="actionMode !=='view'" v-model="eqCard.eqPassport"></textarea>
-                <p name="eqPassport" v-if="actionMode =='view'">{{eqCard.eqPassport}}</p>
-            </div>
-        </div>
-        <div class="eq-card-col-50 eq-card-container">
             <div class="eq-card-label"><label class="mb-0">Производитель</label></div>
             <div class="eq-card-item"> 
                 <input style="width:100%" name="eqProducer" v-model="eqCard.eqProducer" v-if="actionMode !=='view'"></input>
                 <p name="eqProducer" v-if="actionMode =='view'">{{eqCard.eqProducer}}</p>
             </div>
-            <div class="eq-card-label"><label class="mb-0">Наличие техдокументации</label></div>
-            <div class="eq-card-item">
-                <div class="eq-card-file-button"  v-if ="actionMode !=='view' && eqCard.id != -1"> 
+        </div>
+        <div class="eq-card-col-100 eq-card-container-doc"  v-if="addEnable">
+        <div class="eq-card-label"><label class="mb-0">Наличие техдокументации</label></div>
+            <!-- <div class="eq-card-item"> -->
+                <div class="eq-card-file-button"> 
                     <label @click="$emit('showAddDoc')"> 
                         <i  class="fa fa-plus" title="добавить документ"></i>
                         добавить документ
                     </label>
                 </div>
-                <div class="doc-container">
-                    <div class="doc-item" v-for="(doc, i) in docList">
-                        <div class="doc-name">{{fileName(doc.docTypeId)!=null ? fileName(doc.docTypeId) : doc.name}}</div>
-                        <div class="doc-button">
-                            <a :href='doc.path' target='_blank'><i  class="fa fa-download" title="загрузить документ" ></i></a>
-                            <i v-if ="addEnable" class="fa fa-trash-alt" title="удалить документ" v-on:click="$emit('deleteDoc', {idDoc: doc.idDoc})"></i>
+                <input type="file" name="file" id="input__file_doc" ref='fileDoc' class="eq-card-input-file" v-on:change="handleFileDocUpload()"/>
+                <div class="eq-card-col-30-doc" v-for="(doc, i) in docList">
+                    <!-- <div class="doc-container"> -->
+                        <div class="doc-item">
+                            <div class="doc-name">{{fileName(doc.docTypeId)!=null ? fileName(doc.docTypeId) : doc.name}}</div>
+                            <div class="doc-button">
+                                <a v-if="doc.path !== ''" :href='doc.path' target='_blank'><i  class="fa fa-download" title="скачать документ" ></i></a>
+                                <label v-if ="addEnable && doc.path === ''" for="input__file_doc" class="mb-0 label-file">
+                                    <i  class="fa fa-upload" title="загрузить документ" @click="addDocClick({idDoc: doc.idDoc})"></i>
+                                </label>
+                                <label class="mb-0">
+                                    <i v-if ="addEnable" class="fa fa-trash-alt" title="удалить документ" v-on:click="$emit('deleteDoc', {idDoc: doc.idDoc})"></i>
+                                </label>
+                            </div>
                         </div>
-                    </div>
+                    <!-- </div> -->
                 </div>
-                
-
-            </div>
+            <!-- </div> -->
         </div>
+
+
          <div class="eq-card-col-100 eq-card-container">
               <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Номер в госреестре</label></label></div>
@@ -408,8 +419,11 @@
                 <div class="eq-card-item eq-card-small"> <p name="eqCostKeep">{{eqCard.eqCostKeep}}</p></div>
             </div>
             <div class="eq-card-col-25">
-                <div class="eq-card-label eq-card-small"></div>
-                <div class="eq-card-item eq-card-small"></div>
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Примечание</label></div>
+                <div class="eq-card-item eq-card-small">
+                    <input name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote"></input>
+                    <p name="eqNote" v-if="actionMode =='view'">{{eqCard.eqNote}}</p>
+                </div>
             </div>
         </div>
         <div class="eq-card-col-100 eq-card-container">
@@ -455,10 +469,10 @@
             </div>
         </div>
          <div class="eq-card-col-100 eq-card-top-container">
-            <div class="eq-card-col-50">
+            <div class="eq-card-col-50" v-if="addEnable">
                 <div class="eq-card-label"><label class="mb-0">Фото оборудования</label></div>
                 <div class="eq-card-item-image">
-                    <div class="eq-card-image-button" v-if="addEnable">
+                    <div class="eq-card-image-button">
                         <input type="file" name="file" id="input__file_image" ref='fileImage' class="eq-card-input-file" accept="image/x-png,image/gif,image/jpeg" v-on:change="$emit('handleImageUpload', {imageArr: imagesEq, ref: $refs.fileImage, phototype: 1})"/>
                         <label for="input__file_image"> 
                             <i  class="fa fa-plus" title="добавить фото"></i>
@@ -474,10 +488,10 @@
                 
             </div>
             <vue-gallery-slideshow :images="imagesEq" :index="indexEq" @close="indexEq = null"></vue-gallery-slideshow>
-            <div class="eq-card-col-50">
+            <div class="eq-card-col-50" v-if="addEnable">
                 <div class="eq-card-label"><label class="mb-0">Схема расположения</label></div>
                 <div class="eq-card-item-image">
-                    <div class="eq-card-image-button" v-if="addEnable">
+                    <div class="eq-card-image-button">
                         <input type="file" name="file" id="input__file_loc" ref='fileLoc' class="eq-card-input-file" accept="image/x-png,image/gif,image/jpeg" v-on:change="$emit('handleImageUpload', {imageArr: imagesLoc, ref: $refs.fileLoc, phototype: 2})"/>
                         <label for="input__file_loc"> 
                             <i class="fa fa-plus" title="добавить схему"> </i>
@@ -536,17 +550,16 @@ $(window).on('resize', function(){
                 responsibleList: {type: Array},
                 lang: {type: Object},
                 imagesEq: {type: Array},
-                imagesLoc: {type: Array},
-                factDate:{type: Date},
-                comDate:{type: Date},
-                resValueDate:{type: Date}
+                 imagesLoc: {type: Array}
                 
     },
     data() { 
             return { 
                  indexEq: null,
                  indexLoc: null,
-                 show: false
+                 show: false,
+                 currentIdDoc: '',
+                 fileDoc: ''
                 }
     },
     components: {
@@ -596,7 +609,16 @@ $(window).on('resize', function(){
         costBlur: function(){
             if(event)
                 event.target.value = toCost(event.target.value)
-        }
+        },
+        addDocClick(params){
+            this.currentIdDoc = params.idDoc;
+       },
+       handleFileDocUpload(){
+           this.fileDoc = this.$refs.fileDoc.files[0];
+           if(this.fileDoc !== '')
+                this.$emit('handleFileDocUpload', {idDoc: this.currentIdDoc, ref: this.$refs.fileDoc});
+
+       }
 
     },
     mounted: function(){
@@ -613,10 +635,19 @@ $(window).on('resize', function(){
     width: 100%;
     text-align: center;
 }
-.eq-card-container {
+.eq-card-container,
+.eq-card-container-doc,
+.eq-card-container-single {
   display: flex;
    flex-wrap: wrap;
    align-items: flex-end;
+}
+.eq-card-container-single{
+    align-items: flex-start
+}
+.eq-card-container-doc {
+    justify-content: left;
+    align-items:flex-start;
 }
 .eq-card-top-container {
   display: flex;
@@ -638,6 +669,18 @@ $(window).on('resize', function(){
    width: 33%;
    min-width: 120px;
     text-align: center;
+}
+.eq-card-col-30-doc{
+     display: inline-block;
+    width: 33%;
+     border: 1px solid #ced4da;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
+    margin-bottom:.25em;
+    margin-left:.25em;
+    padding: .25em;
+ 
 }
 .eq-card-col-25{
    display: inline-block;
@@ -719,9 +762,7 @@ $(window).on('resize', function(){
     justify-content:flex-start;
     align-items: flex-start;
   }
-  .doc-container
-  {
-    max-height: 5vh;
+  .doc-container{
     display: block;
     overflow: auto;
     width: 100%;
@@ -735,7 +776,7 @@ $(window).on('resize', function(){
   }
   .doc-item{
      width: 100%;
-     min-width: 350px;
+     min-width: 200px;
      display: flex;
     flex-wrap: nowrap;
     justify-content:flex-start;
@@ -767,14 +808,14 @@ $(window).on('resize', function(){
 }
 .doc-name{
   width:80%;
-  min-width: 300px;
+  min-width:150px;
   text-align: left;
 }
 .doc-button
 {
     display: flex;
     justify-content: flex-end;
-    margin-right: .5em;
+    margin-left: .5em;
 }
 .doc-button i
 {
@@ -792,7 +833,7 @@ $(window).on('resize', function(){
  }
 
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
     .eq-card-col-50{
         width: 100%;
     }
@@ -809,17 +850,27 @@ $(window).on('resize', function(){
         width: 49%;
     }
     
+    
 }
 @media screen and (max-width: 1200px) {
     .image-container
     {
-    flex-wrap: wrap;
+         flex-wrap: wrap;
+    }
+    .eq-card-col-30-doc{
+        width: 100%;
     }
 }
 @media (max-width: 767px){
 .vgs__container {
     top: 0% !important;
 }
+}
+
+@media screen and (max-width: 480px) {
+   html {
+      -webkit-text-size-adjust: none;
+   }
 }
 
 // .eq-card-item select:focus, 
@@ -831,94 +882,9 @@ $(window).on('resize', function(){
 // }
 
 
-.eq-card-body
-  {
-    width: 100%;
-    padding-right: 1rem;
-  }
-  .eq-card-body-item{
-     width: 100%;
-     display: flex;
-     padding: .1rem 0;
-  }
-  .eq-card-body label {
-    display: inline-block;
-    margin-left: auto;
-    margin-right: .5em;
-  }
-  .foto_label {
-    display: inline-block;
-    margin-left: .5em;
-    margin-right: auto;
-    text-align: left;
-    width: 20em;
-  }
-  .image-button, 
-  .file-button{
-    display: inline-block;
-    margin-right: .5em;
-    margin-left: auto;
-    text-align: right;
-    color:#337ab7;
-  }
-  .image-button label:hover,
-  .file-button label:hover{
-    cursor: pointer;
-    color: #ed9b19;
-  }
-  .eq-card-body input,
-  .eq-card-body span {
-    border: 1px solid #ced4da;
-    position: relative;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-     border-radius:  .25em;
-    cursor: text;
-    //display: inline;
-    width: 100%;
-  }
-  .eq-card-body textarea,
-  .eq-card-body p {
-    border: 1px solid #ced4da;
-    position: relative;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    cursor: text;
-    width: 100%;
-    min-height: 2em;
-    text-align: left;
-  }
-  .div-15{
-    display: inline-block;
-    width: 15%;
-  }
-  .label{
-    width: 10%;
-    text-align: right;
-    display: inline-block;
-  }
-  .div-25{
-    display: inline-block;
-    width: 25%;
-  }
-   .div-50{
-    display: inline-block;
-    width: 50%;
-
-  }
-  .div-60{
-    display: inline-block;
-    width: 60%;
-  }
-  .div-90{
-    display: inline-block;
-    width: 90%;
-  }
   .mx-datepicker{
     width: 100%;
   }
-
 
 
 

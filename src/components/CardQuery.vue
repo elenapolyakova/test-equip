@@ -474,6 +474,7 @@
     margin-right: .5em;
     font-style: italic;
     font-size: 12pt;
+    color:#337ab7;
   }
    .query-card-contract label{
      max-width: 70px;

@@ -59,9 +59,9 @@
       display: none;
     }
 
-    .metrology-table .view-hide:nth-child(1),
-    .metrology-table .edit-hide:nth-child(2),
-    .metrology-table .delete-hide:nth-child(3){ 
+    /* .metrology-table .view-hide:nth-child(1), */
+    .metrology-table .edit-hide:nth-child(1),
+    .metrology-table .delete-hide:nth-child(2){ 
         display: none;
     }
 

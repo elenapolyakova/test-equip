@@ -28,10 +28,13 @@
             </div>
           </div> 
         </DataTable>
+
+       
   </div>
 </template>
 
 <script>
+
   import { DataTable } from 'v-datatable-light'
   import DatePicker from 'vue2-datepicker'
   import 'vue2-datepicker/locale/ru'
@@ -49,7 +52,8 @@
         DatePicker
     },
       props: {
-             idEq: {type: Number, required: true}
+             idEq: {type: Number, required: true},
+             updatedMetData: {type:Object, required:false}
     },
     data() {
       return {
@@ -60,9 +64,10 @@
          MTypeList: [],
 
          eqMetrologyData: [],
+         metCard: {metId: -1},
 
         headerFields: [
-          "__slot:actions:actionsView",
+        //  "__slot:actions:actionsView",
           "__slot:actions:actionsEdit",
           "__slot:actions:actionsDelete",
           { name: "attDateFormat", label: "Дата аттестации",  sortable: true},
@@ -82,12 +87,42 @@
        },
       }
     },
+    watch: {
+      updatedMetData(value){
+          let eqMetItem = {};
+          eqMetItem.metId = value.metId;
+          eqMetItem.attDate = value.attDate ? new Date(value.attDate) : '';
+          eqMetItem.attDateFormat = formatDate(eqMetItem.attDate);
+          eqMetItem.M_Type = value.M_Type.id; 
+          eqMetItem.M_TypeName = value.M_Type.name
+          eqMetItem.attType = value.attType.id; 
+          eqMetItem.attTypeName = value.attType.name;
+          eqMetItem.eqEnable = value.eqEnable;
+          eqMetItem.eqEnableName = value.eqEnable ? 'Да' : 'Нет';
+          eqMetItem.attEnd = value.attEnd ? new Date(value.attEnd) : '';
+          eqMetItem.attEndFormat = formatDate(eqMetItem.attEnd);
+          eqMetItem.attDocPath = value.attDocPath;
+          eqMetItem.protocolDocPath = value.protocolDocPath;
+          if ( this.rowCurrentIndex === -1){
+           this.eqMetrologyData.push(eqMetItem);
+          }
+          else{
+             var oldValue =_.find(this.eqMetrologyData, {metId: eqMetItem.metId});
+             Object.assign(oldValue, eqMetItem);
+            this.eqMetrologyData.push({});  this.eqMetrologyData.pop();
+          }
+
+      },
+      idEq(value){
+        this.initData();
+      }
+    },
     methods: {
         initData: function(){
           this.$emit('loading', true);
+          this.eqMetrologyData = [];
           this.attTypeList = getAttType();
           this.MTypeList = getMType();
-
            api().
               get('/metrology/' + this.idEq)
               .then(response => 
@@ -96,15 +131,15 @@
                 data.forEach(item =>
                 {
                    let eqMetItem = {};
-                    eqMetItem.id_met = item.id_metr;
+                    eqMetItem.metId = item.id_metr;
                     eqMetItem.attDate = item.attestatdate ? new Date(item.attestatdate) : '';
                     eqMetItem.attDateFormat = formatDate(eqMetItem.attDate);
                     eqMetItem.M_Type = item.m_type; 
                     eqMetItem.M_TypeName = this.MTypeName(item.m_type);
                     eqMetItem.attType = item.atttype; 
                     eqMetItem.attTypeName = this.attTypeName(item.atttype);
-                    eqMetItem.eqEnable = typeof(item.eqenable) === "number" ? item.eqenable : 1;
-                    eqMetItem.eqEnableName = eqMetItem.eqEnable === 1 ? 'Да' : 'Нет';
+                    eqMetItem.eqEnable = typeof(item.eqenable) === "number" ? !!item.eqenable : false;
+                    eqMetItem.eqEnableName = eqMetItem.eqEnable ? 'Да' : 'Нет';
                     eqMetItem.attEnd = item.atestatend ? new Date(item.atestatend) : '';
                     eqMetItem.attEndFormat = formatDate(eqMetItem.attEnd);
                     eqMetItem.attDocPath = item.att_docpath ? `${endpoint}${item.att_docpath.trim()}` : '';
@@ -113,7 +148,7 @@
                     this.eqMetrologyData.push(eqMetItem);
                 });
                 this.rowCurrentIndex = 0;
-               // this.eqCard = this.eqData[this.rowCurrentIndex];
+                this.metCard = this.eqMetrologyData[this.rowCurrentIndex];
                  this.$emit('loading', false);
               })
               .catch(error => 
@@ -139,33 +174,27 @@
       },
       actionAddClick: function()
       {
-        // this.actionMode = 'add';
-        // this.rowCurrentIndex = -1;
-        // this.initCard(null);
-        // this.eqCard.id = -1;
-        // this.showEqCard = true;
+         this.initCard(null);
+         this.rowCurrentIndex = -1;
+         this.$emit('addMet', this.metCard)
       },
       actionEditClick: function (params) {
-        // this.actionMode = 'edit';
-        // this.initCard(params);
-        // this.eqCard.id = params.rowData.id;
-        // this.rowCurrentIndex = params.rowIndex;
-        // this.showEqCard = true;
+         this.initCard(params);
+         this.rowCurrentIndex = params.rowIndex;
+         this.$emit('editMet', this.metCard)
       },
       actionViewClick: function(params){
-          // this.actionMode = 'view';
-          // this.initCard(params);
-          // this.eqCard.id = params.rowData.id;
-          // this.rowCurrentIndex = params.rowIndex;
-          // this.showEqCard = true;
+           this.initCard(params);
+           this.rowCurrentIndex = params.rowIndex;
+           this.$emit('viewMet', this.metCard)
       },
       actionDeleteClick: function(params){
          this.$emit('loading', true);
-          let idMet = params.rowData.id_met;
+          let metId = params.rowData.metId;
           api().
-              delete('/metrology/' + idMet)
+              delete('/metrology/' + metId)
               .then(response => { 
-                this.eqMetrologyData = _.reject(this.eqMetrologyData, {id_met: idMet});
+                this.eqMetrologyData = _.reject(this.eqMetrologyData, {metId: metId});
      
                 this.$emit('loading', false);
               })
@@ -173,6 +202,30 @@
               this.$emit('loading', false);
                alert('Ошибка при удалении аттестации/поверки:  '+ error);
             });
+      },
+      initCard: function(params)
+      {
+         this.metCard = {
+            idEq: this.idEq,
+            metId: params? params.rowData.metId : -1,
+            attDate: params? params.rowData.attDate : '',
+            attDateFormat:  params? params.rowData.attDateFormat : '',
+            M_Type: {
+              id: params? params.rowData.M_Type : '',
+              name: params? params.rowData.M_TypeName : ''
+            },
+            attType: {
+              id: params? params.rowData.attType : '',
+              name: params? params.rowData.attTypeName : ''
+            },
+            eqEnable:  params? params.rowData.eqEnable : false,
+            eqEnableName:  params? params.rowData.eqEnableName : 'нет',
+            attEnd: params? params.rowData.attEnd : '',
+            attEndFormat: params? params.rowData.attEndFormat : '',
+            attDocPath: params? params.rowData.attDocPath : '',
+            protocolDocPath: params? params.rowData.protocolDocPath : ''
+
+         }
       }
      
     },
@@ -180,10 +233,10 @@
       {
         this.rights = getFunRight(this.funShortName);
 
-        if (!this.rights.view || this.rights.edit){
-          this.datatableCss.tbodyTd += ' view-hide'
-          this.datatableCss.theadTh += ' view-hide'
-        }
+        // if (!this.rights.view || this.rights.edit){
+        //   this.datatableCss.tbodyTd += ' view-hide'
+        //   this.datatableCss.theadTh += ' view-hide'
+        // }
         if (!this.rights.edit){
           this.datatableCss.tbodyTd += ' edit-hide'
           this.datatableCss.theadTh += ' edit-hide'

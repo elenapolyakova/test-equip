@@ -9,6 +9,15 @@ import Contract from '../components/Contract'
 import Metrology from '../components/Metrology'
 import Report from '../components/Report'
 import AdminUser from '../components/AdminUser'
+/*import rEqList from '../components/rEquipmentList'
+import rEqAge from '../components/rEquipmentAge'
+import rEqAnal from '../components/rEquipmentAnalysis'
+import rEqCard from '../components/rEquipmentCard'
+import rEqStat from '../components/rEquipmentStat'
+import rSummary from '../components/rSummary'
+import rEqWork from '../components/rEquipmentWork'
+import rContract from '../components/rContract'
+import rRepair from '../components/rRepair'*/
 
 import store  from '../../store'
 
@@ -28,6 +37,17 @@ const router = new Router({
       { path: '/report/:id', name:'report', component: Report, props: true },
       { path: '/metrology', name:'metrology', component: Metrology},
       { path: '/adminuser', name:'adminuser', component: AdminUser},
+     /* { path: '/rEqList', name:'rEqList', component: rEqList},
+      { path: '/rEqAge', name:'rEqAge', component: rEqAge},
+      { path: '/rEqCard', name:'rEqCard', component: rEqCard},
+      { path: '/rEqAnal', name:'rEqAnal', component: rEqAnal},
+      { path: '/rEqStat', name:'rEqStat', component: rEqStat},
+      { path: '/rSummary', name:'rSummary', component: rSummary},
+      { path: '/rEqWork', name:'rEqWork', component: rEqWork},
+      { path: '/rContract', name:'rContract', component: rContract},
+      { path: '/rRepair', name:'rRepair', component: rRepair},*/
+      
+      
       
     ],
      mode: 'history'

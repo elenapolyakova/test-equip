@@ -33,7 +33,10 @@
               <p v-if="!isEdit(props)"> {{props.rowData.execWork}}</p>
               <textarea v-if="isEdit(props)" v-model="props.rowData.execWork"></textarea>
           </div>
-          
+          <div slot="repMasterFIOItem" slot-scope="props">
+              <p v-if="!isEdit(props)"> {{props.rowData.repMasterFIO}}</p>
+              <input class="input-repair-master" v-if="isEdit(props)" v-model="props.rowData.repMasterFIO"></input>
+          </div>
          <div slot="repDocAct" slot-scope="props">
             <div v-if="!isEdit(props) && props.rowData.repDocPath !==''" class='act-btn'>
               <a :href="props.rowData.repDocPath" target="_blank"><i class="fa fa-download" title="загрузить документ" ></i></a>
@@ -76,6 +79,11 @@
     props: {
              idEq: {type: Number, required: true}
     },
+    watch:{
+        idEq(value) {
+            this.initData();
+        }
+    },
     data() {
       return {
          repTypeList: [],
@@ -86,6 +94,7 @@
           { name: "repDate", label: "Дата" /*, format: formatDate*/,  sortable: true, customElement: "repDateItem" },
           { name: "repType", label: "Вид ремонта",  sortable: true,  customElement: "repTypeNameItem" },
           { name: "execWork", label: "Выполненные работы",  sortable: true, customElement: "execWorkItem" },
+          { name: "repMasterFIO", label: "ФИО мастера",  sortable: true, customElement: "repMasterFIOItem" },
           { name: "repDocPath", label: "Акт", sortable: false, customElement: "repDocAct"}
         ],
        rowCurrentIndex: 0,
@@ -101,7 +110,8 @@
        currentId: -1,
        nextId: 0,
        msgError: "Необходимо завершить редактирование",
-       funShortName: 'rep'
+       funShortName: 'rep',
+       file: ''
       }
     },
     methods: {
@@ -111,10 +121,11 @@
       initData: function()
       {
         this.$emit('loading', true);
+        this.eqRepairData = [];
         this.repTypeList = getRepType();
         api().
-            get('/repair/' + this.idEq
-            ).then(response => {
+            get('/repair/' + this.idEq)
+            .then(response => {
                 let data = response.data;
                  data.forEach(item =>
                  {
@@ -124,6 +135,7 @@
                      repItem.repDate = item.rep_date ? new Date(item.rep_date) : '';
                      repItem.repType = item.rep_type ? item.rep_type : '';
                      repItem.execWork = item.rep_maintenance ? item.rep_maintenance.trim() : '';
+                     repItem.repMasterFIO = item.rep_masterfio ? item.rep_masterfio.trim() : '';
                      this.eqRepairData.push(repItem);
                  })
                   this.$emit('loading', false);
@@ -152,6 +164,7 @@
           idRep: -1, 
           repDate: null, 
           execWork: '',
+          repMasterFIO: '',
           repDocPath: '',
           repType: ''});
       },
@@ -318,6 +331,7 @@
     color: #337ab7;
   }
   .repair-table select,
+  .repair-table .input-repair-master,
   .repair-table textarea
   {
     border: 1px solid #ced4da;
@@ -329,6 +343,9 @@
     text-align: left;
     width: 100%;
     height: 3em;
+  }
+  .input-repair-master{
+    width: 350px;
   }
   .repair-table textarea
   {

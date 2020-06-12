@@ -3,7 +3,7 @@
     <header class="systemTitle">
       <div class='logo'> <img src="../src/logo.png" /> </div>
       <div class='header-title'>
-        <h5 >ИСПЫТАТЕЛЬНЫЙ ЦЕНТР АО "ВНИИЖТ"</h5>
+        <h5>ИСПЫТАТЕЛЬНЫЙ ЦЕНТР АО "ВНИИЖТ"</h5>
         <h5 class="red">СИСТЕМА УПРАВЛЕНИЯ ИСПЫТАТЕЛЬНЫМ ОБОРУДОВАНИЕМ</h5>
       </div>
       <div class="logout" v-if="$store.getters.isAuthenticated" @click="logout" title="Выйти из системы">
@@ -34,20 +34,29 @@ import {hasRight}  from "./utils/right";
 $(window).on('resize', function(){
   let header = $('.systemTitle').height();
   let logo =  $('.logo').height();
-     //  $('main').css("margin-top", (header + 3 + 'px'));
        $('main').css("height", ($(window).height() - header) -15 + 'px');
        $('funcContent').css("height", ($(window).height() - header) -15 + 'px');
-        $('.logout').css("height", (header + 'px'));
+        // $('.logout').css("height", (header + 'px'));
         $('.logout').css("margin-top", (header - 22 + 'px'));
       
 });
+
+$(function() {
+  setTimeout(() => {
+   let header = $('.systemTitle').height();
+   let logo =  $('.logo').height();
+        $('main').css("height", ($(window).height() - header) -15 + 'px');
+        $('funcContent').css("height", ($(window).height() - header) -15 + 'px');
+        //  $('.logout').css("height", (header + 'px'));
+         $('.logout').css("margin-top", (header - 22 + 'px'));
+  }, 100);
+ });
   export default {
     name: "app",
     data () {
       return {
         menu:[],
         heightTitle: 50
-        
       }
     },
     components:  {
@@ -56,10 +65,12 @@ $(window).on('resize', function(){
     created: function(){
         if (this.$store.getters.isAuthenticated)
           this.getMenuList();
+      
+       
     },
     mounted: function()
     {
-        this.resizeHeader();
+       // this.resizeHeader();
       
     },
     methods: {
@@ -67,7 +78,7 @@ $(window).on('resize', function(){
         let header = $('.systemTitle').height();
         $('main').css("height", ($(window).height() - header)-15 + 'px');
         $('funcContent').css("height", ($(window).height() - header)-15 + 'px');
-        $('.logout').css("height", (header + 'px'));
+        // $('.logout').css("height", (header + 'px'));
         $('.logout').css("margin-top", (header - 22 + 'px'));
 
       },
@@ -92,12 +103,34 @@ $(window).on('resize', function(){
                       ]});
         //if (hasRight('met')) todo delete
         //  this.menu.push({title: 'Метрология', href: {path: '/metrology', name: "metrology"}, icon:  'fa fa-book'});
+        // if (hasRight('rpt'))
+        // this.menu.push({title: 'Отчёты', icon: 'fa fa-chart-line', 
+        //               child: [
+        //                 { title: 'Каталог оборудования', href: {path: '/report', name: "report", params: { id: 1 } }},
+        //                 { title: 'Использование оборудования', href: {path: '/report', name: "report", params: { id: 2 } }}
+        //               ]});     
+        
+        
+       /* if (hasRight('rpt'))
+            this.menu.push({title: 'Перечень оборудования', href: { path: '/rEqList',  name: "rEqList"}, icon: 'fa fa-table'});   
         if (hasRight('rpt'))
-        this.menu.push({title: 'Отчёты', icon: 'fa fa-chart-line', 
-                      child: [
-                        { title: 'Каталог оборудования', href: {path: '/report', name: "report", params: { id: 1 } }},
-                        { title: 'Использование оборудования', href: {path: '/report', name: "report", params: { id: 2 } }}
-                      ]});      
+            this.menu.push({title: 'Возраст оборудования', href: { path: '/rEqAge',  name: "rEqAge"}, icon: 'fa fa-chart-pie'}); 
+        if (hasRight('rpt'))
+            this.menu.push({title: 'Карточка оборудования', href: { path: '/rEqCard',  name: "rEqCard"}, icon: 'fa fa-newspaper'}); 
+         if (hasRight('rpt'))
+            this.menu.push({title: 'Аналитическая подсистема',  icon: 'fa fa-chart-line',
+              child: [
+                        { title: 'Анализ работы оборудования', href: {path: '/rEqAnal', name: "rEqAnal"}},
+                        { title: 'Статистика загрузки оборудования', href: {path: '/rEqStat', name: "rEqStat"}},
+                        { title: 'Сводные данные по работе', href: {path: '/rSummary', name: "rSummary"}},
+                        { title: 'О работе лабораторного ИО научных подразделений', href: {path: '/rEqWork', name: "rEqWork"}}
+                      ]
+            }); 
+         if (hasRight('rpt'))
+            this.menu.push({title: 'Стоимость работы по договорам', href: { path: '/rContract',  name: "rContract"}, icon: 'fa fa-file-contract'}); 
+          if (hasRight('rpt'))
+            this.menu.push({title: 'Журнал технического обслуживания и ремонта (ТОиР)', href: { path: '/rRepair',  name: "rRepair"}, icon: 'fa fa-tools'}); 
+*/
         if (hasRight('au'))
           this.menu.push({title: 'Администрирование', href: { path: '/AdminUser',  name: "adminuser"}, icon: 'fa fa-users-cog'});    
 
@@ -126,6 +159,17 @@ $(window).on('resize', function(){
 
   
   }
+  .vsm--title{
+      word-wrap: break-word !important;
+      white-space:normal !important;
+
+  }
+ 
+   .vsm--dropdown>.vsm--list .vsm--title{
+     font-size: 12pt;
+
+   }
+
   
   h5 {
     font-weight:600;

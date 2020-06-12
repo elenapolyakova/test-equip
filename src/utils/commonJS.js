@@ -21,4 +21,5 @@ const toFloatView = val => {
     return null;
 }
 
+
 export {toFloat, toCost, toFloatView}

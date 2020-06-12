@@ -23,6 +23,10 @@
     overflow: hidden;
     margin-left: 20px;
      margin-bottom: -2px; /*hide bottom border */
+     display: flex;
+     flex-wrap: wrap;
+     justify-content: flex-start;
+     align-items: flex-start;
 }
 
 .tabs ul {
