@@ -18,7 +18,7 @@ const orderTimeList = [{id:1, name: '1 час', hours: 1}, {id:2, name: '2 ча�
 const docTypeList = [{id:1, name: 'Паспорт/формуляр оборудования'}, {id:2, name: 'Инструкция/руководство по эксплуатации'}, {id:3, name: 'Инструкция по ТБ'}, {id:4, name: 'Методика поверки'},
     {id:5, name: 'Методика калибровки'}, {id:6, name: 'Программа и методика аттестации'}, {id:7, name: 'Методика испытаний'}];
 
-const repTypeList = [{id: 1, name: 'Плановый'}, {id: 2, name: 'Капитальный'}]
+const repTypeList = [{id: 1, name: 'Плановый'}, {id: 2, name: 'Капитальный'}, {id: 3, name: 'Модернизация'}]
 
 const queryTypeList =[{id: 1, name: 'Проведение испытаний'}, {id: 2,  name: 'Техническое обслуживание'}, {id: 3, name: 'Аттестация/Поверка'}]
 
@@ -28,8 +28,21 @@ const workingModeList = [{id: 1, name: "с 9:00 до 18:00", timeStart: "09:00",
 const attTypeList =[{id:1, name: "Аттестация"}, {id:2, name:"Поверка"}]
 const MTypeList =[{id:1, name: "Первичная"}, {id:2, name:"Плановая"}, {id:3, name:"Внеплановая"}]
 
+const devisionFullNameList =[{id: 2, name:"Научный центр «Нетяговый подвижной состав и автотормозные системы поезда»"},
+    {id: 3, name: "Электрификация и теплоэнергетика"},
+    {id: 4, name:"Научный аттестационный центр"},
+    {id: 5, name:"Путевая инфраструктура и вопросы взаимодействия колесо-рельс"},
+    {id: 6, name:"Центр «Охрана труда, экология и промышленная безопасность»"},
+    {id: 7, name:"Транспортная механика "},
+    {id: 8, name:"Научный центр «Высокоскоростные магистрали»"},
+    {id: 9, name:"Тяговый подвижной состав "},
+    {id: 11, name:"Научный центр «Рельсы, сварка, транспортное материаловедение»"},
+]
+
+const eventType = {"INSERT": 1, "UPDATE": 2, "DELETE": 3}
 
 const getFunList = () => FunList
+const getFunId = (funShortName) => { let fun = FunList.find(fun => fun.shortName === funShortName); return fun ? fun.id : null};
 const getEqReadiness = () => eqReadinessList 
 const getOrderTime = () => orderTimeList
 const getDocType = () => docTypeList
@@ -54,6 +67,8 @@ const getWorkingPeriod = (workingMode) => {
 }
 const getAttType = () => attTypeList
 const getMType = () => MTypeList
+const getDevFullName = () => devisionFullNameList
+const getEventType = () => eventType
 
 export {getFunList, getEqReadiness, getOrderTime, getDocType, getRepType, getQueryType, 
-    getWorkingMode, getOrderTimeHours, getWorkingPeriod, getAttType, getMType};
+    getWorkingMode, getOrderTimeHours, getWorkingPeriod, getAttType, getMType, getDevFullName, getFunId, getEventType};

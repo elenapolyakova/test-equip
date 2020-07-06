@@ -1,16 +1,20 @@
 <template>
   <div id="app">
+     
     <header class="systemTitle">
-      <div class='logo'> <img src="../src/logo.png" /> </div>
+      <div class='logo' @click="goHome"> <img src="../src/logo.png" /> </div>
       <div class='header-title'>
         <h5>ИСПЫТАТЕЛЬНЫЙ ЦЕНТР АО "ВНИИЖТ"</h5>
         <h5 class="red">СИСТЕМА УПРАВЛЕНИЯ ИСПЫТАТЕЛЬНЫМ ОБОРУДОВАНИЕМ</h5>
       </div>
-      <div class="logout" v-if="$store.getters.isAuthenticated" @click="logout" title="Выйти из системы">
-            <span class='fa fa-user'> {{ $store.getters.username }}</span>
-      </div>     
+      <div class="logout" v-if="$store.getters.isAuthenticated"@click="showLogoutMenu" >
+            <span> <i class='fa fa-user'></i><b> {{ $store.getters.username }}</b></span>
+      </div>    
+      <div class="logout-menu" @click="logout" title="Выйти из системы"><span>Выйти из системы</span></div>
     </header>
-    <main>
+     
+    <main @click="hideLogoutMenu">
+        
         <sidebar-menu 
             v-if="$store.getters.isAuthenticated" 
             :collapsed="true"
@@ -18,7 +22,7 @@
             :menu="menu" 
            />
       <div class="funcContent">
-        <router-view @getMenuList="getMenuList"></router-view>
+        <router-view @getMenuList="getMenuList" @resizeHeader="resizeHeader"></router-view>
       </div>
       
     </main>
@@ -34,6 +38,7 @@ import {hasRight}  from "./utils/right";
 $(window).on('resize', function(){
   let header = $('.systemTitle').height();
   let logo =  $('.logo').height();
+  header = logo > header ? logo : header;
        $('main').css("height", ($(window).height() - header) -15 + 'px');
        $('funcContent').css("height", ($(window).height() - header) -15 + 'px');
         // $('.logout').css("height", (header + 'px'));
@@ -45,6 +50,7 @@ $(function() {
   setTimeout(() => {
    let header = $('.systemTitle').height();
    let logo =  $('.logo').height();
+   header = logo > header ? logo : header;
         $('main').css("height", ($(window).height() - header) -15 + 'px');
         $('funcContent').css("height", ($(window).height() - header) -15 + 'px');
         //  $('.logout').css("height", (header + 'px'));
@@ -76,6 +82,8 @@ $(function() {
     methods: {
       resizeHeader: function(){
         let header = $('.systemTitle').height();
+        let logo =  $('.logo').height();
+        header = logo > header ? logo : header;
         $('main').css("height", ($(window).height() - header)-15 + 'px');
         $('funcContent').css("height", ($(window).height() - header)-15 + 'px');
         // $('.logout').css("height", (header + 'px'));
@@ -111,35 +119,52 @@ $(function() {
         //               ]});     
         
         
-       /* if (hasRight('rpt'))
+     if (hasRight('rpt'))
             this.menu.push({title: 'Перечень оборудования', href: { path: '/rEqList',  name: "rEqList"}, icon: 'fa fa-table'});   
         if (hasRight('rpt'))
             this.menu.push({title: 'Возраст оборудования', href: { path: '/rEqAge',  name: "rEqAge"}, icon: 'fa fa-chart-pie'}); 
-        if (hasRight('rpt'))
-            this.menu.push({title: 'Карточка оборудования', href: { path: '/rEqCard',  name: "rEqCard"}, icon: 'fa fa-newspaper'}); 
+         if (hasRight('rpt'))
+            this.menu.push({title: 'Карточка оборудования', href: { path: '/rEqCardF',  name: "rEqCardF"}, icon: 'fa fa-newspaper'}); 
          if (hasRight('rpt'))
             this.menu.push({title: 'Аналитическая подсистема',  icon: 'fa fa-chart-line',
               child: [
-                        { title: 'Анализ работы оборудования', href: {path: '/rEqAnal', name: "rEqAnal"}},
+                        { title: 'Анализ работы оборудования', href: {path: '/rEqAnalysis', name: "rEqAnal"}},
                         { title: 'Статистика загрузки оборудования', href: {path: '/rEqStat', name: "rEqStat"}},
-                        { title: 'Сводные данные по работе', href: {path: '/rSummary', name: "rSummary"}},
-                        { title: 'О работе лабораторного ИО научных подразделений', href: {path: '/rEqWork', name: "rEqWork"}}
+                        { title: 'Сводные данные по работе ИО', href: {path: '/rSummary', name: "rSummary"}},
+                       { title: 'О работе лабораторного ИО', href: {path: '/rEqWork', name: "rEqWork"}}
                       ]
             }); 
-         if (hasRight('rpt'))
+       if (hasRight('rpt'))
             this.menu.push({title: 'Стоимость работы по договорам', href: { path: '/rContract',  name: "rContract"}, icon: 'fa fa-file-contract'}); 
-          if (hasRight('rpt'))
+        /*    if (hasRight('rpt'))
             this.menu.push({title: 'Журнал технического обслуживания и ремонта (ТОиР)', href: { path: '/rRepair',  name: "rRepair"}, icon: 'fa fa-tools'}); 
 */
-        if (hasRight('au'))
+       if (hasRight('au'))
           this.menu.push({title: 'Администрирование', href: { path: '/AdminUser',  name: "adminuser"}, icon: 'fa fa-users-cog'});    
 
       },
        logout: function() {
           this.menu = [];
+          $('.logout-menu').hide();
           this.$store.dispatch(AUTH_LOGOUT).then(() => this.$router.push("/login"));
           
       },
+      showLogoutMenu:function(){
+           let header = $('.systemTitle').height();
+          $('.logout-menu').css("margin-top", (header + 3 + 'px'));
+          $('.logout-menu').toggle()
+      },
+      hideLogoutMenu: function(){
+        $('.logout-menu').hide()
+      },
+      goHome: function(){
+           this.$router.push({name:'home'
+           /*,  
+              params: {
+                eqId: eqId,
+              }*/
+          });
+      }
 
     }
   }
@@ -201,6 +226,7 @@ $(function() {
   .logo {
     width: 100px;
     padding-bottom: 2px;
+    cursor: pointer;
   }
   .logout {
     &:hover {
@@ -213,6 +239,27 @@ $(function() {
     width: 200px;
     text-align: right;
 
+  }
+  .logout-menu{
+     &:hover {
+      cursor: pointer;
+      color: #337ab7;
+    }
+    position: absolute; 
+    right: 0;
+    margin-right: 0px;
+    margin-top: 0px;
+    width: 200px;
+    text-align: center;
+    vertical-align: middle;
+    display: none;
+    border: 2px solid #337ab7;
+    background: #e7eaee;
+    height: 3em;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
+    z-index: 10;
   }
   .header-title{
     width: calc(100vw - 350px);

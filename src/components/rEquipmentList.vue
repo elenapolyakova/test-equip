@@ -45,13 +45,14 @@
                     </div>
               </div>
                <div class="action-panel-filter-button">
-                   <button class="filter-button" @click="getReport"><i class='fa fa-check'> </i> Применить фильтр</button></td>
+                   <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
+                    <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button>
               </div>
 
           </div>
           <div class="action-panel-btn">
-            <div class="export-button"><i class="fa fa-file-excel" title="Экспорт в excel" @click="exportExcel"></i></div>
-            <div class="export-button"><i class="fa fa-file-pdf" title="Экспорт в pdf" @click="exportPDF"></i></div>
+            <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
+            <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
          </div>
       </div>
         <div class='title'>{{report_name}}</div>
@@ -63,57 +64,25 @@
                 @on-update="dtUpdateSort"> 
             </DataTable>
         </div>
-        <div>
-            <table id='myTable'>  <thead>
-        <tr>
-          <th>Привет</th>
-          <th>First name</th>
-          <th>Last name</th>
-          <th>Email</th>
-          <th>Country</th>
-          <th>IP-address</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Donna</td>
-          <td>Moore</td>
-          <td>dmoore0@furl.net</td>
-          <td>China</td>
-          <td>211.56.242.221</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Janice</td>
-          <td>Henry</td>
-          <td>jhenry1@theatlantic.com</td>
-          <td>Ukraine</td>
-          <td>38.36.7.199</td>
-        </tr>
-      </tbody></table>
-        </div>
+      
   </div>
 </template>
 
 <script>
-   /*import html2canvas from 'html2canvas'
-   import canvg from 'canvg';
-   import '../js/arial-normal.js'
+
    import api from "../utils/api";
    import { saveAs } from 'file-saver';
    import ExcelJS from 'exceljs'; 
    import Loading from 'vue-loading-overlay';
-   // import  jsPDF  from 'jspdf'; 
-   import 'jspdf-autotable';
    import DynamicSelect from 'vue-dynamic-select'
    import {getEqReadiness} from '../utils/dictionary'
    import {toCost} from '../utils/commonJS'
    import { DataTable } from 'v-datatable-light'
+   import pdfMake from 'pdfmake/build/pdfmake'
+   import pdfFonts from 'pdfmake/build/vfs_fonts'
 
    export default {
     name: "rEqList",
-     props: ['id'],
     components: {
         DataTable,
         DynamicSelect,
@@ -127,16 +96,21 @@
          devisionList: [],
          readinessList: [],
          locationList: [],
-         fData: [],
+         fData: {
+                devision: null,
+                readiness: null,
+                location: null
+          },
          sort: 'asc',
         isLoading: false,
          headerFields: [
+             { name: "number", label: "№",  sortable: true },
             { name: "devisionName", label: "Подразделение",  sortable: true },
             { name: "responsibleName", label: "Ответственный",  sortable: true },
             { name: "name", label: "Название оборудования",  sortable: true} ,
             { name: "location", label: "Месторасположение",  sortable: true },
             { name: "invNum", label: "Инвентарный номер",  sortable: true },
-            { name: "comDateYear", label: "Год выпуска",  sortable: true },
+            { name: "comDateYear", label: "Год ввода в экспл.",  sortable: true },
             { name: "resValue", label: "Остаточная стоимость на конец предыдущего года",  sortable: true },
             { name: "note", label: "Примечание", sortable: true }
         ],
@@ -149,54 +123,166 @@
        }
     },
     methods: {
-        exportExcel: function(){},
+        exportExcel: function(){
+  
+  let wb = new ExcelJS.Workbook();
+  let workbookName = `${this.report_name}.xlsx`;
+  let worksheetName = this.report_name;
+  let ws = wb.addWorksheet(worksheetName);
+
+  ws.columns = [
+    { 
+      key: "number", 
+      header: "№", 
+      width: 7 
+    },
+    {
+      key: "devisionName",
+      header: "Подразделение",
+      width: 20
+    },
+    { 
+      key: "responsibleName", 
+      header: "Ответственный", 
+      width: 30
+    },
+    {
+      key: "name",
+      header: "Название оборудования",
+      width: 50
+    },
+    { 
+      key: "location", 
+      header: "Месторасположение",
+      width: 30
+    },
+    {
+      key: "invNum",
+      header: "Инвентарный номер",
+      width: 15
+    },
+    {
+      key: "comDateYear",
+      header: "Год ввода в эксплуат.",
+      width: 10
+    },
+    {
+      key: "resValue",
+      header: "Остаточная стоимость на конец предыдущего года",
+      width: 20
+    },
+    {
+      key: "note",
+      header: "Примечание",
+      width: 50
+     
+    },
+    
+  ];
+  ws.addRows(this.eqData);
+
+  ws.views = [{ state: "frozen", ySplit: 1}];
+ for (let i = 1; i <= ws.columns.length; i++)
+ {
+    let cell = ws.getRow(1).getCell(i);
+    cell.font = { 
+      bold: true,  color: { argb: "000000" }
+    };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "9cc2e5" }
+    };
+   cell.border = { top: {style: 'thin'}, 
+                 left: {style: 'thin'}, 
+                 bottom: {style: 'thin'}, 
+                 right: {style: 'thin'}
+               };
+  cell.alignment = { horizontal: "center", vertical:"middle",  wrapText: true };
+ }
+  for(let i = 2; i < this.eqData.length + 2; i++)
+  for (let j = 1; j < ws.columns.length + 1; j++)
+  {
+      let cell = ws.getRow(i).getCell(j);
+    
+    cell.border = { top: {style: 'thin'}, 
+                  left: {style: 'thin'}, 
+                  bottom: {style: 'thin'}, 
+                  right: {style: 'thin'}
+                };
+    cell.alignment = { vertical:"middle", wrapText: true };
+    }
+
+  ws.autoFilter = {
+    from: {
+      row: 1,
+      column: 1
+    },
+    to: {
+      row: this.eqData.length + 1,
+      column: ws.columns.length
+    }
+  }
+
+    wb.xlsx.writeBuffer()
+      .then(function(buffer) {
+        saveAs(
+          new Blob([buffer], { type: "application/octet-stream" }),
+          workbookName
+        );
+    });
+  
+        },
         exportPDF: function(){
-            const doc = new jsPDF('l', 'pt', 'a4');
-            doc.setFont("arial", "normal");
-            var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-            var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
 
-            let title = this.report_name;
-            doc.setFontSize(18);
-            doc.text(title,pageWidth/2, 22,{align: "center"});
-            doc.setFontSize(11);
+           var headers = [];
+           var body = [];
+           this.headerFields.forEach((hField) => {
+                 headers.push({text: hField.label, style: 'tableHeader'});
+            });
+           body.push (headers);
 
-              
-              var finalY = doc.previousAutoTable.finalY || 10
+           this.eqData.forEach((dItem) =>{
+              let dataItem = [];
+              this.headerFields.forEach((hField) => {
+                   dataItem.push({text: dItem[hField.name], style:'defaultStyle'})
+                 })
+             body.push(dataItem);
+            })
 
-           const head = [['Подразделение', 'Ответственный', 'Название оборудования', 'Месторасположение']]
-           const data = [
-            [1, 'Finland', 7.632, 'привет'],
-            [2, 'Norway', 7.594, 'Oslo'],
-            [3, 'Denmark', 7.555, 'Copenhagen'],
-            [4, 'Iceland', 7.495, 'Reykjavík'],
-            [5, 'Switzerland', 7.487, 'Bern'],
-            [9, 'Sweden', 7.314, 'Stockholm'],
-            [73, 'Belarus', 5.483, 'Minsk'],
-            ]
-                 doc.autoTable({startY: finalY + 20, 
-                             head: head,
-                             body: data,
-                            willDrawCell: function (data) {
-                                
-                                 if (data.row.index === 5 || data.row.cells["1"].raw === "Finland") {
-                                    //  console.log(JSON.stringify(data.row));
-                                     doc.setFont("arial", "normal");
-                                     doc.setTextColor(231, 76, 60);
-                                    // data.cell.styles.fillColor = [40, 170, 100]
-                                 }
-                             }
-                            //{ headStyles: {
-                            //     fillColor: [241, 196, 15],
-                         //  fontSize: 15,
-                         //    }, 
-                       
-                        // addPageContent: function(data) {
-                        //     doc.text("", 40, 30);
-                         //}
-                     });
-               // doc.autoTable({ html: '#myTable' })
-                doc.save('test.pdf');
+          var docDefenition = {
+            content: [
+                {text: this.report_name, style: 'header'},
+                {
+                  table: {
+
+                  headerRows: 1,
+                  widths: [15,50,70,180,100,45,30,60,150],
+
+                  body: body
+                }
+              }],
+        
+            styles: {
+              header: {fontSize: 11, alignment: 'center' },
+              tableHeader: {alignment: 'center', verticalAlign: 'center', fontSize: 9, fillColor:"#9cc2e5", bold: true },
+              defaultStyle: {fontSize: 9, alignment: 'center', color: '#000000', background:'#ffffff' }
+
+            },
+            pageOrientation: 'landscape'
+            
+          }
+        pdfMake.createPdf(docDefenition).download(this.report_name + ".pdf");
+
+        },
+        clearFilter: function(){
+            this.fData = {
+                devision: null,
+                readiness: null,
+                location: null
+                }
+            this.getReport();
+
         },
         getReport: function(){
              this.eqData = this.eqInitialList;
@@ -208,6 +294,8 @@
 
             if (this.fData.location) 
                 this.eqData = _.filter(this.eqData, {'location': this.fData.location.name})
+
+            this.$emit('resizeHeader');
         },
         fillDict: function(list, key){
             list = [];
@@ -242,6 +330,7 @@
                 .then(response => 
                 {
                     let data = response.data;
+                    let i = 0;
                     data.forEach(item =>
                     {
                     let eqItem = {};
@@ -257,10 +346,12 @@
                         eqItem.resValue = toCost(item.eqprice);
                         eqItem.note = item.remark ? item.remark.trim() : '';
                         eqItem.eqReadiness = item.is_ready;
+                        eqItem.number = ++i;
                         this.eqInitialList.push(eqItem);
                     });
                     this.locationList = this.fillDict(this.locationList , 'location');
                     this.eqData = this.eqInitialList ;
+                    this.$emit('resizeHeader');
                     this.isLoading = false;
                 })
                 .catch(error => 
@@ -288,7 +379,6 @@
       }
     
 }
-*/
 </script>
 
 <style lang="scss">
@@ -312,17 +402,22 @@
     padding: 0 1.5em; 
 }
 .action-panel-filter-button{
-    display: inline-block;
-    padding-left: 1.5em;
-    text-align: center;
-    vertical-align: bottom;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
 }
 .action-panel-filter-item-label{
+    display: inline-block;
+    min-width: 120px;
     width: 100%;
     text-align: center;
+    font-style: italic;
     color:#337ab7;
+    font-size: 12pt;
+    padding-top: .5em;
 }
-.filter-button {
+.filter-button,
+.export-button  {
      border: 1px solid #ced4da;
     position: relative;
     padding: .425em .5em;
@@ -331,7 +426,8 @@
     border-radius: .25em;
     cursor: pointer;
     margin: 10px;
-    width: 250px;
+    width: 50px;
+    height: 3em;
 }
 .action-panel-filter-item-select{
    
@@ -348,10 +444,8 @@
     width: 130px;
 }
 .export-button i{
-    padding-left: 1.5em;
-    padding-top:.5em;
     color: #337ab7;
-    font-size: 30px;
+    font-size: 20pt;
 }
 
 .filter-button:hover{
@@ -375,9 +469,6 @@
         flex-wrap: wrap;
     }
     .action-panel-filter-item{
-        width: 100%;
-    }
-    .action-panel-filter-button{
         width: 100%;
     }
 }

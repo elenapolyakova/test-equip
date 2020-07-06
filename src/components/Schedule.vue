@@ -27,7 +27,8 @@
 							<div class='query-item' :name="'queryId_' + query.queryId">
 								<p>{{query.timeStart}} - {{query.timeEnd}} <br/>
 								{{query.title}}</p>
-								<p>{{query.dayOf}}</p>
+								<p v-if="isFit(query)"><button class="history-item" @click.stop="showHistory(query)"><i class="fa fa-history"></i> История изменений</button></p>
+								<p>{{query.dayOf}} <i class="fa fa-history" @click.stop="showHistory(query)" v-if="!isFit(query)" title="История изменений" style="font-size: 12pt"></i></p>
 							</div>
 					</li>
 					<li class="query-list-item add-item hidden-item" :style="styleObjAdd" @click="addItemClick">
@@ -101,7 +102,6 @@
 	.query-list p{
 		text-align: center;
 		font-size: 1rem;
-      
 	}
 	.query-list-item{
 		position: absolute;
@@ -137,7 +137,7 @@
 	.query-list-item p{
 		text-align: center;
 		padding: 0;
-		font-size: 0.8rem;
+		/* font-size: 0.8rem; */
 		color: #EDF2F6;
 	}
 	.query-list-item h5{
@@ -162,12 +162,30 @@
 		display: inline-block;
 		font-size: small;
 	}
+	.history-item{
+		-moz-border-radius: .25em;
+      	-webkit-border-radius:  .25em;
+		border-radius:  .25em;
+		border: 1px solid #ced4da;
+		color: #000000;
+		font-size: 9pt;
+		margin: 0 .5em !important;
+	
+	}
+	.history-item:hover{
+		border:#337ab7;
+		color: #337ab7;
+	}
+
 	.blink {
 	  -webkit-animation: blinker 2s 3;
       -moz-animation: blinker 2s 3;
       -o-animation: blinker 2s 3;
       animation: blinker 2s 3;
 
+}
+.small-history{
+	padding: 0 !important;
 }
  
    @keyframes blinker {
@@ -338,6 +356,18 @@ export default {
 	},
 
 	methods: {
+		isFit: function(query){
+			let startMin = query.timeStart.split(':')[0] * 60 + query.timeStart.split(':')[1] * 1;
+			let endMin = query.timeEnd.split(':')[0] * 60 + query.timeEnd.split(':')[1] * 1;
+			let difMin = endMin - startMin;
+
+			if (difMin > 120){
+				query.styleObj.fontSize = "10pt";
+				return true;
+			}
+			query.styleObj.fontSize = "7pt";	
+			return false;
+		},
 		loadData:  function(){
 			this.initQueryData = [];
 			this.queryList = [];
@@ -371,7 +401,8 @@ export default {
                       dateStart: item.date_start ? new Date(item.date_start) : null,
                       dateEnd: item.date_end ? new Date(item.date_end) : null,
                       Q_type: item.q_type,
-					  conId: item.id_cont_contract
+					  conId: item.id_cont_contract,
+					  userId: item.id_user_users
 					  
                     }
 					 
@@ -487,7 +518,7 @@ export default {
 		hasEquip: function(){
 			return (this.eqId && this.eqId > -1);
 		},
-		editClick(query){
+		editClick: function (query){
 			if (this.rights.edit || this.rights.delete){
 				$(".add-item").addClass("hidden-item");
 				if (query.queryId === this.showQueryId)
@@ -497,6 +528,9 @@ export default {
 					this.$emit('editQuery', queryData)
 				}
 			}
+		},
+		showHistory: function (query){
+			this.$emit('showHistory', query.queryId)
 		},
 		addClick(){
 			if (this.rights.add){
@@ -520,7 +554,7 @@ export default {
 			
 			if(this.hasEquip()) 
 			{
-				let query = {queryId: -1, eqId: this.eqId, conId: '', Q_type: ''};
+				let query = {queryId: -1, eqId: this.eqId, conId: '', Q_type: '', userId: this.$store.getters.id_user};
 				if (this.itemInfo){
 					query.dateStart = new Date (this.Month.getFullYear(), this.Month.getMonth(), this.itemInfo.day, this.itemInfo.time + this.pageTimeGround[0].split(":")[0]*1)
 					query.dateEnd = new Date (this.Month.getFullYear(), this.Month.getMonth(), this.itemInfo.day, this.itemInfo.time + this.pageTimeGround[0].split(":")[0]*1 + 1)
@@ -538,11 +572,11 @@ export default {
 			return {time: time, day: day}
 		},
 		invertColor(queryId){
-			$('[name=queryId_' + queryId).parent().css("backgroundColor", this.color[queryId % this.color.length].invertColor);
+			$('[name=queryId_' + queryId+ ']').parent().css("backgroundColor", this.color[queryId % this.color.length].invertColor);
 		
 		},
 		normalizeColor(queryId){
-			$('[name=queryId_' + queryId).parent().css("backgroundColor", this.color[queryId % this.color.length].color);
+			$('[name=queryId_' + queryId + ']').parent().css("backgroundColor", this.color[queryId % this.color.length].color);
 		},
 		initTimeGroud(value){
 			if(value && value.length == 2){

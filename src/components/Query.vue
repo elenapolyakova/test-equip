@@ -7,6 +7,7 @@
       </loading>
     <filter-equipment
              @filterData="filterData"
+             @clearFilter="clearFilter"
              :fData="fData" 
              :eqNameList="eqNameList"
              :eqDevisionList="eqDevisionList"
@@ -153,6 +154,25 @@
             }
         });
       },
+      clearFilter: function(){
+
+          this.fData = {
+          cardNum: '', 
+          invNum: '',
+          eqName: null,
+          devision: null,
+          eqType: null,
+          eqProducer: null,
+          factNum: '',
+          factDate: null,
+          comDate: null,
+          repDate: '',
+          responsible: null,
+          eqReadiness: null
+        };
+        this.filterData(true);
+      },
+
         filterData: function(showLoading){
         if (showLoading)
           this.isLoading = true;

@@ -73,6 +73,7 @@
           { name: "attDateFormat", label: "Дата аттестации",  sortable: true},
           { name: "attTypeName", label: "Вид", sortable: true},
           { name: "M_TypeName", label: "Тип", sortable: true},
+          { name: "attNum", label: "Номер", sortable: true},
           { name: "eqEnableName", label: "Допущен к работе",  sortable: true},
           { name: "attEndFormat", label: "Дата оконч. срока действия", sortable: true},
           { name: "attDocPath", label: "Аттестат/св-во о поверке",  sortable: false, customElement: "attDoc" },
@@ -95,6 +96,7 @@
           eqMetItem.attDateFormat = formatDate(eqMetItem.attDate);
           eqMetItem.M_Type = value.M_Type.id; 
           eqMetItem.M_TypeName = value.M_Type.name
+          eqMetItem.attNum = value.attNum;
           eqMetItem.attType = value.attType.id; 
           eqMetItem.attTypeName = value.attType.name;
           eqMetItem.eqEnable = value.eqEnable;
@@ -138,6 +140,7 @@
                     eqMetItem.M_TypeName = this.MTypeName(item.m_type);
                     eqMetItem.attType = item.atttype; 
                     eqMetItem.attTypeName = this.attTypeName(item.atttype);
+                    eqMetItem.attNum = item.atestatnum;
                     eqMetItem.eqEnable = typeof(item.eqenable) === "number" ? !!item.eqenable : false;
                     eqMetItem.eqEnableName = eqMetItem.eqEnable ? 'Да' : 'Нет';
                     eqMetItem.attEnd = item.atestatend ? new Date(item.atestatend) : '';
@@ -218,6 +221,7 @@
               id: params? params.rowData.attType : '',
               name: params? params.rowData.attTypeName : ''
             },
+            attNum: params? params.rowData.attNum : '',
             eqEnable:  params? params.rowData.eqEnable : false,
             eqEnableName:  params? params.rowData.eqEnableName : 'нет',
             attEnd: params? params.rowData.attEnd : '',
@@ -258,7 +262,9 @@
     border: 1px solid #ced4da;
     position: relative;
     padding: .425em .5em;
-    border-radius: .25em;
+     -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
     cursor: pointer;
     margin: 10px;
     width: 300px;

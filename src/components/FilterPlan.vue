@@ -1,18 +1,21 @@
 <template lang="html">
-  <div class="filter">
-    <table>
-        <tr>
-            <td><label class="filter-label">Подразделение</label>
-                <dynamic-select 
+  <div class="filter-plan-container">
+      <div class="filter-plan-col-25"> 
+           <div class="filter-plan-label"><label class="mb-0">Подразделение</label></div>
+           <div class="filter-plan-item">
+              <dynamic-select 
                     :options="devisionList"
                     option-value="id"
                     option-text="name"
                     placeholder=""
                     v-model="fData.devision"
                     @input="devisionSelected" />
-            </td>
-            <td><label class="filter-label">Наименование</label>
-                <dynamic-select 
+            </div>
+      </div>
+      <div class="filter-plan-col-50"> 
+           <div class="filter-plan-label"><label class="mb-0">Наименование</label></div>
+           <div class="filter-plan-item">
+              <dynamic-select 
                       :options="eqNameList"
                       option-value="id"
                       option-text="name"
@@ -20,8 +23,11 @@
                       v-model="fData.eqName"
                        @input="eqNameSelected" 
                        :container="container"/>
-            </td>
-            <td><label class="filter-label">Инвентарный номер</label>
+            </div>
+      </div>
+      <div class="filter-plan-col-25"> 
+          <div class="filter-plan-label"><label class="mb-0">Инвентарный номер</label></div>
+           <div class="filter-plan-item">
               <dynamic-select 
                         :options="invNumList"
                         option-value="id"
@@ -29,10 +35,9 @@
                         placeholder=""
                         v-model="fData.invNum" 
                          @input="invNumSelected"/>
-            </td>
+            </div>
+      </div>
 
-        </tr>
-    </table>
   </div>
 </template>
 
@@ -200,47 +205,43 @@
 </script>
 
 <style lang="scss" scoped>
-   .filter{
-    display: flex;
-    padding-top:20px;
-    top: 0;
+ .filter-plan-container {
+  display: flex;
+   flex-wrap: wrap;
+   align-items: flex-start;
+   border-bottom: 3px solid #4285f4;
+   max-width: calc(100vw - 100px);
+}
+.filter-plan-col-50{
+   
+   width: 50%;//calc(50% - 1px);
+   min-width: 360px;
+    text-align: center;
+}
+.filter-plan-col-25{
+   display: inline-block;
+   width: 25%;
+   min-width: 200px;
+    text-align: center;
+}
+.filter-plan-label {
+    display: inline-block;
+    min-width: 120px;
     width: 100%;
     text-align: center;
-    background: #ffffff;
-    border-bottom: 3px solid #4285f4;
-    font-size: 14px;
-    color: #2c3e50;
+    font-style: italic;
+    color:#337ab7;
+    font-size: 12pt;
+    padding-top: .5em;
   }
-   .filter table
-   {
-     width: 90vw;
-     table-layout: fixed;
-    //border-spacing: 10px;
-     border-collapse: separate;
-    }
-   td
-  {
-    text-align: center;
-    padding-left: 1em;
-    padding-right: 1em;
-    width: 300px;
+  .filter-plan-item {
+      display: block;
+      width: 100%;
+      min-width: 200px;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-bottom: .25em;
   }
-    .filter-button:hover{
-    color: #337ab7;
-    border-color: #337ab7;
-  }
-  .filter-button{ 
-      border: 1px solid #ced4da;
-      position: relative;
-      padding: .425em .5em;
-      margin: .5em;
-      -moz-border-radius: .25em;
-      -webkit-border-radius:  .25em;
-      border-radius:  .25em;
-      cursor: pointer;
-      width: 70%
-  }
-  
      
 
 </style>

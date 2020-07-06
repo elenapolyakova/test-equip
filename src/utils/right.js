@@ -6,7 +6,7 @@ import store  from '../../store'
       let funList = getFunList();
       let fun = funList.find(fun => fun.shortName === funShortName);
       let funId = fun ? fun.id : -1;
-      let userRights = store.getters.userRights;
+      let userRights =  store.getters.userRights;
       let rgt = parseInt(userRights[funId], 16);
       let rights = {};
       rights.add = (rgt&1) > 0 //  добавление

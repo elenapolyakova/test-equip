@@ -5,7 +5,7 @@
           @close="$emit('close')">
       <div slot="modal-header"></div>
       <div class="met-card-content">
-        <div class="met-card-col-40">
+        <div class="met-card-col-30">
           <div class="met-card-label"><label class="mb-0">Вид</label></div>
           <div class="met-card-item">  
              <dynamic-select 
@@ -19,7 +19,7 @@
                 <p v-if="actionMode =='view'">{{metCard.attType.name}}</p>         
             </div>
         </div>
-        <div class="met-card-col-40">
+        <div class="met-card-col-30">
           <div class="met-card-label"><label class="mb-0">Тип</label></div>
           <div class="met-card-item">
                <dynamic-select 
@@ -32,15 +32,22 @@
                 <p v-if="actionMode =='view'">{{metCard.M_Type.name}}</p>      
           </div>
         </div>
+         <div class="met-card-col-30">
+          <div class="met-card-label"><label class="mb-0">Номер</label></div>
+          <div class="met-card-item">
+                 <input v-model="metCard.attNum" v-if="actionMode !=='view'" class="met-card-item-input"></input>
+                <p v-if="actionMode =='view'">{{metCard.attNum}}</p>      
+          </div>
+        </div>
         
-        <div class="met-card-col-40">
+        <div class="met-card-col-30">
           <div class="met-card-label"><label class="mb-0">Дата аттестации</label></div>
           <div class="met-card-item">
                 <date-picker v-model="metCard.attDate" popup-class='calPopup' format='DD.MM.YYYY' v-if="actionMode !=='view'"></date-picker>
                 <p name="comDate" v-if="actionMode =='view'">{{metCard.attDateFormat}}</p>
           </div>
         </div>
-        <div class="met-card-col-40">
+        <div class="met-card-col-30">
           <div class="met-card-label"><label class="mb-0">Дата оконч. срока действия</label></div>
           <div class="met-card-item">
                <date-picker v-model="metCard.attEnd" popup-class='calPopup'  format='DD.MM.YYYY' v-if="actionMode !=='view'"></date-picker>
@@ -55,7 +62,7 @@
           
           </div>
         </div>
-        <div class="met-card-col-40" v-if="metCard.attDocPath !=='' || actionMode !=='view'">
+        <div class="met-card-col-50" v-if="metCard.attDocPath !=='' || actionMode !=='view'">
           <div class="met-card-label"><label class="mb-0">Аттестат/св-во о поверке</label></div>
           <div class="met-card-item">
              <div v-if="metCard.attDocPath !=='' && actionMode ==='view'" class='act-btn'>
@@ -75,7 +82,7 @@
             </div>
           </div>
         </div>
-        <div class="met-card-col-40"  v-if="metCard.protocolDocPath !=='' || actionMode !=='view'">
+        <div class="met-card-col-50"  v-if="metCard.protocolDocPath !=='' || actionMode !=='view'">
           <div class="met-card-label"><label class="mb-0" >Протокол</label></div>
           <div class="met-card-item">
             <div v-if="metCard.protocolDocPath !=='' && actionMode ==='view'" class='act-btn'>
@@ -327,8 +334,8 @@ import DynamicSelect from 'vue-dynamic-select'
     align-items: flex-start;
      justify-content:space-evenly;
 }
-.met-card-col-40{
-   width: 40%;
+.met-card-col-30{
+   width: 33%;
     text-align: center;
     min-width: 250px;
 }

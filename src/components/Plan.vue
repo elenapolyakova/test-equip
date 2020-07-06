@@ -14,6 +14,7 @@
               :showQueryId="showQueryId"
               :dateStartQuery="dateStartQuery"
               @editQuery="editQuery"
+              @showHistory="showHistory"
               @addQuery="addQuery"
               :updatedQueryData="updatedQueryData"
               @loading="loadingSchedule"
@@ -26,6 +27,13 @@
                 @close="closeCardQuery"
                 @loading="loading"
     ></card-query>
+    <history-query
+                :queryId="historyQueryId"
+                :showHistoryQuery="showHistoryQuery"
+                @close="closeHistoryQuery"
+                @loading="loading"
+    ></history-query>
+
 
   </div>
 </template>
@@ -34,6 +42,7 @@
    import Schedule from './Schedule'
    import CardQuery from './CardQuery'
    import FilterPlan from './FilterPlan'
+   import HistoryQuery from './HistoryQuery'
    import Loading from 'vue-loading-overlay'
 
   export default {
@@ -41,6 +50,7 @@
     components:  {
       Schedule,
       CardQuery,
+      HistoryQuery,
       FilterPlan,
       Loading
     },
@@ -64,7 +74,9 @@
         isLoading: false,
         isLoadingSchedule:false,
         isLoadingData: false,
-        queryData: {}
+        queryData: {},
+        showHistoryQuery: false,
+        historyQueryId: -1
       }
     },
     methods: {
@@ -75,6 +87,7 @@
         this.showQueryCard = true;
 
       },
+      
       addQuery(params){
           this.queryData = params;
           this.queryData.orderTimeHours = this.orderTimeHours;
@@ -92,6 +105,13 @@
       },
       closeCardQuery(){
         this.showQueryCard = false;
+      },
+      showHistory(queryId){
+          this.historyQueryId = queryId;
+          this.showHistoryQuery = true;
+      },
+      closeHistoryQuery(){
+         this.showHistoryQuery = false;
       },
       filterData(eqData){
           this.curEqId = eqData.eqId;

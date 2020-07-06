@@ -80,5 +80,10 @@
   .admin-user-table .delete-hide:nth-child(3){ 
       display: none;
   }
-
+  .admin-user-table td:nth-child(1),
+  .admin-user-table td:nth-child(2),
+  .admin-user-table td:nth-child(3)
+   {
+      width: 5em
+    }
      

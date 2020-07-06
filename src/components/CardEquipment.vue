@@ -1,260 +1,6 @@
 <template lang="html">
 <div>
-    <div class="eq-card-body" v-if="false">
-        <div class="eq-card-body-item">
-            <div class="label"><label for="devision">Подразделенеие</label></div>
-            <div class="div-25">
-                <dynamic-select 
-                    :options="eqDevisionList"
-                    option-value="id"
-                    option-text="name"
-                    placeholder=''
-                    v-model="eqCard.devision"
-                    v-if="actionMode !=='view'"/>
-                <p name="devision" v-if="actionMode =='view'">{{eqCard.devision.name}}</p>
-            </div> 
-            <div class="label"><label for="responsible">Ответственный</label></div>
-            <div style="width:55%">
-                <dynamic-select 
-                    :options="responsibleList"
-                        option-value="id"
-                        option-text="name"
-                        v-model="eqCard.responsible"
-                        placeholder=''
-                        v-if="actionMode !=='view'"/>
-                 <p name="responsible" v-if="actionMode =='view'">{{eqCard.responsible.name}}</p>
-            </div> 
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqType">Вид оборудования</label></div>
-            <div class="div-25">
-                <dynamic-select 
-                    :options="eqTypeList"
-                    option-value="id"
-                    option-text="name"
-                    v-model="eqCard.eqType"
-                    placeholder=''
-                    v-if="actionMode !=='view'"/>
-                <p name="eqType" v-if="actionMode =='view'">{{eqCard.eqType.name}}</p>
-            </div> 
-            <div class="label"><label for="regNum">№ в госреестре</label></div>
-            <div style="width: 20%">
-                <input v-model="eqCard.regNum" v-if="actionMode !=='view'"></input>
-                <p name="regNum" v-if="actionMode =='view'">{{eqCard.regNum}}</p>
-            </div> 
-            <div class="label"><label for="eqReadiness">Готовность</label></div>
-            <div class="div-25">
-                <dynamic-select 
-                    :options="eqReadinessList"
-                        option-value="id"
-                        option-text="name"
-                        v-model="eqCard.eqReadiness"
-                        placeholder=''
-                        v-if="actionMode !=='view'"/>
-                 <p name="eqReadiness" v-if="actionMode =='view'">{{eqCard.eqReadiness.name}}</p>
-            </div> 
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqName">Название</label> </div>
-            <div class="div-90">
-                <textarea name="eqName" v-if ="actionMode !=='view'" v-model="eqCard.eqName"></textarea>
-                <p name="eqName" v-if="actionMode =='view'">{{eqCard.eqName}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqPurpose">Назначение</label> </div>
-            <div class="div-90">
-                <textarea name="eqPurpose" v-if ="actionMode !=='view'" v-model="eqCard.eqPurpose"></textarea>
-                <p name="eqPurpose" v-if="actionMode =='view'">{{eqCard.eqPurpose}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqPassport">Паспортные характеристики</label> </div>
-            <div class="div-90">
-                <textarea name="eqPassport" v-if ="actionMode !=='view'" v-model="eqCard.eqPassport"></textarea>
-                <p name="eqPassport" v-if="actionMode =='view'">{{eqCard.eqPassport}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item" v-if="false">
-            <div class="label"><label for="eqDocumentation">Документация</label> </div>
-            <div class="div-90">
-                <p name="eqDocumentation" >{{eqCard.eqDocumentation}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label>Документация</label> </div>
-            <div class="doc-container">
-                <div class="doc-item" v-for="(doc, i) in docList">
-                    <div class="doc-name">{{fileName(doc.docTypeId)!=null ? fileName(doc.docTypeId) : doc.name}}</div>
-                    <div class="doc-button">
-                        <a :href='doc.path' target='_blank'><i  class="fa fa-download" title="загрузить документ" ></i></a>
-                        <i v-if ="addEnable" class="fa fa-trash-alt" title="удалить документ" v-on:click="$emit('deleteDoc', {idDoc: doc.idDoc})"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="file-button"  v-if ="actionMode !=='view' && eqCard.id != -1"> 
-                <label @click="$emit('showAddDoc')"> 
-                    <i  class="fa fa-plus" title="добавить документ"></i>
-                    добавить документ
-                </label>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqTechState">Техническое состояние</label> </div>
-            <div class="div-90">
-                <textarea name="eqTechState" v-if ="actionMode !=='view'" v-model="eqCard.eqTechState"></textarea>
-                <p name="eqTechState" v-if="actionMode =='view'">{{eqCard.eqTechState}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqProducer">Производитель</label></div>
-            <div style="width: 65%">
-                <input style="width:100%" name="eqProducer" v-model="eqCard.eqProducer" v-if="actionMode !=='view'"></input>
-                <p name="eqProducer" v-if="actionMode =='view'">{{eqCard.eqProducer}}</p>
-            </div>
-            <div class="label"><label for="factDate">Дата выпуска</label></div>
-            <div class="div-15">
-                <date-picker v-model="eqCard.factDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' v-if="actionMode !=='view'"></date-picker>
-                <p name="factDate" v-if="actionMode =='view'">{{eqCard.factDateFormat}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqCostKeep">Затраты на содержание в год</label> </div>
-            <div class="div-15">
-                <p name="eqCostKeep">{{eqCard.eqCostKeep}}</p>
-            </div>
-            <div class="label"><label for="eqWorkLoad">Средняя загрузка в год, %</label> </div>
-            <div class="div-15">
-                <p name="eqWorkLoad">{{eqCard.eqWorkLoad}}</p>
-            </div>
-            <div class="label"><label for="eqAtt">Аттестация от</label> </div>
-            <div class="div-15">
-                <p name="eqAtt">{{eqCard.eqAtt}}</p>
-            </div>
-            <div class="label"><label for="eqVer">Поверка до</label> </div>
-            <div class="div-15">
-                <p name="eqVer">{{eqCard.eqVer}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqResValue">Остаточная стоимость</label> </div>
-            <div class="div-15">
-                <input name="eqResValue" v-model="eqCard.eqResValue" v-if="actionMode !=='view'" @keyup="costKeyUp" @focus="costFocus" @blur="costBlur"></input>
-                <p name="eqResValue" v-if="actionMode =='view'">{{eqCard.eqResValue}}</p>
-            </div>
-            <div class="label"><label for="resValueDate">Дата определ. остат. стоимости</label> </div>
-            <div class="div-15">
-                <date-picker v-model="eqCard.resValueDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' v-if="actionMode !=='view'"></date-picker>
-                <p name="resValueDate" v-if="actionMode =='view'">{{eqCard.resValueDateFormat}}</p>
-            </div>
-            <div class="label"><label for="comDate">Дата ввода в эксплуатацию</label> </div>
-            <div class="div-15">
-                <date-picker v-model="eqCard.comDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' v-if="actionMode !=='view'"></date-picker>
-                <p name="comDate" v-if="actionMode =='view'">{{eqCard.comDateFormat}}</p>
-            </div>
-            <div class="label"><label for="repDate">Год послед. модернизации</label> </div>
-            <div class="div-15">
-                <input name="repDate" v-model="eqCard.repDate" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
-                <p name="repDate" v-if="actionMode =='view'">{{eqCard.repDate}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqCalInterval">МПИ/МАИ (мес.)</label> </div>
-            <div class="div-15">
-                <input name="eqCalInterval" type="number" v-model="eqCard.eqCalInterval" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
-                <p name="eqCalInterval" v-if="actionMode =='view'">{{eqCard.eqCalInterval}}</p>
-            </div>
-            <div class="label"><label for="TOInterval">Интервал ТО (мес.)</label> </div>
-            <div class="div-15">
-                <input name="TOInterval" type="number" v-model="eqCard.TOInterval" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
-                <p name="TOInterval" v-if="actionMode =='view'">{{eqCard.TOInterval}}</p>
-            </div>
-            <div class="label"><label for="costLaborTime">Стоимость нормо-час</label> </div>
-            <div class="div-15">
-                <input name="costLaborTime" v-model="eqCard.costLaborTime" v-if="actionMode !=='view'"  @keyup="costKeyUp" @focus="costFocus" @blur="costBlur"></input>
-                <p name="costLaborTime" v-if="actionMode =='view'">{{eqCard.costLaborTime}}</p>
-            </div>
-            <div class="label"><label for="orderTime">Мин. время заказа</label> </div>
-            <div class="div-15">
-                <dynamic-select 
-                    :options="orderTimeList"
-                    option-value="id"
-                    option-text="name"
-                    v-model="eqCard.orderTime"
-                    placeholder=''
-                    v-if="actionMode !=='view'"/>
-                <p name="orderTime" v-if="actionMode =='view'">{{eqCard.orderTime.name}}</p>                            
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label></label> </div>
-            <div class="div-15"> </div>
-            <div class="label"><label></label> </div>
-            <div class="div-15"> </div>
-            <div class="label"><label></label> </div>
-            <div class="div-15"> </div>
-            <div class="label"><label for="workingMode">Режим работы</label> </div>
-            <div class="div-15"> 
-                 <dynamic-select 
-                    :options="workingModeList"
-                    option-value="id"
-                    option-text="name"
-                    v-model="eqCard.workingMode"
-                    placeholder=''
-                    v-if="actionMode !=='view'"/>
-                <p name="workingMode" v-if="actionMode =='view'">{{eqCard.workingMode.name}}</p>                            
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="div-50">
-                <div class="foto_label">Фото оборудования </div>
-                <div class="image-button" v-if="addEnable">
-                    <input type="file" name="file" id="input__file_image" ref='fileImage' class="input input__file" accept="image/x-png,image/gif,image/jpeg" v-on:change="$emit('handleImageUpload', {imageArr: imagesEq, ref: $refs.fileImage, phototype: 1})"/>
-                    <label for="input__file_image"> 
-                        <i  class="fa fa-plus" title="добавить фото"></i>
-                        добавить фото
-                     </label>
-                </div>
-                <div class="image-container">
-                    <div class="image-item" v-for="(image, i) in imagesEq">
-                        <img class="image" :src="image" @click="showImg(i)"><i v-if="actionMode!=='view'" class='fa fa-trash-alt' title='удалить фото' @click="$emit('deleteImage', {imageArr: imagesEq, index: i, phototype: 1})"></i></img>
-                    </div>
-                </div>
-                <vue-gallery-slideshow :images="imagesEq" :index="indexEq" @close="indexEq = null"></vue-gallery-slideshow>
-            </div>
-            <div class="div-50">
-                <div class="foto_label">Схема расположения </div>
-                <div class="image-button" v-if="addEnable">
-                    <input type="file" name="file" id="input__file_loc" ref='fileLoc' class="input input__file" accept="image/x-png,image/gif,image/jpeg" v-on:change="$emit('handleImageUpload', {imageArr: imagesLoc, ref: $refs.fileLoc, phototype: 2})"/>
-                    <label for="input__file_loc"> 
-                        <i class="fa fa-plus" title="добавить схему"> </i>
-                        добавить схему
-                    </label>
-                </div>
-                <div class="image-container">
-                    <div class="image-item" v-for="(image, i) in imagesLoc">
-                        <img class="image"  :src="image" @click="showLoc(i)"><i v-if="actionMode!=='view'" class='fa fa-trash-alt' title="удалить схему" @click="$emit('deleteImage', {imageArr: imagesLoc, index: i, phototype: 2})"></i></img>
-                    </div>
-                </div>
-                <vue-gallery-slideshow :images="imagesLoc" :index="indexLoc" @close="indexLoc = null"></vue-gallery-slideshow>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqLocation">Расположение</label> </div>
-            <div class="div-90">
-                <textarea name="eqLocation" v-if ="actionMode !=='view'" v-model="eqCard.eqLocation"></textarea>
-                <p name="eqLocation" v-if="actionMode =='view'">{{eqCard.eqLocation}}</p>
-            </div>
-        </div>
-        <div class="eq-card-body-item">
-            <div class="label"><label for="eqNote">Примечание</label> </div>
-            <div class="div-90">
-                <textarea name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote"></textarea>
-                <p name="eqNote" v-if="actionMode =='view'">{{eqCard.eqNote}}</p>
-            </div>
-        </div>
-    </div>
-
+   
     <div class="eq-card-content eq-card-container">
         <div class="eq-card-col-50 eq-card-container">
             <div class="eq-card-label"><label class="mb-0">Наименование оборудования</label></div>
@@ -312,8 +58,9 @@
             <div class="eq-card-col-30">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Год последней модернизации</label></div>
                 <div class="eq-card-item eq-card-small">
-                     <input name="repDate" v-model="eqCard.repDate" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
-                    <p name="repDate" v-if="actionMode =='view'">{{eqCard.repDate}}</p>
+                     <!-- <input name="repDate" v-model="eqCard.repDate" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
+                    <p name="repDate" v-if="actionMode =='view'">{{eqCard.repDate}}</p> -->
+                     <p name="repDate">{{eqCard.repDate}}</p>
                 </div>
             </div>
            
@@ -345,10 +92,10 @@
                 <p name="eqProducer" v-if="actionMode =='view'">{{eqCard.eqProducer}}</p>
             </div>
         </div>
-        <div class="eq-card-col-100 eq-card-container-doc"  v-if="addEnable">
+        <div class="eq-card-col-100 eq-card-container-doc">
         <div class="eq-card-label"><label class="mb-0">Наличие техдокументации</label></div>
             <!-- <div class="eq-card-item"> -->
-                <div class="eq-card-file-button"> 
+                <div class="eq-card-file-button" v-if="addEnable"> 
                     <label @click="$emit('showAddDoc')"> 
                         <i  class="fa fa-plus" title="добавить документ"></i>
                         добавить документ
@@ -401,9 +148,12 @@
         </div>
         <div class="eq-card-col-100 eq-card-container">
               <div class="eq-card-col-25">
-                <div class="eq-card-label eq-card-small"><label class="mb-0">Остаточная стоимость</label></label></div>
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Остаточная стоимость, ₽</label></label></div>
                 <div class="eq-card-item eq-card-small">
-                    <input name="eqResValue" v-model="eqCard.eqResValue" v-if="actionMode !=='view'" @keyup="costKeyUp" @focus="costFocus" @blur="costBlur"></input>
+                    <input name="eqResValue" v-model="eqCard.eqResValue" v-if="actionMode !=='view'"
+                     @keyup="eqCard.eqResValue = toFloatView(eqCard.eqResValue)" 
+                     @focus="eqCard.eqResValue = toFloatView(eqCard.eqResValue)" 
+                     @blur="eqCard.eqResValue = toCost(eqCard.eqResValue)"></input>
                     <p name="eqResValue" v-if="actionMode =='view'">{{eqCard.eqResValue}}</p>
                 </div>
             </div>
@@ -428,9 +178,12 @@
         </div>
         <div class="eq-card-col-100 eq-card-container">
               <div class="eq-card-col-25">
-                <div class="eq-card-label eq-card-small"><label class="mb-0">Стоимость нормо-часа</label></label></div>
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Стоимость нормо-часа, ₽</label></label></div>
                 <div class="eq-card-item eq-card-small">
-                    <input name="costLaborTime" v-model="eqCard.costLaborTime" v-if="actionMode !=='view'"  @keyup="costKeyUp" @focus="costFocus" @blur="costBlur"></input>
+                    <input name="costLaborTime" v-model="eqCard.costLaborTime" v-if="actionMode !=='view'" 
+                    @keyup="eqCard.costLaborTime = toFloatView(eqCard.costLaborTime)" 
+                    @focus="eqCard.costLaborTime = toFloatView(eqCard.costLaborTime)" 
+                    @blur="eqCard.costLaborTime = toCost(eqCard.costLaborTime)"></input>
                     <p name="costLaborTime" v-if="actionMode =='view'">{{eqCard.costLaborTime}}</p>
                 </div>
             </div>
@@ -598,18 +351,12 @@ $(window).on('resize', function(){
         if (docType) return docType.name;
         return null;
       },
-     costKeyUp: function(){
-            if(event)
-                event.target.value = toFloatView(event.target.value) 
-        },
-        costFocus: function(){
-            if(event)
-                event.target.value = toFloatView(event.target.value)
-        },
-        costBlur: function(){
-            if(event)
-                event.target.value = toCost(event.target.value)
-        },
+      toFloatView: function(target){
+            return toFloatView(target);
+      },
+      toCost: function(target){
+            return toCost(target);
+      },
         addDocClick(params){
             this.currentIdDoc = params.idDoc;
        },
@@ -728,7 +475,7 @@ $(window).on('resize', function(){
   }
   .eq-card-item  p
   {
-      margin-bottom: 0;
+      margin: 0;
   }
   .eq-card-image-button,
   .eq-card-file-button{

@@ -7,6 +7,7 @@
     </loading>
    <filter-equipment 
                   @filterData="filterData"
+                  @clearFilter="clearFilter"
                    :fData="fData" 
                   :eqNameList="eqNameList"
                   :eqDevisionList="eqDevisionList"
@@ -17,12 +18,6 @@
                   :lang="lang"
                   :hasExtended="true">
    </filter-equipment> 
-
-
-   
-   
-
-
 
       <div class="eqContent">
         <div v-if="rights.add">
@@ -122,6 +117,7 @@
                       		<Schedule  :eqId="eqCard.id"
                                     :workingMode="workingMode"
                                      @editQuery="editQuery"
+                                     @showHistory="showHistory"
                                      @addQuery="addQuery"
                                      :updatedQueryData="updatedQueryData"
                                      @loading="loadingSchedule">
@@ -163,6 +159,7 @@
                       </div>
                </div>
                <div class ="eq-card-footer">
+                <button class="modal-button"  v-if="eqCard.id != -1 && activetab===0" @click='cardShow' title='печать карточки'><i class = 'fa fa-print'></i> Печать</button>
                 <button class="modal-button"  v-if="actionMode !=='view' && activetab===0" @click = 'saveModal' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
                 <button class="modal-button" @click = "closeModal" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
               </div>
@@ -209,6 +206,12 @@
                      @close="closeCardQuery"
                     @loading="loading"
           ></card-query>
+           <history-query
+                :queryId="historyQueryId"
+                :showHistoryQuery="showHistoryQuery"
+                @close="closeHistoryQuery"
+                @loading="loading"
+          ></history-query>
          <card-metrology
                             
                             :metCard="metCard"
@@ -237,16 +240,19 @@
   import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours} from '../utils/dictionary'
   import Schedule from './Schedule'
   import CardQuery from './CardQuery'
+  import HistoryQuery from './HistoryQuery'
   import CardMetrology from './CardMetrology'
   import {toCost, toFloat} from '../utils/commonJS'
   import DynamicSelect from 'vue-dynamic-select'
+  import rEqCard from '../components/rEquipmentCard'
+  import rEqCardF from '../components/rEquipmentCardWithFilter'
 
   import 'vue2-datepicker/index.css'
   import '../css/v-datatable-light.css'
   import '../css/stackable-modal.scss'
   import '../css/tab-pages.css'
   import 'vue-loading-overlay/dist/vue-loading.css'
-
+  import '../css/background-color.css'
 
    
 
@@ -263,7 +269,8 @@
       Schedule, 
       CardQuery,
       DynamicSelect,
-      CardMetrology
+      CardMetrology,
+      HistoryQuery
 
     },
     data() {
@@ -319,17 +326,11 @@
           "__slot:actions:actionsCopy",
           "__slot:actions:actionsDelete",
           { name: "cardNum", label: "Номер карточки" /*, format: formatDate*/,  sortable: true },
-          { name: "invNum", label: "Инвентарный номер",  sortable: true },
-          { name: "eqDevisionName", label: "Подразделение",  sortable: true },
           { name: "eqName", label: "Наименование",  sortable: true} ,
           { name: "eqTypeName", label: "Вид/категория",  sortable: true },
-          { name: "eqProducer", label: "Производитель",  sortable: true },
-          { name: "factNum", label: "Заводской номер",  sortable: true },
           { name: "factDateFormat", label: "Дата выпуска", sortable: true },
-          { name: "comDateFormat", label: "Дата ввода в эксплуатацию", sortable: true },
-          { name: "repDate", label: "Год последней модернизации",  sortable: true },
           { name: "responsibleName", label: "Ответственный",  sortable: true },
-          { name: "eqReadinessName", label: "Готовность",  sortable: true }
+          { name: "eqReadinessName", label: "Тех. состояние",  sortable: true }
         ],
        rowCurrentIndex: 0,
        datatableCss: {
@@ -363,6 +364,8 @@
        orderTimeHours: 0,
        workingMode: 1,
        queryData: {},
+       historyQueryId: -1,
+       showHistoryQuery: false,
 
        actionModeMetrology: '',
        showMetrologyCard: false,
@@ -440,11 +443,11 @@
                     eqItem.workingModeName = this.workingModeName(eqItem.workingMode);
                     eqItem.eqLocation = item.eq_place ? item.eq_place.trim() : '';
                     eqItem.eqNote = item.remark ? item.remark.trim() : '';
-                    eqItem.repDate = item.repdate;
+                    eqItem.repDate = item.repdate ? formatDate(new Date(item.repdate)): '';;
                     eqItem.eqCostKeep = item.eqcostkeep ? + item.eqcostkeep +' ₽' : '0 ₽';
                     eqItem.eqWorkLoad = item.eqworkload;
                     eqItem.eqAtt = item.eqatt ? formatDate(new Date(item.eqatt)): '';
-                    item.eqVer = item.eqver ? formatDate(new Date(item.eqver)): '';
+                    eqItem.eqVer = item.eqver ? formatDate(new Date(item.eqver)): '';
                     this.eqInitialList.push(eqItem);
                 });
                 this.eqNameList = this.fillDict(this.eqNameList , 'eqName');
@@ -480,6 +483,14 @@
         if (val && val !== '')
           return parseFloat(val.toString().replace(',','.'));
         return null;
+     },
+     cardShow: function(){
+         let eqId =  this.eqCard.id;
+     /*    this.$router.push({name:'rEqCardF', component: rEqCardF,  
+              params: {
+                eqId: eqId,
+              }
+          });*/
      },
      saveModal: function()
      {
@@ -582,8 +593,12 @@
      },
       closeModal: function()
       {
-        this.showEqCard = false;
-        this.activetab = 0;
+          if (confirm('Вы уверены, что хотите закрыть карточку?')){
+              this.showEqCard = false;
+              this.activetab = 0;
+          }
+
+
       },
       eqDevisionName: function (_id){
         let devisionItem = _.find(this.eqDevisionList, {id: _id});
@@ -785,7 +800,23 @@
         }
         else this.isLoading = false;
       },
-
+      clearFilter: function(){
+          this.fData = {
+          cardNum: '', 
+          invNum: '',
+          eqName: null,
+          devision: null,
+          eqType: null,
+          eqProducer: null,
+          factNum: '',
+          factDate: null,
+          comDate: null,
+          repDate: '',
+          responsible: null,
+          eqReadiness: null
+        };
+        this.filterData(true);
+      },
       filterData: function(showLoading){
         if (showLoading)
           this.isLoading = true;
@@ -983,7 +1014,6 @@
                 }
             ).then(response => {
                 let filename = response.data.filename;
-                alert (filename);
                 if (filename)
                 {
                   let docItem = _.find(this.docList, {idDoc: idDoc});
@@ -1091,6 +1121,13 @@
       },
       closeCardQuery(){
         this.showQueryCard = false;
+      },
+      showHistory(queryId){
+          this.historyQueryId = queryId;
+          this.showHistoryQuery = true;
+      },
+      closeHistoryQuery(){
+         this.showHistoryQuery = false;
       },
       
        getOrderTimeParams(){
@@ -1253,6 +1290,11 @@
   text-align: left;
   height: 2.5em;
 }
+
+.eq-card-col-25 p{
+  margin: 0 !important;
+}
+
 .eq-card-dyn-select {
   width: 65%;
   height: 2.5em;

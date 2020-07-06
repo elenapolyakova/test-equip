@@ -20,6 +20,12 @@ const toFloatView = val => {
     }
     return null;
 }
+const inMonth = i =>  ['январе', 'феврале', 'марте', 'апреле', 'мае', 'июне', 'июле', 'августе', 'сентябре', 'октябре', 'ноябре', 'декабре'][i]
+const ofMonth = i =>  ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'][i]
+const forMonth = i =>  ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'][i]
+
+const truncated = num => Math.trunc(parseFloat(num).toFixed(2) * 100) / 100;
 
 
-export {toFloat, toCost, toFloatView}
+
+export {toFloat, toCost, toFloatView, inMonth, ofMonth, truncated, forMonth}

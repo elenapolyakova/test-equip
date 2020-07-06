@@ -11,7 +11,7 @@ import VueApexCharts from 'vue-apexcharts'
 
 const _ = require('lodash');
 
-Vue.use(axios);
+//Vue.use(axios);
 Vue.component('apexchart', VueApexCharts);
 
 Vue.use(Vue2TouchEvents, {disableClick: false,

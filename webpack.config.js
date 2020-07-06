@@ -12,7 +12,10 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new TerserPlugin()
+    new TerserPlugin({
+      sourceMap: false
+    }
+    )
   ],
   module: {
     rules: [

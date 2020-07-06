@@ -44,6 +44,10 @@
                   </option>
                 </select>
             </div>
+            <div class="query-card-content-item">
+            <label>Автор заявки</label>
+                <p>{{author}}</p>
+            </div>
           <div class="query-card-content-item">
           <label>Договор</label>
               <dynamic-select class ="query-card-dynamic-select" :options="contractList"
@@ -106,7 +110,7 @@
   import api from "../utils/api"
 
   import '../css/stackable-modal.scss'
-  import {getQueryType, getWorkingPeriod} from '../utils/dictionary'
+  import {getQueryType, getWorkingPeriod, getFunId} from '../utils/dictionary'
   import {formatDate, HoursDiff} from '../utils/date'
 
   export default {
@@ -132,6 +136,7 @@
         this.contractData = {};
         this.updateQueryData = {};
         this.contract ={}
+        this.author = '';
   
         if(this.queryData.dateStartOriginal)
            this.dateStart = this.queryData.dateStartOriginal;
@@ -142,6 +147,7 @@
         else if(this.queryData.dateEnd)
             this.dateEnd = this.queryData.dateEnd;
         this.Q_type = this.queryData.Q_type;
+        this.author = this.authorName(this.queryData.userId);
         this.contract = _.find(this.contractList, {id:this.queryData.conId});
 
 
@@ -194,10 +200,12 @@
         modalClass:'modal-xl',
         queryInitialList: [],
         updateQueryData: {},
+        authorList: [],
         dateStart: null,
         dateEnd: null,
         Q_type: 0, 
         contract: {},
+        author: '',
         minTime: 9*60,
         maxTime: 18*60,
         format:'DD.MM.YYYY HH:mm',
@@ -225,24 +233,39 @@
             this.rights = getFunRight(this.funShortName);
             this.$emit('loading', true);
              api().
-               get('/contract')
+               get('/dictionary')
                .then(response => 
                {
-                 let data = response.data;
-                 data.forEach(item =>{
-                    let contractItem = {
-                     
-                      name: `${item.con_num ? '№'+item.con_num.trim() : ''} ${item.con_date ? ' от ' + formatDate(item.con_date): ''}`,
-                      id: item.id_cont
-                    }
-                     this.contractList.push(contractItem);
-                 });
+                 let dict = response.data;
+                 this.authorList = dict.userList;
+                 this.authorList.forEach(item => item.name =`${item.us_surname} ${item.us_name} ${item.us_patname}`);
+                      api().
+                        get('/contract')
+                        .then(response => 
+                        {
+                          let data = response.data;
+                          data.forEach(item =>{
+                              let contractItem = {
+                              
+                                name: `${item.con_num ? '№'+item.con_num.trim() : ''} ${item.con_date ? ' от ' + formatDate(item.con_date): ''}`,
+                                id: item.id_cont
+                              }
+                              this.contractList.push(contractItem);
+                          });
 
-                 this.$emit('loading', false);
+                            
+
+                          this.$emit('loading', false);
+                        })
+                        .catch(error =>  {
+                            this.$emit('loading', false);
+                            alert ('Ошибка при получении данных о договорах: ' + error);
+                            
+                        })
                })
                .catch(error =>  {
                   this.$emit('loading', false);
-                   alert ('Ошибка при получении данных о договорах: ' + error);
+                   alert ('Ошибка при получении данных о пользователях: ' + error);
                   
                })
             this.queryTypeList = getQueryType();
@@ -317,6 +340,11 @@
         {
           //???
         },
+        authorName: function (_id){
+          if (_id) _id = parseInt(_id);
+          let authorItem = _.find(this.authorList, {id: _id});
+          return authorItem ? authorItem.name: '';
+        },
        saveContract: function(){
          this.dataChange();
          this.$emit('loading', true);
@@ -377,7 +405,8 @@
               dateEnd: this.dateEnd,
               Q_type: this.Q_type,
               conId: this.contract.id,
-              userId: this.$store.getters.id_user
+              userId: this.$store.getters.id_user,
+              funId: getFunId(this.funShortName)
           }
           if (this.queryData.queryId === -1)
          {
@@ -410,7 +439,6 @@
                   let query =_.find(this.queryInitialList, {queryId: this.queryData.queryId});
                   query.dateStart = this.updateQueryData.dateStart;
                   query.dateEnd =  this.updateQueryData.dateEnd;
-                  console.log(JSON.stringify(this.queryInitialList)); //todo check
                   this.$emit('loading', false);
                   alert ('Данные сохранены!');
                   this.$emit('save', this.updateQueryData);
@@ -489,7 +517,8 @@
   }
 .query-card-content-item select,
 .query-card-content-item input,
-.query-card-content-item textarea
+.query-card-content-item textarea,
+.query-card-content-item p
   {
     border: 1px solid #ced4da;
     position: relative;
@@ -502,7 +531,8 @@
     text-align: left;
     margin-right: 2em;
   }
-  .query-card-content-item select{
+  .query-card-content-item select,
+  .query-card-content-item p{
     width: 330px;
     padding: .5em .5em;
   }
@@ -542,6 +572,7 @@
   .query-card-content-item select,
   .query-card-content-item input,
   .query-card-content-item textarea,
+  .query-card-content-item p,
   .query-card-dynamic-select{
     width: 210px !important;
   }
