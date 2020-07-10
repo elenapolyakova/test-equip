@@ -7,7 +7,7 @@
                               <label class="mb-0">Период:</label> </div>
                             <div class="action-panel-filter-calendar-item">
                             <date-picker 
-                              v-model="fData.datePeriod" 
+                              v-model="datePeriod" 
                               type="date" 
                               :range="true"
                               :format="format"
@@ -32,9 +32,9 @@
                                         placeholder=''/>
                             </div>
                       </div>
-                      <div class="action-panel-filter-button">
-                          <button class="filter-button" @click="getReport" title= 'Применить фильтр'><i class='fa fa-check'> </i></button>
-                          <!-- <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button> -->
+                    <div class="btns">
+                          <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
+                          <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button>
                       </div>
 
                   </div>
@@ -81,6 +81,7 @@
          fData: {},
          devisionList: [],
          format:'DD.MM.YYYY',
+         datePeriod: [new Date(), new Date()],
        }
     },
     methods: {
@@ -89,9 +90,15 @@
         clearFilter: function(){
 
         },
+            clearFilter: function(){
+              this.fData = {
+                    devision: null
+            }
+            this.getReport();
+        },
         getReport: function(){
-            let dateStart = this.fData.datePeriod[0];
-            let dateEnd = this.fData.datePeriod[1];
+            let dateStart = this.datePeriod[0];
+            let dateEnd = this.datePeriod[1];
             let daysCount = DateDiff(dateEnd, dateStart);
             if (daysCount <= 30){
               alert ("каждый день")
@@ -112,6 +119,10 @@
       
       initData: function(){
             this.isLoading = true;
+            let now = new Date();
+            this.datePeriod = [];
+            this.datePeriod.push(new Date(now.getFullYear(), now.getMonth(), 1));
+            this.datePeriod.push(now);
 
             api().
             get('/dictionary')
@@ -120,9 +131,9 @@
                 this.devisionList = [];
                 this.devisionList = dict.divisionList;
 
-                let allDevision = {id: -1, name: 'АО «ВНИИЖТ»'}
-                this.devisionList.push(allDevision);
-                this.fData.devision = allDevision;
+               // let allDevision = {id: -1, name: 'АО «ВНИИЖТ»'}
+               // this.devisionList.push(allDevision);
+               // this.fData.devision = allDevision;
                /* api().
                 get('/equipment')
                 .then(response => 
@@ -166,9 +177,9 @@
       {
       
        window.html2canvas = html2canvas;
-        let allDevision = {id: 1000, name: 'АО «ВНИИЖТ»'}
-        this.devisionList.push(allDevision);
-        this.fData.devision = allDevision;
+        // let allDevision = {id: 1000, name: 'АО «ВНИИЖТ»'}
+        // this.devisionList.push(allDevision);
+        // this.fData.devision = allDevision;
 
         this.initData();
         
@@ -268,7 +279,10 @@
 .mx-datepicker-range{
     width: 100% !important;
 }
-
+  .btns{
+    display : flex;
+    flex-wrap: nowrap;
+  }
 @media screen and (max-width: 1400px) {
    .action-panel-filter{
      flex-wrap: wrap;

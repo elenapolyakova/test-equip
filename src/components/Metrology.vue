@@ -1,6 +1,6 @@
 <template lang="html">
   <div>
-        <div v-if="rights.add">
+        <div v-if="rights.add && !isArchive">
             <button class="add-button" @click="actionAddClick" ><i class='fa fa-plus'> </i> Добавить  аттестацию/поверку</button></td>
         </div>
         <DataTable
@@ -42,7 +42,7 @@
   import {formatDate, dateFromString} from '../utils/date'
   import {getFunRight, hasRight}  from "../utils/right";
   import api from "../utils/api";
-  import {getAttType, getMType} from '../utils/dictionary'
+  import {getAttType, getMType, getFunId} from '../utils/dictionary'
 
     import '../css/v-datatable-light.css'
   export default {
@@ -53,7 +53,8 @@
     },
       props: {
              idEq: {type: Number, required: true},
-             updatedMetData: {type:Object, required:false}
+             updatedMetData: {type:Object, required:false},
+             isArchive: {type: Boolean, required: false},
     },
     data() {
       return {
@@ -227,7 +228,8 @@
             attEnd: params? params.rowData.attEnd : '',
             attEndFormat: params? params.rowData.attEndFormat : '',
             attDocPath: params? params.rowData.attDocPath : '',
-            protocolDocPath: params? params.rowData.protocolDocPath : ''
+            protocolDocPath: params? params.rowData.protocolDocPath : '',
+            funId: getFunId (this.funShortName)
 
          }
       }
@@ -241,13 +243,21 @@
         //   this.datatableCss.tbodyTd += ' view-hide'
         //   this.datatableCss.theadTh += ' view-hide'
         // }
-        if (!this.rights.edit){
-          this.datatableCss.tbodyTd += ' edit-hide'
-          this.datatableCss.theadTh += ' edit-hide'
+        if (this.isArchive){
+            this.datatableCss.tbodyTd += ' edit-hide'
+            this.datatableCss.theadTh += ' edit-hide'
+            this.datatableCss.tbodyTd += ' delete-hide'
+            this.datatableCss.theadTh += ' delete-hide'
         }
-        if (!this.rights.delete){
-          this.datatableCss.tbodyTd += ' delete-hide'
-          this.datatableCss.theadTh += ' delete-hide'
+        else {
+          if (!this.rights.edit){
+            this.datatableCss.tbodyTd += ' edit-hide'
+            this.datatableCss.theadTh += ' edit-hide'
+          }
+          if (!this.rights.delete){
+            this.datatableCss.tbodyTd += ' delete-hide'
+            this.datatableCss.theadTh += ' delete-hide'
+          }
         }
         this.initData();
       

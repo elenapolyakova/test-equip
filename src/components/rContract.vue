@@ -34,8 +34,7 @@
                                         option-value="id"
                                         option-text="name"
                                         v-model="fData.devision"
-                                        placeholder=''
-                                         @input="devisionSelected"/>
+                                        placeholder=''/>
                             </div>
                       </div>
                       <div class="action-panel-filter-item">
@@ -52,9 +51,9 @@
                             </div>
                       </div>
 
-                      <div class="action-panel-filter-button">
+                      <div class="btns">
                           <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
-                          <!-- <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button> -->
+                          <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button>
                       </div>
 
                   </div>
@@ -384,6 +383,13 @@
         pdfMake.createPdf(docDefenition).download(this.report_name + ".pdf");
 
         },
+        clearFilter: function(){
+              this.fData = {
+                    devision: null, 
+                    cardNum: null
+            }
+            this.getReport();
+        },
         getReport: function(){
             this.isLoading = true;
             let dateStart = this.datePeriod[0];
@@ -437,9 +443,9 @@
             .then(response => {
                 let dict = response.data;
                 this.devisionList = [];
-                let allDevision = {id: -1, name: 'АО «ВНИИЖТ»'}
-                this.devisionList.push(allDevision);
-                this.fData.devision = allDevision;
+               // let allDevision = {id: -1, name: 'АО «ВНИИЖТ»'}
+              //  this.devisionList.push(allDevision);
+              //  this.fData.devision = allDevision;
                 dict.divisionList.forEach(devision => {this.devisionList.push(devision)});
                 api().
                 get('/equipment')
@@ -568,7 +574,9 @@
         devisionSelected: function()
         {
             this.isLoading = true;
-            let devisionId = this.fData.devision.id;
+            let devisionId = -1;
+            if (this.fData.devision)
+                devisionId = this.fData.devision.id;
             this.eqData = this.eqInitialList;
          
             if (devisionId > 0)
@@ -692,6 +700,10 @@
 .table-eq-cont td {
   vertical-align: middle !important;
 }
+  .btns{
+    display : flex;
+    flex-wrap: nowrap;
+  }
 @media screen and (max-width: 1500px) {
    .action-panel-filter{
      flex-wrap: wrap;

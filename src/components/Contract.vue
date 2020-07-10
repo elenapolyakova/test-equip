@@ -229,7 +229,7 @@
           //console.log ('unite ' + this.parentId + '____' + params.rowData.idCon);
 
           api().
-              post('/contractUnite/' + this.parentId + '&' + idCon) //todo проверить
+              post('/contractUnite/' + this.parentId + '&' + idCon) 
               .then(response => { 
                 this.contractData = _.reject(this.contractData, {idCon: idCon});
                 this.actionMode = 'view';

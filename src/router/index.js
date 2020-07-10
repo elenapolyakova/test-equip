@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Home from '../components/Home'
 import Login from '../components/Login'
 import Equipment from '../components/Equipment'
+import equipArch from '../components/Equipment'
 import Query from '../components/Query'
 import Plan from '../components/Plan'
 import Contract from '../components/Contract'
@@ -31,8 +32,9 @@ const router = new Router({
     routes: [
       { path: '/', name:'home', component: Home },
       { path: '/login', name:'login', component: Login },
-      { path: '/equipment', name:'equipment', component: Equipment },
-      { path: '/query', name:'query', component: Query },
+      { path: '/equip', name:'equipment', component: Equipment,  props: {isArchive: false} },
+      { path: '/equipArch', name:'equipArch', component: equipArch,  props: {isArchive: true} },
+      { path: '/queryList', name:'query', component: Query },
       { path: '/plan', name:'plan', component: Plan,  props: true},
       { path: '/contract', name:'contract', component: Contract },
       { path: '/report/:id', name:'report', component: Report, props: true },

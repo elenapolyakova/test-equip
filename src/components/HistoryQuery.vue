@@ -4,9 +4,9 @@
           :modal-class="{[modalClass]: true}"
           @close="$emit('close')">
       <div slot="modal-header">
-          <div class="title">История изменения заявки</div>
+          <div class="title history-query-header">История изменения заявки</div>
       </div>
-      <div class="query-card-content">
+      <div class="history-query-content">
              <DataTable
             :header-fields="headerFields"
             :data="historyData || []"
@@ -14,7 +14,7 @@
         </DataTable>
       </div>
       <div slot="modal-footer">
-        <div class ="query-card-footer">
+        <div class ="history-query-footer">
             <button class="modal-button" @click="$emit('close')" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
         </div>
       </div>  
@@ -30,6 +30,13 @@
   import {formatDate, formatDateTime} from '../utils/date'
   import { DataTable } from 'v-datatable-light'
 
+$(window).on('resize', function(){
+        let header = $('.history-query-header').height();
+        let footer = $('.history-query-footer').height();
+        $('.history-query-content ').css("height", ($(window).height() - header - footer) -120 + 'px');
+});
+
+
   export default {
     name:"history-query",
     components: {
@@ -38,7 +45,7 @@
     },
     props: {
         queryId: {type: Number},
-		showHistoryQuery: {type: Boolean}
+		    showHistoryQuery: {type: Boolean}
   },
   watch:{
     showHistoryQuery(value)
@@ -48,6 +55,13 @@
         this.$emit('loading', true);
         this.historyData = [];
         let funId = getFunId(this.funShortName)
+
+        setTimeout(() => { 
+             let header = $('.history-query-header').height();
+             let footer = $('.history-query-footer').height();
+              $('.history-query-content ').css("height", ($(window).height() - header - footer) -120 + 'px');
+            }, 10)
+
            api().
                get('/queryHistory', {
                   params: { queryId: this.queryId, funId: funId }
@@ -72,6 +86,10 @@
                    alert ('Ошибка при получении данных об истории заявки: ' + error);
                })
         }
+
+
+       
+             
     }
   },
     data() {
@@ -126,6 +144,8 @@
             this.queryTypeList = getQueryType();
             this.eventType = getEventType();
 
+          
+
         },
     methods: {
       getChange: function (eventTypeId, newValue, oldValue){
@@ -169,107 +189,21 @@
 </script>
 
 <style lang="scss" scoped>
-.query-card-content,
-.query-card-contract{
+.history-query-content{
     display: block;
-    width: 800px;
+    width: 100%;
     text-align: center;
     margin: auto;
+    overflow: auto;
     border-bottom: 3px solid #4285f4;
 }
-.query-card-contract{
-    border: 1px solid #ced4da;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-}
-.query-card-content-item{
-   display: inline-block;
-    padding-top: .5em;
-     margin-left: 1.5em;
-}
-  .query-card-content-item label {
-    display: inline-block;
-    max-width: 200px;
-    margin-left: auto;
-    margin-right: .5em;
-    font-style: italic;
-    font-size: 12pt;
-    color:#337ab7;
-  }
-   .query-card-contract label{
-     max-width: 70px;
-   }
-   .query-card-content-item i{
-     color: #337ab7;
-     width: 200px;
-   }
-  .query-card-content-item i:hover {
-      color: #ed9b19;
-      cursor: pointer;
-  }
-.query-card-content-item select,
-.query-card-content-item input,
-.query-card-content-item textarea,
-.query-card-content-item p
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    cursor: text;
-    margin-left: 10px;
-    display: inline-block;
-    text-align: left;
-    margin-right: 2em;
-  }
-  .query-card-content-item select,
-  .query-card-content-item p{
-    width: 330px;
-    padding: .5em .5em;
-  }
-  .query-card-dynamic-select{
-     width: 330px !important;
-    display: inline-block !important;
-  }
-  .query-card-content-item input
-  {
-    width: 210px;
-  }
-  .query-card-content-item textarea
-  {
-    width: 310px;
-  }
+
 @media screen and (max-width: 980px) {
-  .query-card-content,
-  .query-card-contract{
+  .history-query-content{
       width: auto;
       float: none;
   }
-  .query-card-content{
-   margin: 20px 0;
-   }
-  .query-card-contract{
-    margin: 5px 0;
-  }
-  .query-card-content-item{
-       width: 90%;
-  }
-  .query-card-content-item label {
-     max-width: 200px;
-  }
-  .query-card-contract label{
-     max-width: 70px;
-   }
-  .query-card-content-item select,
-  .query-card-content-item input,
-  .query-card-content-item textarea,
-  .query-card-content-item p,
-  .query-card-dynamic-select{
-    width: 210px !important;
-  }
-
+  
 }
 @media screen and (max-width: 480px) {
    html {
@@ -277,7 +211,7 @@
    }
 }
 
-.query-card-footer {
+.history-query-footer {
     padding-bottom: 1em;
     display: flex;
     justify-content: flex-end;
@@ -298,20 +232,5 @@
     color: #337ab7;
     border-color: #337ab7;
   }
-  .fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
-    opacity: 0;
-  }
-  .query-error
-	{
-		color: red;
-		display: inline-block;
-		font-size: small;
-  }
-  .has-error
-  {
-    visibility: visible;
-  }
+  
 </style>

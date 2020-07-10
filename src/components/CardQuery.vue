@@ -406,7 +406,7 @@
               Q_type: this.Q_type,
               conId: this.contract.id,
               userId: this.$store.getters.id_user,
-              funId: getFunId(this.funShortName)
+              funId:getFunId (this.funShortName)
           }
           if (this.queryData.queryId === -1)
          {

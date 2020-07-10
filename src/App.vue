@@ -97,11 +97,13 @@ $(function() {
         this.menu = [];
         //this.menu.push({header: true, title: 'Функции', hiddenOnCollapse: true})
         if (hasRight('eq'))//???? || hasRight('met') || hasRight('rep'))
-          this.menu.push({title: 'Оборудование', href: { path: '/equipment',  name: "equipment"}, icon: 'fa fa-microchip'});
+          this.menu.push({title: 'Оборудование', href: { path: '/equip',  name: "equipment"}, icon: 'fa fa-microchip'});
+         if (hasRight('eq'))//???? || hasRight('met') || hasRight('rep'))
+          this.menu.push({title: 'Архив', href: { path: '/equipArch',  name: "equipArch"}, icon: 'fa fa-archive'});
         if (hasRight('q'))
           this.menu.push({title: 'Заявки', icon:  'fa fa-list-alt', 
                       child: [
-                        { title: 'Список заявок', href: {path: '/query', name: "query"}},
+                        { title: 'Список заявок', href: {path: '/queryList', name: "query"}},
                         { title: 'Загрузка оборудования', href: {path: '/plan', name: "plan"}}
                       ]});
         if (hasRight('con'))
@@ -123,8 +125,8 @@ $(function() {
             this.menu.push({title: 'Перечень оборудования', href: { path: '/rEqList',  name: "rEqList"}, icon: 'fa fa-table'});   
         if (hasRight('rpt'))
             this.menu.push({title: 'Возраст оборудования', href: { path: '/rEqAge',  name: "rEqAge"}, icon: 'fa fa-chart-pie'}); 
-         if (hasRight('rpt'))
-            this.menu.push({title: 'Карточка оборудования', href: { path: '/rEqCardF',  name: "rEqCardF"}, icon: 'fa fa-newspaper'}); 
+        // if (hasRight('rpt'))
+        //    this.menu.push({title: 'Карточка оборудования', href: { path: '/rEqCardF',  name: "rEqCardF"}, icon: 'fa fa-newspaper'}); 
          if (hasRight('rpt'))
             this.menu.push({title: 'Аналитическая подсистема',  icon: 'fa fa-chart-line',
               child: [

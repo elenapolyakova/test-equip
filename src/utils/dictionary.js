@@ -5,10 +5,11 @@ const FunList = [
     {id: 3, name:'metrology', parFunId:'0', shortName: 'met' },
     {id: 4, name:'repair', parFunId: '0',  shortName: 'rep'},
     {id: 5, name:'report', shortName: 'rpt'},
-    {id: 6, name:'uniteCon',  parFunId: '0', shortName: 'conExt'},//объединение договоров
+    {id: 6, name:'uniteCon',  parFunId: '2', shortName: 'conExt'},//объединение договоров
     {id: 7, name:'adminUser', shortName: 'au'}  ] 
 
 const eqReadinessList = [{id: 1, name: 'Готово к использованию'}, {id: 2, name: 'На ТО'}, {id: 3, name: 'На модернизации'}, {id: 4, name: 'На консервации'}];
+const noWorkable = [4]; 
 
 const orderTimeList = [{id:1, name: '1 час', hours: 1}, {id:2, name: '2 часа', hours: 2}, {id:3, name: '3 часа', hours: 3},
  {id:4, name: 'Смена',
@@ -70,5 +71,6 @@ const getMType = () => MTypeList
 const getDevFullName = () => devisionFullNameList
 const getEventType = () => eventType
 
+
 export {getFunList, getEqReadiness, getOrderTime, getDocType, getRepType, getQueryType, 
-    getWorkingMode, getOrderTimeHours, getWorkingPeriod, getAttType, getMType, getDevFullName, getFunId, getEventType};
+    getWorkingMode, getOrderTimeHours, getWorkingPeriod, getAttType, getMType, getDevFullName, getFunId, getEventType, noWorkable};

@@ -163,7 +163,7 @@
                       eqName: item.eqname ? item.eqname.trim() : '',
                       idEq: item.id_eq,
                       orderTime: item.minworktime,
-                      workingMode: 1//item.workingMode todo загружать из базы
+                      workingMode: item.eq_worktime //todo загружать из базы
                     }
                     this.filterData.push(filterItem);
                    });

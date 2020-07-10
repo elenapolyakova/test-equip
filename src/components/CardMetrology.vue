@@ -141,7 +141,7 @@ import DynamicSelect from 'vue-dynamic-select'
     props: {
             metCard: {type: Object, required: true},
             actionMode: {type: String},
-		    showMetrologyCard: {type: Boolean}
+		        showMetrologyCard: {type: Boolean}
   },
 
     data() {
@@ -224,7 +224,7 @@ import DynamicSelect from 'vue-dynamic-select'
                })
              .catch(error => {
                 this.$emit('loading', false);
-                alert('Ошибка при добавлении аттестации/поверке: '+ error);
+                alert('Ошибка при добавлении аттестации/поверки: '+ error);
                 return;
          });
 
@@ -238,7 +238,7 @@ import DynamicSelect from 'vue-dynamic-select'
                })
                .catch(error => {
                  this.$emit('loading', false);
-                 alert('Ошибка при редактировании заявки:  '+ error);
+                 alert('Ошибка при редактировании аттестации/поверки: '+ error);
                  return;
              });
         }
@@ -276,7 +276,7 @@ import DynamicSelect from 'vue-dynamic-select'
                         }
                     }).catch(error => {//ошибка при добавлении файла
                     this.$emit('loading', false);
-                    alert('Ошибка при сохранении файла с аттестатом/свидетельством о поверке'+ error);
+                    alert('Ошибка при сохранении файла с аттестатом/свидетельством о поверке: '+ error);
                 })
         }
         else attSent = true;
@@ -308,7 +308,7 @@ import DynamicSelect from 'vue-dynamic-select'
                         }
                     }).catch(error => {//ошибка при добавлении файла
                     this.$emit('loading', false);
-                    alert('Ошибка при сохранении файла с протоколом'+ error);
+                    alert('Ошибка при сохранении файла с протоколом: '+ error);
                 })
         }
         else protocolSent = true;

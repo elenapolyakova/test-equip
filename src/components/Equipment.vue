@@ -20,7 +20,7 @@
    </filter-equipment> 
 
       <div class="eqContent">
-        <div v-if="rights.add">
+        <div v-if="rights.add && !isArchive">
             <button class="add-button" @click="actionAddClick"><i class='fa fa-plus'> </i> Добавить оборудование</button></td>
         </div>
         <DataTable
@@ -120,12 +120,14 @@
                                      @showHistory="showHistory"
                                      @addQuery="addQuery"
                                      :updatedQueryData="updatedQueryData"
+                                     :isArchive="isArchive"
                                      @loading="loadingSchedule">
                           </Schedule>	
                   </div>
                   <div v-if="activetab===2" class='tabcontent'>
                         <repair :idEq="eqCard.id"
-                                @loading="loading"></repair>
+                                @loading="loading"
+                                :isArchive="isArchive"></repair>
                   </div>
                   <div v-if="activetab===3" class='tabcontent'>
                       <metrology :idEq="eqCard.id"
@@ -134,6 +136,7 @@
                                 @editMet="editMet"
                                 @addMet="addMet"
                                 @viewMet="viewMet"
+                                :isArchive="isArchive"
                               ></metrology>
 
                   </div>
@@ -237,7 +240,7 @@
   import api from "../utils/api";
   import {endpoint} from '../utils/config'
   import {formatDate, dateFromString} from '../utils/date'
-  import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours} from '../utils/dictionary'
+  import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours, getFunId, noWorkable} from '../utils/dictionary'
   import Schedule from './Schedule'
   import CardQuery from './CardQuery'
   import HistoryQuery from './HistoryQuery'
@@ -327,6 +330,7 @@
           "__slot:actions:actionsDelete",
           { name: "cardNum", label: "Номер карточки" /*, format: formatDate*/,  sortable: true },
           { name: "eqName", label: "Наименование",  sortable: true} ,
+          { name: "eqDevisionName", label: "Подразделение",  sortable: true} ,
           { name: "eqTypeName", label: "Вид/категория",  sortable: true },
           { name: "factDateFormat", label: "Дата выпуска", sortable: true },
           { name: "responsibleName", label: "Ответственный",  sortable: true },
@@ -370,46 +374,76 @@
        actionModeMetrology: '',
        showMetrologyCard: false,
        metCard: {metId: -1},
-       updatedMetData: {}
+       updatedMetData: {},
+
+       isDictLoad: false,
+       isDictLoading: false
       }
  
     }, 
     props:
       {
-
+           isArchive: {type: Boolean, required: true},
     },
     watch:{
-      
+      isArchive(value){
+          this.reloadData();
+      }
     },
     computed: {
      
     },
     methods: {
 
-     
+      getDictionaries: async function(){
+          if (!this.isDictLoading)
+          {
+            this.isDictLoading = true;
+            api().
+              get('/dictionary')
+              .then(response => {
+                  let dict = response.data;
+                  this.eqDevisionList =  dict.divisionFullList;
+                  this.eqTypeList = dict.eqTypeList;
+                  this.responsibleList = dict.userList;
+                  this.responsibleList.forEach(item => item.name =`${item.us_surname} ${item.us_name} ${item.us_patname}`);
+                  this.eqReadinessList = getEqReadiness();
+                  this.orderTimeList = getOrderTime();
+                  this.workingModeList = getWorkingMode();
+                  this.docTypeList = getDocType();
+                  this.isDictLoad = true;
+                })
+                .catch(error => {
+                this.isLoading = false;
+                alert ('Ошибка при получении справочников: ' + error);
+              
+            });
+          }
+
+      },
       initData: function(){
         this.isLoading = true;
-
-         api().
-          get('/dictionary')
-          .then(response => {
-            let dict = response.data;
-            this.eqDevisionList =  dict.divisionList;
-            this.eqTypeList = dict.eqTypeList;
-            this.responsibleList = dict.userList;
-            this.responsibleList.forEach(item => item.name =`${item.us_surname} ${item.us_name} ${item.us_patname}`);
-            this.eqReadinessList = getEqReadiness();
-            this.orderTimeList = getOrderTime();
-            this.workingModeList = getWorkingMode();
-            this.docTypeList = getDocType();
+        if (!this.isDictLoad)
+        {
+            this.getDictionaries();
+            setTimeout(() => {
+                this.initData();
+            }, 100)
+        }
+        else {
             api().
               get('/equipment')
               .then(response => 
               {
+                this.eqInitialList = [];
                 let data = response.data;
                 data.forEach(item =>
                 {
+                  if ((!this.isArchive && (!item.is_ready || noWorkable.indexOf(item.is_ready) == -1))
+                    || (this.isArchive && noWorkable.indexOf(item.is_ready) > -1))
+                  {
                    let eqItem = {};
+
                     eqItem.id = item.id_eq;
                     eqItem.cardNum = item.card_num ? item.card_num.trim() : '';
                     eqItem.invNum = item.inv_num ? item.inv_num.trim() : '';
@@ -420,10 +454,10 @@
                     eqItem.eqTypeName = this.eqTypeName(eqItem.eqType);
                     eqItem.eqProducer = item.eqproducer ? item.eqproducer.trim() : '';
                     eqItem.comDate =  item.eq_comdate ? new Date(item.eq_comdate) : '';
-                    eqItem.comDateFormat	= formatDate(eqItem.comDate);
+                    eqItem.comDateFormat	= eqItem.comDate ? eqItem.comDate.getFullYear() : '';
                     eqItem.factNum = item.fact_num ? item.fact_num.trim() : '';
                     eqItem.factDate = item.fact_date ? new Date(item.fact_date) : '';
-                    eqItem.factDateFormat	= formatDate(eqItem.factDate);
+                    eqItem.factDateFormat	= eqItem.factDate ? eqItem.factDate.getFullYear() : '';
                     eqItem.responsible = item.id_respose_man;
                     eqItem.responsibleName = this.responsibleName(eqItem.responsible);
                     eqItem.eqReadiness = item.is_ready;
@@ -443,18 +477,21 @@
                     eqItem.workingModeName = this.workingModeName(eqItem.workingMode);
                     eqItem.eqLocation = item.eq_place ? item.eq_place.trim() : '';
                     eqItem.eqNote = item.remark ? item.remark.trim() : '';
-                    eqItem.repDate = item.repdate ? formatDate(new Date(item.repdate)): '';;
+                    eqItem.repDate = item.repdate ? new Date(item.repdate): '';
+                     eqItem.repDateFormat = eqItem.repDate ? eqItem.repDate.getFullYear(): '';
                     eqItem.eqCostKeep = item.eqcostkeep ? + item.eqcostkeep +' ₽' : '0 ₽';
                     eqItem.eqWorkLoad = item.eqworkload;
                     eqItem.eqAtt = item.eqatt ? formatDate(new Date(item.eqatt)): '';
                     eqItem.eqVer = item.eqver ? formatDate(new Date(item.eqver)): '';
                     this.eqInitialList.push(eqItem);
+                  }
                 });
                 this.eqNameList = this.fillDict(this.eqNameList , 'eqName');
                 this.eqProducerList = this.fillDict(this.eqProducerList , 'eqProducer');
                 this.eqData = this.eqInitialList ;
                 this.rowCurrentIndex = 0;
-                this.eqCard = this.eqData[this.rowCurrentIndex];
+                this.initCard(this.eqData[this.rowCurrentIndex]);
+                //this.eqCard = this.eqData[this.rowCurrentIndex];
                 this.isLoading = false;
               })
               .catch(error => 
@@ -463,12 +500,8 @@
                   alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
-          })
-          .catch(error => {
-            this.isLoading = false;
-            alert ('Ошибка при получении справочников: ' + error);
-            
-          });
+        }
+        
      },
      fillDict: function(list, key){
        list = [];
@@ -516,10 +549,11 @@
               eqReadinessName: this.eqCard.eqReadiness ? this.eqCard.eqReadiness.name : '',
               eqProducer: this.eqCard.eqProducer,
               factDate: this.eqCard.factDate,
-              factDateFormat: formatDate(this.eqCard.factDate),
+              factDateFormat: this.eqCard.factDate ? this.eqCard.factDate.getFullYear() : '',
               comDate: this.eqCard.comDate,
-              comDateFormat: formatDate(this.eqCard.comDate),
+              comDateFormat: this.eqCard.comDate ? this.eqCard.comDate.getFullYear() : '',
               repDate: this.eqCard.repDate,
+              repDateFormat: this.eqCard.repDate? this.eqCard.repDate.getFullYear() : '',
               eqResValue: toFloat(this.eqCard.eqResValue),
               eqLocation: this.eqCard.eqLocation,
               eqNote: this.eqCard.eqNote, 
@@ -537,7 +571,8 @@
               eqCostKeep: this.eqCard.eqCostKeep,
               eqWorkLoad: this.eqCard.eqWorkLoad,
               eqAtt: this.eqCard.eqAtt,
-              eqVer: this.eqCard.eqVer
+              eqVer: this.eqCard.eqVer,
+              funId: getFunId(this.funShortName)
          }
         
 
@@ -705,10 +740,11 @@
             },
             eqProducer:  params? params.eqProducer : '',
             factDate: params? params.factDate : '',
-            factDateFormat: params?  formatDate(params.factDate) : '', 
+            factDateFormat: params && params.factDate ? params.factDate.getFullYear() : '', 
             comDate:  params? params.comDate : '',
-            comDateFormat: params?  formatDate(params.comDate) : '', 
+            comDateFormat: params && params.comDate ?  params.comDate.getFullYear() : '', 
             repDate: params? params.repDate : '',
+            repDateFormat: params && params.repDate ? params.repDate.getFullYear() : '',
             eqResValue:  params? toCost(params.eqResValue) : '',
             eqLocation: params? params.eqLocation : '',
             eqNote:  params? params.eqNote : '',
@@ -811,7 +847,7 @@
           factNum: '',
           factDate: null,
           comDate: null,
-          repDate: '',
+          repDate: null,
           responsible: null,
           eqReadiness: null
         };
@@ -836,11 +872,11 @@
         if (this.fData.factNum !== '') 
           this.eqData = _.filter(this.eqData, {'factNum': this.fData.factNum})
         if (this.fData.factDate) 
-         this.eqData = _.filter(this.eqData, {'factDate': formatDate(this.fData.factDate)})
+         this.eqData = _.filter(this.eqData, {'factDateFormat': this.fData.factDate.getFullYear()})
         if (this.fData.comDate) 
-          this.eqData = _.filter(this.eqData, {'comDate': formatDate(this.fData.comDate)})  
-        if (this.fData.repDate !== '') 
-          this.eqData = _.filter(this.eqData, {'repDate': this.fData.repDate}) 
+          this.eqData = _.filter(this.eqData, {'comDateFormat': this.fData.comDate.getFullYear()})  
+        if (this.fData.repDate) 
+          this.eqData = _.filter(this.eqData, {'repDateFormat': this.fData.repDate.getFullYear()}) 
         if (this.fData.responsible) 
           this.eqData = _.filter(this.eqData, {'responsible': this.fData.responsible.id}) 
         if (this.fData.eqReadiness) 
@@ -1173,30 +1209,50 @@
       hasRight: function(funShortName)
       {
         return hasRight(funShortName)
+      },
+      reloadData: function(){
+        
+          this.datatableCss.tbodyTd = this.datatableCss.tbodyTd.replace(' edit-hide', '').replace(' copy-hide', '').replace(' delete-hide', '').replace(' view-hide', '');          
+          this.datatableCss.theadTh = this.datatableCss.theadTh.replace(' edit-hide', '').replace(' copy-hide', '').replace(' delete-hide', '').replace(' view-hide', '');
+
+
+          this.rights = getFunRight(this.funShortName);
+        if (this.isArchive){
+            this.datatableCss.tbodyTd += ' edit-hide'
+            this.datatableCss.theadTh += ' edit-hide'
+            this.datatableCss.tbodyTd += ' copy-hide'
+            this.datatableCss.theadTh += ' copy-hide'
+            this.datatableCss.tbodyTd += ' delete-hide'
+            this.datatableCss.theadTh += ' delete-hide'
+
+        }
+        else{
+            if (!this.rights.view || this.rights.edit){
+              this.datatableCss.tbodyTd += ' view-hide'
+              this.datatableCss.theadTh += ' view-hide'
+            }
+            if (!this.rights.edit){
+              this.datatableCss.tbodyTd += ' edit-hide'
+              this.datatableCss.theadTh += ' edit-hide'
+            }
+            if (!this.rights.add){
+              this.datatableCss.tbodyTd += ' copy-hide'
+              this.datatableCss.theadTh += ' copy-hide'
+            }
+           // if (!this.rights.delete){
+              this.datatableCss.tbodyTd += ' delete-hide'
+              this.datatableCss.theadTh += ' delete-hide'
+           // }
+        }
+
+        
+        this.initData();
       }
     },
       mounted: function()
       {
-        this.rights = getFunRight(this.funShortName);
-
-        if (!this.rights.view || this.rights.edit){
-          this.datatableCss.tbodyTd += ' view-hide'
-          this.datatableCss.theadTh += ' view-hide'
-        }
-        if (!this.rights.edit){
-          this.datatableCss.tbodyTd += ' edit-hide'
-          this.datatableCss.theadTh += ' edit-hide'
-        }
-        if (!this.rights.add){
-          this.datatableCss.tbodyTd += ' copy-hide'
-          this.datatableCss.theadTh += ' copy-hide'
-        }
-        if (!this.rights.delete){
-          this.datatableCss.tbodyTd += ' delete-hide'
-          this.datatableCss.theadTh += ' delete-hide'
-        }
-        this.initData();
-      
+        
+          this.reloadData();
       }
     
 

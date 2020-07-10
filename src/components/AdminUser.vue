@@ -280,7 +280,7 @@ $(window).on('resize', function(){
           get('/dictionary')
           .then(response => {
               let dict = response.data;
-              this.devisionList =  dict.divisionList;
+              this.devisionList =  dict.divisionFullList;
               api().
                 get('/role')
                 .then(response => {

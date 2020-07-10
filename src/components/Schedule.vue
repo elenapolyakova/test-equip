@@ -231,7 +231,8 @@ export default {
 		workingMode: {type: Number, required: false},
 		showQueryId: {type: Number, required: false},
 		updatedQueryData: {type:Object, required:false},
-		dateStartQuery: {type: Date}
+		dateStartQuery: {type: Date},
+		isArchive: {type: Boolean, required: false},
 	},
 	
 	watch: {
@@ -254,7 +255,7 @@ export default {
 					get('/equipment/workingMode/' + value,
 					).then(response => 
 					{
-						let data =  1;// response.data.workingMode; //todo получать из базы
+						let data = response.data.workingMode; //todo получать из базы
 						if (data && data > -1){
 							this.eqWorkingMode = data;
 							this.equipTime = getWorkingPeriod(data);
@@ -519,7 +520,7 @@ export default {
 			return (this.eqId && this.eqId > -1);
 		},
 		editClick: function (query){
-			if (this.rights.edit || this.rights.delete){
+			if ((this.rights.edit || this.rights.delete) && !this.isArchive){
 				$(".add-item").addClass("hidden-item");
 				if (query.queryId === this.showQueryId)
 					$('[name=queryId_' + this.showQueryId).parent().removeClass('blink')
@@ -533,7 +534,7 @@ export default {
 			this.$emit('showHistory', query.queryId)
 		},
 		addClick(){
-			if (this.rights.add){
+			if (this.rights.add && !this.isArchive){
 				if(this.hasEquip()) {
 					if (event) {
 						let dateTime = this.calcDayTime({x: event.clientX, y: event.clientY});

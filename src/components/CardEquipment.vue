@@ -44,14 +44,24 @@
             <div class="eq-card-col-30">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Год выпуска</label></div>
                 <div class="eq-card-item eq-card-small">
-                    <date-picker v-model="eqCard.factDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' v-if="actionMode !=='view'"></date-picker>
+                    <date-picker v-model="eqCard.factDate" 
+                    :lang="lang" 
+                    format='YYYY' 
+                    popup-class='calPopup' 
+                    type="year"
+                    v-if="actionMode !=='view'"></date-picker>
                     <p name="factDate" v-if="actionMode =='view'">{{eqCard.factDateFormat}}</p>
                 </div>
             </div>
             <div class="eq-card-col-30">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Год ввода в эксплуатацию</label></div>
                 <div class="eq-card-item eq-card-small">
-                     <date-picker v-model="eqCard.comDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' v-if="actionMode !=='view'"></date-picker>
+                     <date-picker v-model="eqCard.comDate" 
+                     :lang="lang" 
+                     format='YYYY' 
+                     popup-class='calPopup'
+                     type="year"
+                      v-if="actionMode !=='view'"></date-picker>
                     <p name="comDate" v-if="actionMode =='view'">{{eqCard.comDateFormat}}</p>
                 </div>
             </div>
@@ -60,7 +70,7 @@
                 <div class="eq-card-item eq-card-small">
                      <!-- <input name="repDate" v-model="eqCard.repDate" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
                     <p name="repDate" v-if="actionMode =='view'">{{eqCard.repDate}}</p> -->
-                     <p name="repDate">{{eqCard.repDate}}</p>
+                     <p name="repDate">{{eqCard.repDateFormat}}</p>
                 </div>
             </div>
            

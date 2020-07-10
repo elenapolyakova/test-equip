@@ -18,6 +18,17 @@
                       v-model="fData.eqName" />
               </div>
           </div>
+          <div class='filter-item-container'>
+           <div class="filter-item-label"><label class="mb-0">Подразделение</label></div>
+           <div class="filter-item">
+             <dynamic-select 
+                    :options="eqDevisionList"
+                    option-value="id"
+                    option-text="name"
+                    placeholder=""
+                    v-model="fData.devision" />
+            </div>
+         </div>
 
               <div class="btns">
                   <button class="filter-button" @click="$emit('filterData', true)" title="Применить фильтр"><i class='fa fa-check' > </i> </button>
@@ -88,19 +99,20 @@
           <div class='filter-item-container'>
            <div class="filter-item-label"><label class="mb-0">Дата выпуска</label></div>
            <div class="filter-item">
-             <date-picker v-model="fData.factDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' ></date-picker>
+             <date-picker v-model="fData.factDate" :lang="lang" format='YYYY' type="year" popup-class='calPopup' ></date-picker>
             </div>
          </div>
          <div class='filter-item-container'>
            <div class="filter-item-label"><label class="mb-0">Дата ввода в эксплуатацию</label></div>
            <div class="filter-item">
-             <date-picker v-model="fData.comDate" :lang="lang" format='DD.MM.YYYY' popup-class='calPopup' ></date-picker>
+             <date-picker v-model="fData.comDate" :lang="lang" format='YYYY' type="year" popup-class='calPopup' ></date-picker>
             </div>
          </div>
          <div class='filter-item-container'>
            <div class="filter-item-label"><label class="mb-0">Год последней модернизации</label></div>
            <div class="filter-item">
-             <input v-model="fData.repDate" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/>
+             <!-- <input v-model="fData.repDate" type="text" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"/> -->
+              <date-picker v-model="fData.repDate" :lang="lang" format='YYYY' type="year" popup-class='calPopup' ></date-picker>
             </div>
          </div>
          <div class='filter-item-container'>
