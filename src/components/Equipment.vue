@@ -46,7 +46,7 @@
 
        <stack-modal
                 :show="showEqCard"
-                @close="closeModal"
+                @close=""
                 :modal-class="{[modalClass]: true}"
                 :saveButton= "{title: 'Сохранить'}"
                 :cancelButton= "{title: 'Отмена'}"
@@ -377,7 +377,8 @@
        updatedMetData: {},
 
        isDictLoad: false,
-       isDictLoading: false
+       isDictLoading: false,
+       oldCard: {}
       }
  
     }, 
@@ -575,6 +576,7 @@
               funId: getFunId(this.funShortName)
          }
         
+        this.oldCard = _.cloneDeep(this.eqCard);//JSON.parse(JSON.stringify(this.eqCard));
 
          if (this.eqCard.id === -1)
          {
@@ -628,10 +630,20 @@
      },
       closeModal: function()
       {
-          if (confirm('Вы уверены, что хотите закрыть карточку?')){
+        //console.log('old:____' + JSON.stringify(this.oldCard));
+        //console.log('new:____' + JSON.stringify(this.eqCard));
+        let isCardChanged = !_.isEqual(this.oldCard, this.eqCard);
+        if (isCardChanged)
+        {
+           if (confirm('Вы уверены, что хотите закрыть карточку?')){
               this.showEqCard = false;
               this.activetab = 0;
           }
+        }
+        else {
+            this.showEqCard = false;
+            this.activetab = 0;
+        }
 
 
       },
@@ -768,6 +780,8 @@
             eqAtt:  params? params.eqAtt : '',
             eqVer:  params? params.eqVer : ''
          }
+
+         this.oldCard = _.cloneDeep(this.eqCard);//JSON.parse(JSON.stringify(this.eqCard));
         let orderTimeParams = this.getOrderTimeParams();
         this.orderTimeHours = orderTimeParams.hours;
         this.workingMode = orderTimeParams.workingMode;
