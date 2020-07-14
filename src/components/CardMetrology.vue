@@ -2,9 +2,16 @@
    <stack-modal
           :show="showMetrologyCard"
           :modal-class="{[modalClass]: true}"
-          @close="$emit('close')">
+          @close=""> 
       <div slot="modal-header"></div>
       <div class="met-card-content">
+        <div class="met-card-col-30">
+          <div class="met-card-label"><label class="mb-0">Дата</label></div>
+          <div class="met-card-item">
+                <date-picker v-model="metCard.recDate" popup-class='calPopup' format='DD.MM.YYYY' v-if="actionMode !=='view'"></date-picker>
+                <p name="comDate" v-if="actionMode =='view'">{{metCard.recDateFormat}}</p>
+          </div>
+        </div>
         <div class="met-card-col-30">
           <div class="met-card-label"><label class="mb-0">Вид</label></div>
           <div class="met-card-item">  
@@ -33,15 +40,15 @@
           </div>
         </div>
          <div class="met-card-col-30">
-          <div class="met-card-label"><label class="mb-0">Номер</label></div>
+          <div class="met-card-label"><label class="mb-0">Номер документа</label></div>
           <div class="met-card-item">
-                 <input v-model="metCard.attNum" v-if="actionMode !=='view'" class="met-card-item-input"></input>
+                 <input type="text" v-model="metCard.attNum" v-if="actionMode !=='view'" class="met-card-item-input"></input>
                 <p v-if="actionMode =='view'">{{metCard.attNum}}</p>      
           </div>
         </div>
         
         <div class="met-card-col-30">
-          <div class="met-card-label"><label class="mb-0">Дата аттестации</label></div>
+          <div class="met-card-label"><label class="mb-0">Дата аттестата/св-ва о поверке</label></div>
           <div class="met-card-item">
                 <date-picker v-model="metCard.attDate" popup-class='calPopup' format='DD.MM.YYYY' v-if="actionMode !=='view'"></date-picker>
                 <p name="comDate" v-if="actionMode =='view'">{{metCard.attDateFormat}}</p>
@@ -54,7 +61,22 @@
                 <p name="comDate" v-if="actionMode =='view'">{{metCard.attEndFormat}}</p>
           </div>
         </div>
-        <div class="met-card-col-20">
+        <div class="met-card-col-30">
+          <div class="met-card-label"><label class="mb-0">Номер протокола</label></div>
+          <div class="met-card-item">
+                 <input type="text" v-model="metCard.protocolNum" v-if="actionMode !=='view'" class="met-card-item-input"></input>
+                <p v-if="actionMode =='view'">{{metCard.protocolNum}}</p>      
+          </div>
+        </div>
+        
+        <div class="met-card-col-30">
+          <div class="met-card-label"><label class="mb-0">Дата протокола</label></div>
+          <div class="met-card-item">
+                <date-picker v-model="metCard.protocolDate" popup-class='calPopup' format='DD.MM.YYYY' v-if="actionMode !=='view'"></date-picker>
+                <p name="comDate" v-if="actionMode =='view'">{{metCard.protocolDateFormat}}</p>
+          </div>
+        </div>
+        <div class="met-card-col-30">
           <div class="met-card-label-small"><label class="mb-0">Допущен к работе</label></div>
           <div class="met-card-item-small">
               <input v-if="actionMode !=='view'" type='checkbox' v-model="metCard.eqEnable" @change="eqEnableChange"/>
@@ -148,7 +170,7 @@ import DynamicSelect from 'vue-dynamic-select'
       return {
         rights: {},
 		funShortName: 'met',
-        modalClass:'modal-xl',
+        modalClass:'modal-xxl',
         //dictionary
          attTypeList: [], //вид
          MTypeList: [], //тип
@@ -337,7 +359,7 @@ import DynamicSelect from 'vue-dynamic-select'
 .met-card-col-30{
    width: 33%;
     text-align: center;
-    min-width: 250px;
+    min-width: 300px;
 }
 .met-card-col-20{
    width: 20%;
@@ -354,7 +376,7 @@ import DynamicSelect from 'vue-dynamic-select'
 .met-card-label,
 .met-card-label-small {
     display: inline-block;
-    min-width: 250px;
+    min-width: 300px;
     width: 100%;
     text-align: center;
     font-style: italic;
@@ -372,7 +394,7 @@ import DynamicSelect from 'vue-dynamic-select'
 .met-card-item-small {
       display: block;
       width: 100%;
-      min-width: 250px;
+      min-width: 300px;
       padding-left: 15px;
       padding-right: 15px;
   }
@@ -381,7 +403,7 @@ import DynamicSelect from 'vue-dynamic-select'
   }
 
 .met-card-item  select,
-.met-card-item-input,
+.met-card-item input[type=text],
 .met-card-item  p
   {
     border: 1px solid #ced4da;
@@ -425,6 +447,12 @@ import DynamicSelect from 'vue-dynamic-select'
   .label-file:hover{
     color: #ed9b19;
   }
+
+  
+  .mx-datepicker{
+    width: 100%;
+  }
+
 
 @media screen and (max-width: 800px) {
     .met-card-col-20{

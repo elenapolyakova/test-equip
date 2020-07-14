@@ -98,7 +98,7 @@
             </div>
             <div class="eq-card-label"><label class="mb-0">Производитель</label></div>
             <div class="eq-card-item"> 
-                <input style="width:100%" name="eqProducer" v-model="eqCard.eqProducer" v-if="actionMode !=='view'"></input>
+                <input style="width:100%" type="text" name="eqProducer" v-model="eqCard.eqProducer" v-if="actionMode !=='view'"></input>
                 <p name="eqProducer" v-if="actionMode =='view'">{{eqCard.eqProducer}}</p>
             </div>
         </div>
@@ -136,7 +136,7 @@
               <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Номер в госреестре</label></label></div>
                 <div class="eq-card-item eq-card-small"> 
-                    <input v-model="eqCard.regNum" v-if="actionMode !=='view'"></input>
+                    <input type="text" v-model="eqCard.regNum" v-if="actionMode !=='view'"></input>
                     <p name="regNum" v-if="actionMode =='view'">{{eqCard.regNum}}</p>
                 </div>
             </div>
@@ -160,7 +160,7 @@
               <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Остаточная стоимость, ₽</label></label></div>
                 <div class="eq-card-item eq-card-small">
-                    <input name="eqResValue" v-model="eqCard.eqResValue" v-if="actionMode !=='view'"
+                    <input type="text" name="eqResValue" v-model="eqCard.eqResValue" v-if="actionMode !=='view'"
                      @keyup="eqCard.eqResValue = toFloatView(eqCard.eqResValue)" 
                      @focus="eqCard.eqResValue = toFloatView(eqCard.eqResValue)" 
                      @blur="eqCard.eqResValue = toCost(eqCard.eqResValue)"></input>
@@ -178,25 +178,19 @@
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Затраты на содержание</label></div>
                 <div class="eq-card-item eq-card-small"> <p name="eqCostKeep">{{eqCard.eqCostKeep}}</p></div>
             </div>
-            <div class="eq-card-col-25">
-                <div class="eq-card-label eq-card-small"><label class="mb-0">Примечание</label></div>
-                <div class="eq-card-item eq-card-small">
-                    <input name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote"></input>
-                    <p name="eqNote" v-if="actionMode =='view'">{{eqCard.eqNote}}</p>
-                </div>
-            </div>
-        </div>
-        <div class="eq-card-col-100 eq-card-container">
-              <div class="eq-card-col-25">
+             <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Стоимость нормо-часа, ₽</label></label></div>
                 <div class="eq-card-item eq-card-small">
-                    <input name="costLaborTime" v-model="eqCard.costLaborTime" v-if="actionMode !=='view'" 
+                    <input type="text" name="costLaborTime" v-model="eqCard.costLaborTime" v-if="actionMode !=='view'" 
                     @keyup="eqCard.costLaborTime = toFloatView(eqCard.costLaborTime)" 
                     @focus="eqCard.costLaborTime = toFloatView(eqCard.costLaborTime)" 
                     @blur="eqCard.costLaborTime = toCost(eqCard.costLaborTime)"></input>
                     <p name="costLaborTime" v-if="actionMode =='view'">{{eqCard.costLaborTime}}</p>
                 </div>
             </div>
+        </div>
+        <div class="eq-card-col-100 eq-card-container">
+             
             <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Минимальное время заказа</label></div>
                 <div class="eq-card-item eq-card-small"> 
@@ -228,6 +222,27 @@
                 <div class="eq-card-item eq-card-small">
                     <input name="TOInterval" type="number" v-model="eqCard.TOInterval" v-if="actionMode !=='view'" onkeyup="this.value = this.value.replace (/[^0-9]/g, '')"></input>
                     <p name="TOInterval" v-if="actionMode =='view'"><span>{{eqCard.TOInterval}}</span></p>
+                </div>
+            </div>
+             <div class="eq-card-col-25">
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Наличие в паспорте ИЦ</label></div>
+                <div class="eq-card-item eq-card-small">
+                    <input name="inPassport"  type="checkbox"  v-model="eqCard.inPassport" :disabled="actionMode =='view'"></input>
+                    <!-- <p name="inPassport" v-if="actionMode =='view'">{{eqCard.inPassport}}</p> -->
+                </div>
+            </div>
+              <div class="eq-card-col-50">
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Примечание</label></div>
+                <div class="eq-card-item eq-card-small">
+                    <input type="text" name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote"></input>
+                    <p name="eqNote" v-if="actionMode =='view'">{{eqCard.eqNote}}</p>
+                </div>
+            </div>
+              <div class="eq-card-col-50">
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Адрес местоположения</label></div>
+                <div class="eq-card-item eq-card-small">
+                    <input type="text" name="placeAddr" v-if ="actionMode !=='view'" v-model="eqCard.placeAddr"></input>
+                    <p name="placeAddr" v-if="actionMode =='view'">{{eqCard.placeAddr}}</p>
                 </div>
             </div>
         </div>
@@ -467,10 +482,11 @@ $(window).on('resize', function(){
     min-width: 120px;
 }
 
-.eq-card-item  select,
-.eq-card-item  input,
+.eq-card-item select,
+.eq-card-item input[type=text],
+.eq-card-item input[type=number],
 .eq-card-item textarea,
-.eq-card-item  p
+.eq-card-item p
   {
     border: 1px solid #ced4da;
     position: relative;

@@ -2,7 +2,7 @@
    <stack-modal
           :show="showQueryCard"
           :modal-class="{[modalClass]: true}"
-          @close="$emit('close')">
+          @close="">
       <div slot="modal-header"></div>
       <div class="query-card-content">
         <div class="query-card-content-item">
@@ -385,7 +385,7 @@
              $('.query-error').addClass('has-error').html(`Выберите тип заявки`);
              return;
           }
-          if (!this.contract || this.contract.id == 0) {
+          if (this.Q_type === 1 && (!this.contract || this.contract.id == 0)) {
              $('.query-error').addClass('has-error').html(`Выберите договор`);
              return;
           }
@@ -404,7 +404,7 @@
               dateStart: this.dateStart,
               dateEnd: this.dateEnd,
               Q_type: this.Q_type,
-              conId: this.contract.id,
+              conId: this.contract ? this.contract.id : '',
               userId: this.$store.getters.id_user,
               funId:getFunId (this.funShortName)
           }

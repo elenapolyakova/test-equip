@@ -438,6 +438,7 @@
               {
                 this.eqInitialList = [];
                 let data = response.data;
+                
                 data.forEach(item =>
                 {
                   if ((!this.isArchive && (!item.is_ready || noWorkable.indexOf(item.is_ready) == -1))
@@ -484,6 +485,8 @@
                     eqItem.eqWorkLoad = item.eqworkload;
                     eqItem.eqAtt = item.eqatt ? formatDate(new Date(item.eqatt)): '';
                     eqItem.eqVer = item.eqver ? formatDate(new Date(item.eqver)): '';
+                    eqItem.inPassport =  typeof(item.eqinpassport) === "number" ? !!item.eqinpassport : false; 
+                    eqItem.placeAddr = item.eq_placeaddr;
                     this.eqInitialList.push(eqItem);
                   }
                 });
@@ -520,11 +523,11 @@
      },
      cardShow: function(){
          let eqId =  this.eqCard.id;
-     /*    this.$router.push({name:'rEqCardF', component: rEqCardF,  
+         this.$router.push({name:'rEqCardF', component: rEqCardF,  
               params: {
                 eqId: eqId,
               }
-          });*/
+          });
      },
      saveModal: function()
      {
@@ -536,17 +539,17 @@
               cardNum: this.eqCard.cardNum,
               invNum: this.eqCard.invNum,
               factNum: this.eqCard.factNum,
-              devision: this.eqCard.devision ? this.eqCard.devision.id : 0,
+              devision: this.eqCard.devision ? this.eqCard.devision.id : '',
               eqDevisionName: this.eqCard.devision ? this.eqCard.devision.name : '',
-              responsible: this.eqCard.responsible ? this.eqCard.responsible.id : 0,
-              responsibleName: this.eqCard.responsible.id ? this.eqCard.responsible.name : '',
+              responsible: this.eqCard.responsible ? this.eqCard.responsible.id : '',
+              responsibleName: this.eqCard.responsible ? this.eqCard.responsible.name : '',
               eqName: this.eqCard.eqName,
-              eqType: this.eqCard.eqType ? this.eqCard.eqType.id : 0,
+              eqType: this.eqCard.eqType ? this.eqCard.eqType.id : '',
               eqTypeName: this.eqCard.eqType ? this.eqCard.eqType.name : '',
               eqPurpose: this.eqCard.eqPurpose,
               eqPassport: this.eqCard.eqPassport,
               eqTechState: this.eqCard.eqTechState,
-              eqReadiness: this.eqCard.eqReadiness ? this.eqCard.eqReadiness.id : 0,
+              eqReadiness: this.eqCard.eqReadiness ? this.eqCard.eqReadiness.id : '',
               eqReadinessName: this.eqCard.eqReadiness ? this.eqCard.eqReadiness.name : '',
               eqProducer: this.eqCard.eqProducer,
               factDate: this.eqCard.factDate,
@@ -564,15 +567,17 @@
               resValueDateFormat: formatDate(this.eqCard.resValueDate),
               costLaborTime: toFloat(this.eqCard.costLaborTime),
               TOInterval: this.eqCard.TOInterval,
-              orderTime: this.eqCard.orderTime ? this.eqCard.orderTime.id : 0,
+              orderTime: this.eqCard.orderTime ? this.eqCard.orderTime.id : '',
               orderTimeName: this.eqCard.orderTime ? this.eqCard.orderTime.name: '',
-              workingMode: this.eqCard.workingMode ? this.eqCard.workingMode.id : 0,
+              workingMode: this.eqCard.workingMode ? this.eqCard.workingMode.id : '',
               workingModeName: this.eqCard.workingMode ? this.eqCard.workingMode.name : '',
               eqDocumentation: this.eqCard.eqDocumentation,
               eqCostKeep: this.eqCard.eqCostKeep,
               eqWorkLoad: this.eqCard.eqWorkLoad,
               eqAtt: this.eqCard.eqAtt,
               eqVer: this.eqCard.eqVer,
+              inPassport: this.eqCard.inPassport,
+              placeAddr: this.eqCard.placeAddr,
               funId: getFunId(this.funShortName)
          }
         
@@ -778,7 +783,9 @@
             eqCostKeep: params? params.eqCostKeep : '',
             eqWorkLoad:  params? params.eqWorkLoad : '',
             eqAtt:  params? params.eqAtt : '',
-            eqVer:  params? params.eqVer : ''
+            eqVer:  params? params.eqVer : '',
+            inPassport: params? params.inPassport : false,
+            placeAddr: params? params.placeAddr : ''
          }
 
          this.oldCard = _.cloneDeep(this.eqCard);//JSON.parse(JSON.stringify(this.eqCard));
@@ -1127,24 +1134,29 @@
       },
 
       firstClick: function(){
-        if (this.rowCurrentIndex > 0) 
+        if (this.rowCurrentIndex > 0) {
            this.rowCurrentIndex = 0;
-        this.initCard(this.eqData[this.rowCurrentIndex]);
+          this.initCard(this.eqData[this.rowCurrentIndex]);
+        }
       },
       prevClick: function(){
-        if (this.rowCurrentIndex > 0) 
+        if (this.rowCurrentIndex > 0) {
           this.rowCurrentIndex--;
-        this.initCard(this.eqData[this.rowCurrentIndex]);
+          this.initCard(this.eqData[this.rowCurrentIndex]);
+        }
       },
       nextClick: function(){
         if (this.rowCurrentIndex < this.eqData.length-1) 
+        {
           this.rowCurrentIndex++;
-        this.initCard(this.eqData[this.rowCurrentIndex]);
+          this.initCard(this.eqData[this.rowCurrentIndex]);
+        }
       },
       lastClick: function(){
-        if (this.rowCurrentIndex < this.eqData.length-1) 
+        if (this.rowCurrentIndex < this.eqData.length-1) {
           this.rowCurrentIndex =  this.eqData.length-1;
-        this.initCard(this.eqData[this.rowCurrentIndex]);
+          this.initCard(this.eqData[this.rowCurrentIndex]);
+        }
       },
 
       editQuery(params)

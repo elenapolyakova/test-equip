@@ -26,8 +26,8 @@ const queryTypeList =[{id: 1, name: 'Проведение испытаний'}, 
 const workingModeList = [{id: 1, name: "с 9:00 до 18:00", timeStart: "09:00", timeEnd: "18:00"}, 
 {id: 2, name: "3 смены по 8 часов", timeStart: "00:00", timeEnd: "24:00"}, {id: 3, name: "2 смены по 12 часов", timeStart: "00:00", timeEnd: "24:00"}]
 
-const attTypeList =[{id:1, name: "Аттестация"}, {id:2, name:"Поверка"}]
-const MTypeList =[{id:1, name: "Первичная"}, {id:2, name:"Плановая"}, {id:3, name:"Внеплановая"}]
+const attTypeList =[{id:1, name: "Аттестация"}, {id:2, name:"Поверка"}, {id:3, name:"Калибровка"}]
+const MTypeList =[{id:1, name: "Первичная"}, {id:2, name:"Периодическая"}, {id:3, name:"Первичная после ремонта"}, {id:43, name:"Внеочередная"}]
 
 const devisionFullNameList =[{id: 2, name:"Научный центр «Нетяговый подвижной состав и автотормозные системы поезда»"},
     {id: 3, name: "Электрификация и теплоэнергетика"},

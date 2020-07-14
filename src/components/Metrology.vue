@@ -71,11 +71,11 @@
         //  "__slot:actions:actionsView",
           "__slot:actions:actionsEdit",
           "__slot:actions:actionsDelete",
-          { name: "attDateFormat", label: "Дата аттестации",  sortable: true},
+          { name: "recDateFormat", label: "Дата",  sortable: true},
           { name: "attTypeName", label: "Вид", sortable: true},
           { name: "M_TypeName", label: "Тип", sortable: true},
-          { name: "attNum", label: "Номер", sortable: true},
-          { name: "eqEnableName", label: "Допущен к работе",  sortable: true},
+         // { name: "attNum", label: "Номер документа", sortable: true},
+        //  { name: "eqEnableName", label: "Допущен к работе",  sortable: true},
           { name: "attEndFormat", label: "Дата оконч. срока действия", sortable: true},
           { name: "attDocPath", label: "Аттестат/св-во о поверке",  sortable: false, customElement: "attDoc" },
           { name: "protocolDocPath", label: "Протокол",  sortable: false, customElement: "protocolDoc" }
@@ -95,9 +95,14 @@
           eqMetItem.metId = value.metId;
           eqMetItem.attDate = value.attDate ? new Date(value.attDate) : '';
           eqMetItem.attDateFormat = formatDate(eqMetItem.attDate);
+          eqMetItem.protocolDate = value.protocolDate ? new Date(value.protocolDate) : '';
+          eqMetItem.protocolDateFormat = formatDate(eqMetItem.protocolDate);
+          eqMetItem.recDate = value.recDate ? new Date(value.recDate) : '';
+          eqMetItem.recDateFormat = formatDate(eqMetItem.recDate);
           eqMetItem.M_Type = value.M_Type.id; 
           eqMetItem.M_TypeName = value.M_Type.name
           eqMetItem.attNum = value.attNum;
+          eqMetItem.protocolNum = value.protocolNum;
           eqMetItem.attType = value.attType.id; 
           eqMetItem.attTypeName = value.attType.name;
           eqMetItem.eqEnable = value.eqEnable;
@@ -135,17 +140,23 @@
                 {
                    let eqMetItem = {};
                     eqMetItem.metId = item.id_metr;
+                    eqMetItem.recDate = item.recdate ? new Date(item.recdate) : '';
+                    eqMetItem.recDateFormat = formatDate(eqMetItem.recDate);
                     eqMetItem.attDate = item.attestatdate ? new Date(item.attestatdate) : '';
                     eqMetItem.attDateFormat = formatDate(eqMetItem.attDate);
+                    eqMetItem.protocolDate = item.protocol_date ? new Date(item.protocol_date) : '';
+                    eqMetItem.protocolDateFormat = formatDate(eqMetItem.protocolDate);
                     eqMetItem.M_Type = item.m_type; 
                     eqMetItem.M_TypeName = this.MTypeName(item.m_type);
                     eqMetItem.attType = item.atttype; 
                     eqMetItem.attTypeName = this.attTypeName(item.atttype);
                     eqMetItem.attNum = item.atestatnum;
+                    eqMetItem.protocolNum = item.protocol_num;
                     eqMetItem.eqEnable = typeof(item.eqenable) === "number" ? !!item.eqenable : false;
                     eqMetItem.eqEnableName = eqMetItem.eqEnable ? 'Да' : 'Нет';
                     eqMetItem.attEnd = item.atestatend ? new Date(item.atestatend) : '';
                     eqMetItem.attEndFormat = formatDate(eqMetItem.attEnd);
+
                     eqMetItem.attDocPath = item.att_docpath ? `${endpoint}${item.att_docpath.trim()}` : '';
                     eqMetItem.protocolDocPath = item.protocol_docpath ? `${endpoint}${item.protocol_docpath.trim()}` : '';
 
@@ -212,8 +223,12 @@
          this.metCard = {
             idEq: this.idEq,
             metId: params? params.rowData.metId : -1,
+            recDate: params? params.rowData.recDate : '',
+            recDateFormat:  params? params.rowData.recDateFormat : '',
             attDate: params? params.rowData.attDate : '',
             attDateFormat:  params? params.rowData.attDateFormat : '',
+            protocolDate: params? params.rowData.protocolDate : '',
+            protocolDateFormat:  params? params.rowData.protocolDateFormat : '',
             M_Type: {
               id: params? params.rowData.M_Type : '',
               name: params? params.rowData.M_TypeName : ''
@@ -223,6 +238,7 @@
               name: params? params.rowData.attTypeName : ''
             },
             attNum: params? params.rowData.attNum : '',
+            protocolNum: params? params.rowData.protocolNum : '',
             eqEnable:  params? params.rowData.eqEnable : false,
             eqEnableName:  params? params.rowData.eqEnableName : 'нет',
             attEnd: params? params.rowData.attEnd : '',
