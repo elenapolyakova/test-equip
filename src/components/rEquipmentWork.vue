@@ -3,13 +3,13 @@
     <loading :active.sync="isLoading"
         :can-cancel="false"
         :is-full-page="true"
-        color='#337ab7'>
+        color='#e21a1a'>
     </loading>
-      <div class="action-panel">
+      <div class="action-panel-end">
            <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
             <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
       </div>
-      
+      <div class="report-content">
         <div class='title'>О работе лабораторного испытательного оборудования научных подразделений за
          <date-picker v-model="calMonth"  type="month"  format="MMMM YYYY года" :editable="false" popup-class='calPopup' name="Month"></date-picker></div>
         
@@ -28,7 +28,7 @@
             </thead>
             <tbody></tbody>
           </table>
-
+      </div>
          
   </div>
 </template>
@@ -427,13 +427,15 @@
               .catch(error => 
               {
                 this.isLoading = false;
-                  alert ('Ошибка при получении данных об оборудовании: ' + error);
+                this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+                  //alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
           })
           .catch(error => {
             this.isLoading = false;
-            alert ('Ошибка при получении справочников: ' + error);
+            this.$alert('Ошибка при получении справочников: '+ error, '', 'error', {allowOutsideClick: false});
+            //alert ('Ошибка при получении справочников: ' + error);
             
           });
         
@@ -574,43 +576,13 @@
 </script>
 
 <style lang="scss" scoped>
-.action-panel{
-    display: flex;
-    justify-content: flex-end;
-    margin-right: .5em;
-}
-.export-button  {
-     border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 50px;
-    height: 3em;
-}
-.export-button i{
-    color: #337ab7;
-    font-size: 20pt;
-}
-.export-button i:hover {
-    cursor: pointer;
-    color: #ed9b19;
-}
 
-.title{
-    width:100%;
-    font-size: 18px;
-    text-align: center;
-    padding-bottom: 1em
-  }
+
 
 .table-eq-work th {
   text-align: center !important;
   vertical-align: middle !important;
-  color:#337ab7;
+
 }
 .table-eq-work td {
   vertical-align: middle !important;

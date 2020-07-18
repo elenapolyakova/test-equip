@@ -3,7 +3,7 @@
       <loading :active.sync="isLoading"
           :can-cancel="false"
           :is-full-page="true"
-          color='#337ab7'>
+          color='#e21a1a'>
       </loading>
     <filter-plan
               @filterData="filterData"

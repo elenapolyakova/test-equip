@@ -79,7 +79,8 @@
         <div class="met-card-col-30">
           <div class="met-card-label-small"><label class="mb-0">Допущен к работе</label></div>
           <div class="met-card-item-small">
-              <input v-if="actionMode !=='view'" type='checkbox' v-model="metCard.eqEnable" @change="eqEnableChange"/>
+              <input id="eqEnable" v-if="actionMode !=='view'" type='checkbox' v-model="metCard.eqEnable" @change="eqEnableChange"/>
+              <label for="eqEnable"></label>
               <p name="comDate" v-if="actionMode =='view'">{{metCard.eqEnableName}}</p>
           
           </div>
@@ -128,8 +129,8 @@
       <div slot="modal-footer">
         <div class ="met-card-footer">
           <label class='metrology-error'></label>
-          <button class="modal-button" v-if="actionMode!=='view'" @click="saveMetrology" title='Сохранить аттестацию/поверку'><i class = 'fa fa-save' ></i> Сохранить</button>
-          <button class="modal-button" @click="$emit('close')" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
+          <button class="modal-button" v-if="actionMode!=='view'" @click="saveMetrology" title='Сохранить аттестацию/поверку'>Сохранить</button>
+          <button class="modal-button" @click="$emit('close')" title='закрыть'>Закрыть</button>
           </div>
       </div>  
 
@@ -169,7 +170,7 @@ import DynamicSelect from 'vue-dynamic-select'
     data() {
       return {
         rights: {},
-		funShortName: 'met',
+		   funShortName: 'met',
         modalClass:'modal-xxl',
         //dictionary
          attTypeList: [], //вид
@@ -226,13 +227,6 @@ import DynamicSelect from 'vue-dynamic-select'
 
     },
     saveMetrology: function(){
-
-        //   if (HoursDiff(this.dateEnd, this.dateStart) < 0){
-        //      $('.query-error').addClass('has-error').html('Дата окончания меньше даты начала использования');
-        //      return;
-        //   }
-   
-    
   
           this.$emit('loading', true);
 
@@ -246,7 +240,8 @@ import DynamicSelect from 'vue-dynamic-select'
                })
              .catch(error => {
                 this.$emit('loading', false);
-                alert('Ошибка при добавлении аттестации/поверки: '+ error);
+                this.$alert('Ошибка при добавлении аттестации/поверки: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert('Ошибка при добавлении аттестации/поверки: '+ error);
                 return;
          });
 
@@ -260,7 +255,8 @@ import DynamicSelect from 'vue-dynamic-select'
                })
                .catch(error => {
                  this.$emit('loading', false);
-                 alert('Ошибка при редактировании аттестации/поверки: '+ error);
+                 this.$alert('Ошибка при редактировании аттестации/поверки: '+ error, '', 'error', {allowOutsideClick: false});
+                 //alert('Ошибка при редактировании аттестации/поверки: '+ error);
                  return;
              });
         }
@@ -293,12 +289,14 @@ import DynamicSelect from 'vue-dynamic-select'
                         attSent = true;
                         if(attSent && protocolSent){
                             this.$emit('loading', false);
-                            alert ('Данные сохранены!');
+                            this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                            //alert ('Данные сохранены!');
                             this.$emit('save', this.metCard);
                         }
                     }).catch(error => {//ошибка при добавлении файла
                     this.$emit('loading', false);
-                    alert('Ошибка при сохранении файла с аттестатом/свидетельством о поверке: '+ error);
+                    this.$alert('Ошибка при сохранении файла с аттестатом/свидетельством о поверке: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert('Ошибка при сохранении файла с аттестатом/свидетельством о поверке: '+ error);
                 })
         }
         else attSent = true;
@@ -325,19 +323,22 @@ import DynamicSelect from 'vue-dynamic-select'
                         protocolSent = true;
                         if(attSent && protocolSent){
                             this.$emit('loading', false);
-                            alert ('Данные сохранены!');
+                            this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                            //alert ('Данные сохранены!');
                             this.$emit('save', this.metCard);
                         }
                     }).catch(error => {//ошибка при добавлении файла
                     this.$emit('loading', false);
-                    alert('Ошибка при сохранении файла с протоколом: '+ error);
+                    this.$alert('Ошибка при сохранении файла с протоколом: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert('Ошибка при сохранении файла с протоколом: '+ error);
                 })
         }
         else protocolSent = true;
 
         if(!this.fileAtt && !this.fileProtocol){
              this.$emit('loading', false);
-             alert ('Данные сохранены!');
+             this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+             //alert ('Данные сохранены!');
               this.$emit('save', this.metCard);
         }
 
@@ -378,9 +379,9 @@ import DynamicSelect from 'vue-dynamic-select'
     display: inline-block;
     min-width: 300px;
     width: 100%;
-    text-align: center;
-    font-style: italic;
-    color:#337ab7;
+    text-align: left;
+    padding-left: 15px;
+    color:#000000;
     font-size: 12pt;
     padding-top: .5em;
   }
@@ -406,7 +407,6 @@ import DynamicSelect from 'vue-dynamic-select'
 .met-card-item input[type=text],
 .met-card-item  p
   {
-    border: 1px solid #ced4da;
     position: relative;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
@@ -430,22 +430,20 @@ import DynamicSelect from 'vue-dynamic-select'
 }
 
  .label-file { 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
       position: relative;
       border-radius: .25em;
       cursor: pointer;
       width: 100%;
-      color: #337ab7;
+      color: #e21a1a;
   }
   .act-btn i{
-    color: #337ab7;
+    color: #e21a1a;
     cursor: pointer;
   }
-  .act-btn i:hover{
-    color: #ed9b19
-  }
+  .act-btn i:hover,
   .label-file:hover{
-    color: #ed9b19;
+    color: #000000
   }
 
   
@@ -480,24 +478,28 @@ import DynamicSelect from 'vue-dynamic-select'
   }
 
 .modal-button { 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
       position: relative;
-      padding: .425em .5em;
+      padding-left: .5em;
+      padding-right: .5em;
+      margin: 0 .5em;
+      text-align:center;
       -moz-border-radius: .25em;
       -webkit-border-radius:  .25em;
       border-radius:  .25em;
       cursor: pointer;
-      width: 10rem;
-      margin: 0 .5em;
+      background-color: #e21a1a;
+      color: #ffffff;
+      width: 200px;
+      height: 39px;
   }
 .modal-button:hover{
-    color: #337ab7;
-    border-color: #337ab7;
+    color: #000000;
   }
  
   .metrology-error
 	{
-		color: red;
+		color: #e21a1a;
 		display: inline-block;
 		font-size: small;
   }

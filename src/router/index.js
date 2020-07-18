@@ -8,7 +8,6 @@ import Query from '../components/Query'
 import Plan from '../components/Plan'
 import Contract from '../components/Contract'
 import Metrology from '../components/Metrology'
-import Report from '../components/Report'
 import AdminUser from '../components/AdminUser'
 import rEqList from '../components/rEquipmentList'
 import rEqAge from '../components/rEquipmentAge'
@@ -25,9 +24,6 @@ import store  from '../../store'
 
 Vue.use(Router);
 
-//const userRights = store.getters.rights;
-//alert (userRights);
-//TODO! добавить проверку на наличие прав на определенную функцию
 const router = new Router({
     routes: [
       { path: '/', name:'home', component: Home },
@@ -37,13 +33,12 @@ const router = new Router({
       { path: '/queryList', name:'query', component: Query },
       { path: '/plan', name:'plan', component: Plan,  props: true},
       { path: '/contract', name:'contract', component: Contract },
-      { path: '/report/:id', name:'report', component: Report, props: true },
       { path: '/metrology', name:'metrology', component: Metrology},
       { path: '/adminuser', name:'adminuser', component: AdminUser},
        { path: '/rEqList', name:'rEqList', component: rEqList},
       { path: '/rEqAge', name:'rEqAge', component: rEqAge},
       { path: '/rEqCardF', name:'rEqCardF', component: rEqCardF,  props: true},
-      { path: '/rEqCard', name:'rEqCard', component: rEqCard,  props: true},
+      { path: '/rEqCard/:eqId', name:'rEqCard', component: rEqCard,  props: true},
       { path: '/rEqAnalysis', name:'rEqAnal', component: rEqAnal},
       { path: '/rEqStat', name:'rEqStat', component: rEqStat},
       { path: '/rSummary', name:'rSummary', component: rSummary},

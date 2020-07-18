@@ -1,7 +1,7 @@
 <template lang="html">
       <div>
         <div v-if="rights.add && !this.isArchive">
-            <button class="add-button" @click="actionAddClick" ><i class='fa fa-plus'> </i> Добавить ремонт</button></td>
+            <button class="add-button" @click="actionAddClick" >Добавить ремонт</button></td>
         </div>
         <label class='repair-error'></label>
         <DataTable
@@ -100,7 +100,7 @@
         ],
        rowCurrentIndex: 0,
        datatableCss: {
-        table: 'table table-bordered table-hover table-striped table-center repair-table',
+        table: 'table table-hover table-center repair-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
         tbodyTr: 'body-row'
@@ -144,7 +144,8 @@
             })
             .catch(error => {
                this.$emit('loading', false);
-               alert('Ошибка при загрузке данных о ремонтах '+ error);
+               this.$alert('Ошибка при загрузке данных о ремонтах: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при загрузке данных о ремонтах '+ error);
             });
 
         
@@ -195,11 +196,13 @@
                  else {
                    this.$emit('loading', false);
                     this.actionMode = 'view';
+                    $('.repair-error').removeClass('has-error').html('');
                  }
             })
             .catch(error => {
               this.$emit('loading', false);
-               alert('Ошибка при добавлении ремонта '+ error);
+              this.$alert('Ошибка при добавлении ремонта: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при добавлении ремонта '+ error);
             });
          }
          else { //редактируем существующий ремонт
@@ -212,11 +215,13 @@
                 else{
                     this.$emit('loading', false);
                     this.actionMode = 'view';
+                    $('.repair-error').removeClass('has-error').html('');
                 }
                
             })
             .catch(error => { //ошибка при обнолении данных о ремонте
-               alert('Ошибка при обновлении данных о ремонте '+ error);
+            this.$alert('Ошибка при обновлении данных о ремонте: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при обновлении данных о ремонте '+ error);
             });
          }
 
@@ -244,12 +249,14 @@
             if (filename){
               params.rowData.repDocPath = `${endpoint}${filename}`;
               this.actionMode = 'view';
+              $('.repair-error').removeClass('has-error').html('');
             }
             this.$emit('loading', false);
           })
         .catch(error => {//ошибка при добавлении файла
           this.$emit('loading', false);
-          alert('Ошибка при сохранении файла '+ error);
+          	this.$alert('Ошибка при сохранении файла: '+ error, '', 'error', {allowOutsideClick: false});
+          //alert('Ошибка при сохранении файла '+ error);
         })
       },
       actionDeleteClick: function (params) {
@@ -268,7 +275,8 @@
             })
             .catch(error => {
               this.$emit('loading', false);
-               alert('Ошибка при удалении ремонта '+ error);
+              	this.$alert('Ошибка при удалении ремонта: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении ремонта '+ error);
             });
         }
 
@@ -297,6 +305,7 @@
          $('.repair-error').addClass('has-error').html(this.msgError);
           return false;
         }
+        $('.repair-error').removeClass('has-error').html('');
         return true;
       }
     },
@@ -319,7 +328,9 @@
           }
 
         }
-
+        this.$nextTick(() => {
+          $('.repair-table .header-item:visible').first().addClass('first-th')
+        })
         this.initData();
     }
 
@@ -327,25 +338,32 @@
 </script>
 
 <style lang="scss" scoped>
-  .add-button
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 15em
+     .add-button{ 
+      border: 1px solid #e21a1a;
+      position: relative;
+      padding-left: .5em;
+      padding-right: .5em;
+      margin-bottom: 0;
+      text-align:center;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
+      cursor: pointer;
+      background-color: #e21a1a;
+      color: #ffffff;
+      width: 200px;
+      height: 39px;
   }
+  
   .add-button:hover
   {
-    color: #337ab7;
+    color: #000000;
   }
   .repair-table select,
   .repair-table .input-repair-master,
   .repair-table textarea
   {
-    border: 1px solid #ced4da;
+    border: 1px solid #e21a1a;
     position: relative;
     margin: .25em 0;
     border-radius: .25em;
@@ -369,33 +387,30 @@
    position: absolute;
  }
  .label-file { 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
       position: relative;
       border-radius: .25em;
       cursor: pointer;
       width: 100%;
-      color: #337ab7;
+      color: #e21a1a;
   }
   .act-btn i{
-    color: #337ab7;
+    color: #e21a1a;
     cursor: pointer;
   }
   .act-btn i:hover{
-    color: #ed9b19
+    color: #000000
   }
   .label-file:hover{
-    color: #ed9b19;
+    color: #000000;
   }
  .has-file {
     color: green;
   }
-  .btn-act{
-     color: #337ab7;
-     cursor: pointer;
-  }
+  
   .repair-error
 	{
-		color: red;
+		color: #e21a1a;
 		display: inline-block;
     font-size: small;
      visibility: hidden;

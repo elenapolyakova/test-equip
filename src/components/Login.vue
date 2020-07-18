@@ -1,13 +1,13 @@
 <template>
- <div>
+ <div class="login-content">
    <form class="login" @submit.prevent="login">
-     <h1>Вход в систему</h1>
-      <label class="mb-0"><i class='fa fa-user'></i> Имя пользователя</label>
-     <input required v-model="username" type="text" placeholder="Имя пользователя" @keyup="hasError=false" /> 
-     <label class="mb-0 mt-2"><i class='fa fa-key'></i> Пароль</label>
-     <input required v-model="password" type="password" placeholder="Пароль"  @keyup="hasError=false"/>
-     <button type="submit" class="mb-0 mt-4"><i class='fa fa-sign-in-alt'></i>  Войти</button>
-     <p class='hasError' v-if="hasError">Неверное имя пользователя или пароль</p>
+     <label class ="login-title">Вход в систему</label>
+     <input required v-model="username" type="text" placeholder="Имя пользователя" @keyup="hideError" /> 
+     <input required v-model="password" type="password" placeholder="Пароль"  @keyup="hideError"/>
+     <button type="submit"> Войти</button>
+     <div>
+        <p class='hasError'>Неверное имя пользователя или пароль</p>
+     </div>
    </form>
  </div>
 </template>
@@ -20,8 +20,7 @@ export default {
   data() {
     return {
       username : "",
-      password : "",
-      hasError : false
+      password : ""
     }
   },
   methods: {
@@ -34,44 +33,72 @@ export default {
       })
       .catch(error =>
       {
-        this.hasError = true;
+        $(".hasError").addClass("visible");
       });
-
+    },
+    hideError: function(){
+        $(".hasError").removeClass("visible");
     }
   }
 };
   </script>
 <style>
+.login-content{
+   display: flex;
+   width: 100%;
+   height: 100%;
+   justify-content:center;
+   align-items: center;
+}
 .login {
   display: flex;
   flex-direction: column;
   width: 300px;
   padding: 10px;
 }
-.login input,
-.login button {
-    border: 1px solid #ced4da;
+.login input {
     position: relative;
-    padding: .425em 0;
-    border-radius: .25em;
+    margin-top:10px;
+    margin-bottom:10px;
     cursor: text;
+    height: 39px;
     width: 100%;  
   }
+.login button{
+    border: 1px solid #000000;
+      position: relative;
+      text-align:center;
+      margin-top:10px;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
+      cursor: pointer;
+      background-color: #000000;
+      color: #ffffff;
+      width: 100%;  
+      height: 39px;
+}
 
 .login button:hover
   {
-    color: #337ab7;
+    color: #e21a1a;
     border-color: #337ab7;
   }
+.login-title{
+  text-align: center;
+  width: 100%;
+  font-weight: 600px;
+  font-size: 18pt;
+}
 
-  h1 {
-    border-bottom: 3px solid #4285f4;
-    width: 100%;
-  }
   .hasError
   {
     color: red;
     display: block;
     font-size: small;
+    visibility: hidden;
+  }
+  .visible{
+    visibility: visible;
   }
 </style>

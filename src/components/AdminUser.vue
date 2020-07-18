@@ -3,7 +3,7 @@
     <loading :active.sync="isLoading"
     :can-cancel="false"
     :is-full-page="true"
-    color='#337ab7'>
+    color='#e21a1a'>
     </loading>
         <div class="filter-container">
             <div class="filter-col">
@@ -35,32 +35,32 @@
                     </div>
             </div>
           <div class="btns">
+                  <button  v-if="rights.add" class="filter-button add-button" @click="actionAddClick"> Добавить пользователя</button></td>
                   <button class="filter-button" @click="filterData(true)" title="Применить фильтр"><i class='fa fa-check' > </i> </button>
                   <button class="filter-button" @click="clearFilter" title="Сбросить фильтр"><i class='fa fa-eraser'> </i> </button>
                 </div>
         </div>
 
-        <div v-if="rights.add">
-            <button class="add-button" @click="actionAddClick" ><i class='fa fa-plus'> </i> Добавить пользователя</button></td>
+        <div class="admin-user-content">
+          <DataTable
+              :header-fields="headerFields"
+              :data="userData || []"
+              :css="datatableCss"
+              @on-update="dtUpdateSort"> 
+              <template v-slot:actionsView="props">
+                <button class="btn btn-act" @click="actionViewClick(props);" title='просмотр'><i class = 'fa fa-search'></i></button>
+            </template>
+            <template v-slot:actionsEdit="props">
+                <button class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
+            </template>
+            <template v-slot:actionsDelete="props">
+                <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
+            </template>
+          </DataTable>
         </div>
-        <DataTable
-            :header-fields="headerFields"
-            :data="userData || []"
-            :css="datatableCss"
-            @on-update="dtUpdateSort"> 
-            <template v-slot:actionsView="props">
-              <button class="btn btn-act" @click="actionViewClick(props);" title='просмотр'><i class = 'fa fa-search'></i></button>
-          </template>
-          <template v-slot:actionsEdit="props">
-              <button class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
-          </template>
-          <template v-slot:actionsDelete="props">
-              <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
-          </template>
-        </DataTable>
          <stack-modal
                     :show="showCard"
-                    @close="closeCard"
+                    @close=""
                     :modal-class="{[modalClass]: true}"
                     :saveButton= "{title: 'Сохранить'}"
                     :cancelButton= "{title: 'Отмена'}"
@@ -175,8 +175,8 @@
             <div slot="modal-footer">
               <div class="user-footer">
                 <label class='user-card-error'></label>
-                <button class="modal-button" v-if="actionMode !=='view'" @click='saveUser' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
-                <button class="modal-button" @click="closeCard" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
+                <button class="modal-button" v-if="actionMode !=='view'" @click='saveUser' title='сохранить'>Сохранить</button>
+                <button class="modal-button" @click="closeCard" title='закрыть'>Закрыть</button>
               </div>
             </div>
 
@@ -263,13 +263,14 @@ $(window).on('resize', function(){
         ],
        rowCurrentIndex: 0,
        datatableCss: {
-        table: 'table table-bordered table-hover table-striped table-center admin-user-table',
+        table: 'table table-hover table-center admin-user-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
         tbodyTr: 'body-row'
        },
        modalClass: 'modal-90per',
-       actionMode: ''
+       actionMode: '',
+       oldUserCard: {}
       }
     },
     methods: {
@@ -329,20 +330,24 @@ $(window).on('resize', function(){
                     .catch(error => 
                     {
                         this.isLoading = false;
-                        alert ('Ошибка при получении данных о пользователе ' + error);
+                        this.$alert('Ошибка при получении данных о пользователе: '+ error, '', 'error', {allowOutsideClick: false});
+	
+                        //alert ('Ошибка при получении данных о пользователе ' + error);
                         
                     })
                 })
                 .catch(error => 
                 {
                     this.isLoading = false;
-                    alert ('Ошибка при получении данных о ролях пользователей ' + error);
+                     this.$alert('Ошибка при получении данных о ролях пользователей: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert ('Ошибка при получении данных о ролях пользователей ' + error);
                     
                 })
             })
           .catch(error => {
             this.isLoading = false;
-            alert ('Ошибка при получении справочников: ' + error);
+            this.$alert('Ошибка при получении справочников: '+ error, '', 'error', {allowOutsideClick: false});
+            //alert ('Ошибка при получении справочников: ' + error);
             
           });
 
@@ -382,7 +387,8 @@ $(window).on('resize', function(){
               })
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при удалении пользователя:  '+ error);
+              this.$alert('Ошибка при удалении пользователя: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении пользователя:  '+ error);
             });
       },
        initCard: function(params){
@@ -409,6 +415,8 @@ $(window).on('resize', function(){
             email:  params? params.rowData.email : ''
         
          }
+
+         this.oldUserCard = _.cloneDeep(this.userCard);
          //this.userRoleList =  params? params.rowData.roleList.split(',') : [];
         this.isLoading = false;
 
@@ -518,18 +526,22 @@ $(window).on('resize', function(){
                  let newId = response.data.idUser;
                  userData.idUser = newId;
                  this.userCard.idUser =  userData.idUser; 
-                
+                 userData.roleList =  userData.roleList.split(','); 
+
                 this.userInitData.push(userData);
+                this.oldUserCard = _.cloneDeep(this.userCard);
              
                 this.filterData(false);
              
                 this.isLoading = false;
-                alert ('Данные сохранены!');
+                this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                //alert ('Данные сохранены!');
                 
               })
             .catch(error => {
                this.isLoading = false;
-               alert('Ошибка при добавлении нового пользователя: '+ error);
+               this.$alert('Ошибка при добавлении нового пользователя: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при добавлении нового пользователя: '+ error);
                return;
             });
 
@@ -539,16 +551,23 @@ $(window).on('resize', function(){
               put('/user/' + userData.idUser, {userData: userData})
               .then(response => {
                   var oldValue =_.find(this.userInitData, {idUser: userData.idUser});
+
+                  userData.roleList =  userData.roleList.split(','); 
+
                   Object.assign(oldValue, userData);
+
+                  this.oldUserCard = _.cloneDeep(this.userCard);
 
                   this.filterData(false);
                   this.isLoading = false;
-                  alert ('Данные сохранены!');
+                  this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                  //alert ('Данные сохранены!');
 
               })
               .catch(error => {
                 this.isLoading = false;
-                alert('Ошибка при редактировании пользователя:  '+ error);
+                this.$alert('Ошибка при редактировании пользователя: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert('Ошибка при редактировании пользователя:  '+ error);
                 return;
             });
         }
@@ -558,8 +577,20 @@ $(window).on('resize', function(){
         //this.userRoleList
       },
       closeCard: function(){
-        if (confirm('Вы уверены, что хотите закрыть карточку?')) 
-          this.showCard = false;
+        let isCardChanged = !_.isEqual(this.oldUserCard, this.userCard);
+        if (isCardChanged)
+        {
+            this.$confirm('Вы уверены, что хотите закрыть карточку?', '', 'question', {allowOutsideClick: false, cancelButtonText: 'Отменить'})
+            .then(() => {
+               this.showCard = false;
+            })
+            // if (confirm('Вы уверены, что хотите закрыть карточку?')) 
+            //     this.showCard = false;
+        }
+        else {
+             this.showCard = false;
+        }
+
       }
      
     },
@@ -579,6 +610,11 @@ $(window).on('resize', function(){
           this.datatableCss.tbodyTd += ' delete-hide'
           this.datatableCss.theadTh += ' delete-hide'
         }
+
+        this.$nextTick(() => {
+          $('.admin-user-table .header-item:visible').first().addClass('first-th')
+        });
+        
         this.initData();
 
 
@@ -589,61 +625,58 @@ $(window).on('resize', function(){
 </script>
 
 <style lang="scss" scoped>
-   .add-button
+   .modal-button,
+   .filter-button
   {
-    border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 300px;
-  }
-
-  .act-btn i{
-    color: #337ab7;
-    cursor: pointer;
-  }
-  .act-btn i:hover{
-    color: #ed9b19
-  }
-   .modal-button{ 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
       position: relative;
-      padding: .425em .5em;
+      padding-left: .5em;
+      padding-right: .5em;
+      margin-bottom: 0;
+      text-align:center;
       -moz-border-radius: .25em;
       -webkit-border-radius:  .25em;
       border-radius:  .25em;
       cursor: pointer;
-      width: 10rem;
-      margin: 0 .5em;
-  }
-  .modal-button:hover,
-  .add-button:hover
-  {
-    color: #337ab7;
-    border-color: #337ab7;
+      background-color: #e21a1a;
+      color: #ffffff;
+      width: 39px;
+      height: 39px;
   }
 
+  .filter-button:hover,
+   .modal-button:hover{
+      color: #000000;
+      border: 1px solid #e21a1a;
+      
+  }
+
+   .modal-button{ 
+
+      margin: 0 .5em;
+  }
+
+  .modal-button,
+  .add-button{
+      width: 200px;
+  }
 .filter-container{
     display: flex;
    flex-wrap: wrap;
-   align-items: flex-start;
+   align-items: flex-end;
    justify-content: flex-start;
    padding-bottom: .25em;
-   border-bottom: 3px solid #4285f4;
+   border-bottom: 3px solid #e21a1a;
 }
 .filter-col {
    display: inline-block;
-   width: 25%;
-   min-width: 250px;
-    text-align: center;
+   width: 350px;
+   text-align: center;
 }
 .btns{
     display : flex;
     flex-wrap: nowrap;
+    align-items: flex-end;;
   }
   .user-footer {
     padding-bottom: 1em;
@@ -682,9 +715,9 @@ $(window).on('resize', function(){
 .user-card-label {
     display: inline-block;
     width: 100%;
-    text-align: center;
-    font-style: italic;
-    color:#337ab7;
+    text-align: left;
+    padding-left: 15px;
+    color:#000000;
     font-size: 12pt;
     padding-top: .5em;
   }
@@ -701,7 +734,6 @@ $(window).on('resize', function(){
 .user-card-item textarea,
 .user-card-item  p
   {
-    border: 1px solid #ced4da;
     position: relative;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
@@ -711,22 +743,27 @@ $(window).on('resize', function(){
     text-align: left;
     width: 100%;
     min-height: 2.25em;
+     height: 39px;
   }
+
   .role-list{
     text-align: left;
   }
+
   .user-card-item  p
   {
       margin: 0;
+      padding-left: 5px;
+      color: #000000;
   }
 
    .error{
-     border: 1px solid red !important;
+     border: 3px solid #e76e0a !important;
      
   }
   .user-card-error
   {
-    color: red;
+    color: #e21a1a;
     display: block;
     font-size: small;
     visibility: hidden;
@@ -735,6 +772,11 @@ $(window).on('resize', function(){
   {
     visibility: visible;
   }
+  .admin-user-content{
+    padding: 15px;
+  }
+
+
 
   @media screen and (max-width: 1500px) {  
        .user-card-col-left{

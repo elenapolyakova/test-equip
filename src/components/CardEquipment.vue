@@ -227,8 +227,11 @@
              <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Наличие в паспорте ИЦ</label></div>
                 <div class="eq-card-item eq-card-small">
-                    <input name="inPassport"  type="checkbox"  v-model="eqCard.inPassport" :disabled="actionMode =='view'"></input>
-                    <!-- <p name="inPassport" v-if="actionMode =='view'">{{eqCard.inPassport}}</p> -->
+                    <div class="checkbox"> 
+                        <input id="inPassport"  type="checkbox"  v-model="eqCard.inPassport" :disabled="actionMode =='view'"></input>
+                        <label for="inPassport"></label>
+                        <!-- <p name="inPassport" v-if="actionMode =='view'">{{eqCard.inPassport}}</p> -->
+                    </div>
                 </div>
             </div>
               <div class="eq-card-col-50">
@@ -445,7 +448,7 @@ $(window).on('resize', function(){
 .eq-card-col-30-doc{
      display: inline-block;
     width: 33%;
-     border: 1px solid #ced4da;
+     border: 1px solid #E21A1A;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
     border-radius:  .25em;
@@ -464,11 +467,11 @@ $(window).on('resize', function(){
     display: inline-block;
     min-width: 300px;
     width: 100%;
-    text-align: center;
-    font-style: italic;
-    color:#337ab7;
+    text-align: left;
+    color:#000000;
     font-size: 12pt;
     padding-top: .5em;
+    padding-left: 15px;
   }
   .eq-card-item,
   .eq-card-item-image {
@@ -488,7 +491,6 @@ $(window).on('resize', function(){
 .eq-card-item textarea,
 .eq-card-item p
   {
-    border: 1px solid #ced4da;
     position: relative;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
@@ -498,10 +500,17 @@ $(window).on('resize', function(){
     text-align: left;
     width: 100%;
     min-height: 2.5em;
+     padding-left: 5px;
   }
+.checkbox{
+    height: 40px;
+}
+
   .eq-card-item  p
   {
       margin: 0;
+      padding-left: 5px;
+      color: #000000;
   }
   .eq-card-image-button,
   .eq-card-file-button{
@@ -509,12 +518,12 @@ $(window).on('resize', function(){
       margin-right: .5em;
       margin-left: auto;
       text-align: right;
-      color:#337ab7;
+      color:#E21A1A
   }
   .eq-card-image-button label:hover,
   .eq-card-file-button label:hover{
     cursor: pointer;
-    color: #ed9b19;
+    color: #000000;
   }
  
 .eq-card-item textarea{
@@ -565,13 +574,13 @@ $(window).on('resize', function(){
   .doc-item
   {
     vertical-align: top;
-    color: #337ab7;
+    color: #E21A1A
   }
   .image-item i:hover,
   .doc-item:hover
   {
     cursor: pointer;
-     color: #ed9b19;
+     color: #000000;
   }
 
 .input__file {
@@ -592,12 +601,12 @@ $(window).on('resize', function(){
 }
 .doc-button i
 {
-  color: #337ab7;
+  color: #E21A1A;
   padding-right: 1.5em;
   padding-left: 1.5em;
 }
 .doc-button i:hover{
-    color: #ed9b19;
+    color: #000000
 }
  img {
     max-width: 100%;

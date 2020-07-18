@@ -1,8 +1,8 @@
 <template lang="html">
   <div class="filter-plan-container">
-      <div class="filter-plan-col-25"> 
+      <div class="filter-item-container"> 
            <div class="filter-plan-label"><label class="mb-0">Подразделение</label></div>
-           <div class="filter-plan-item">
+           <div class="filter-item">
               <dynamic-select 
                     :options="devisionList"
                     option-value="id"
@@ -12,9 +12,9 @@
                     @input="devisionSelected" />
             </div>
       </div>
-      <div class="filter-plan-col-50"> 
+      <div class="filter-item-container"> 
            <div class="filter-plan-label"><label class="mb-0">Наименование</label></div>
-           <div class="filter-plan-item">
+           <div class="filter-item">
               <dynamic-select 
                       :options="eqNameList"
                       option-value="id"
@@ -25,9 +25,9 @@
                        :container="container"/>
             </div>
       </div>
-      <div class="filter-plan-col-25"> 
+      <div class="filter-item-container"> 
           <div class="filter-plan-label"><label class="mb-0">Инвентарный номер</label></div>
-           <div class="filter-plan-item">
+           <div class="filter-item">
               <dynamic-select 
                         :options="invNumList"
                         option-value="id"
@@ -188,13 +188,15 @@
               .catch(error => 
               {
                 this.$emit('loading', false);
-                 alert ('Ошибка при получении данных об оборудовании: ' + error);
+                this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+                 //alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
           })
           .catch(error => {
             this.$emit('loading', false);
-            alert ('Ошибка при получении данных о подразделениях: ' + error);
+            this.$alert('Ошибка при получении данных о подразделениях: '+ error, '', 'error', {allowOutsideClick: false});
+            //alert ('Ошибка при получении данных о подразделениях: ' + error);
           });
     },
     mounted: function(){
@@ -209,30 +211,31 @@
   display: flex;
    flex-wrap: wrap;
    align-items: flex-start;
-   border-bottom: 3px solid #4285f4;
    max-width: calc(100vw - 100px);
+   margin-bottom: 5px;
 }
-.filter-plan-col-50{
-   
-   width: 50%;//calc(50% - 1px);
-   min-width: 360px;
-    text-align: center;
-}
-.filter-plan-col-25{
-   display: inline-block;
-   width: 25%;
-   min-width: 200px;
-    text-align: center;
-}
+.filter-item-container{
+     width: 350px;
+     text-align: center;
+
+   }
+   .filter-item{
+      display: block;
+      width: 100%;
+      min-width: 300px;
+      padding-left: 15px;
+      padding-right: 15px;
+
+  }
 .filter-plan-label {
     display: inline-block;
     min-width: 120px;
     width: 100%;
-    text-align: center;
-    font-style: italic;
-    color:#337ab7;
+    text-align: left;
+    color:#000000;
     font-size: 12pt;
     padding-top: .5em;
+    padding-left: 15px;
   }
   .filter-plan-item {
       display: block;

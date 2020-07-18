@@ -3,29 +3,30 @@
     <loading :active.sync="isLoading"
         :can-cancel="false"
         :is-full-page="true"
-        color='#337ab7'>
+        color='#e21a1a'>
     </loading>
-      <div class="action-panel">
+      <div class="action-panel-end">
            <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
            <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
       </div>
-      
-        <div class='title'>Сводные данные </br> по работе учтённого лабораторного испытательного оборудования научных подразделений за 
-         <date-picker v-model="calMonth"  type="month"  format="MMMM YYYY года" :editable="false" popup-class='calPopup' name="Month"></date-picker></div>
-         <table class="table table-bordered table-hover table-striped table-center table-summary" id="table-summary">
-            <thead>
-              <tr>
-                <th style="width: 50px">№ п/п</th>
-                <th style="width: 400px; min-width: 300px">Научное подразделение</th>
-                <th>Общее количество ИО подлежащего учёту, ед.</th>
-                <th>Количество учтённого и задействованного в работе ИО, ед.</th>
-                <th>Общая продолжительность работы ИО, часы</th>
-                <th>Общий расход ТЭР (эл. энергия, кВт.ч; горюче-смазочные материалы, л.)</th>
-                <th>Общее время (ч) вынужденного простоя</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        <div class="report-content">
+          <div class='title'>Сводные данные </br> по работе учтённого лабораторного испытательного оборудования научных подразделений за 
+          <date-picker v-model="calMonth"  type="month"  format="MMMM YYYY года" :editable="false" popup-class='calPopup' name="Month"></date-picker></div>
+          <table class="table  table-hover  table-center table-summary" id="table-summary">
+              <thead>
+                <tr>
+                  <th style="width: 50px">№ п/п</th>
+                  <th style="width: 400px; min-width: 300px">Научное подразделение</th>
+                  <th>Общее количество ИО подлежащего учёту, ед.</th>
+                  <th>Количество учтённого и задействованного в работе ИО, ед.</th>
+                  <th>Общая продолжительность работы ИО, часы</th>
+                  <th>Общий расход ТЭР (эл. энергия, кВт.ч; горюче-смазочные материалы, л.)</th>
+                  <th>Общее время (ч) вынужденного простоя</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+        </div>
   </div>
 </template>
 
@@ -380,7 +381,8 @@
               .catch(error => 
               {
                 this.isLoading = false;
-                  alert ('Ошибка при получении данных об оборудовании: ' + error);
+                	this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+                  //alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
           
@@ -538,31 +540,6 @@
 </script>
 
 <style lang="scss" scoped>
-.action-panel{
-    display: flex;
-    justify-content: flex-end;
-    margin-right: .5em;
-}
-.export-button  {
-     border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 50px;
-    height: 3em;
-}
-.export-button i{
-    color: #337ab7;
-    font-size: 20pt;
-}
-.export-button i:hover {
-    cursor: pointer;
-    color: #ed9b19;
-}
 
 .title{
     width:100%;
@@ -574,7 +551,7 @@
 .table-summary th {
   text-align: center !important;
   vertical-align: middle !important;
-  color:#337ab7;
+
 }
 .table-summary td {
   vertical-align: middle !important;

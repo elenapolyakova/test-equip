@@ -3,14 +3,11 @@
     <loading :active.sync="isLoading"
         :can-cancel="false"
         :is-full-page="true"
-        color='#337ab7'>
+        color='#e21a1a'>
     </loading>
-      <div class="action-panel">
-           <div class="action-panel-button">
-                   <button  @click="getDiagram" title= 'Построить диаграммы'><i class='fa fa-chart-pie'> </i> </button></td>
-              </div>
-
+      <div class="action-panel-end">
         <div class="action-panel-btn">
+            <button class="export-button" @click="getDiagram" title= 'Построить диаграммы'><i class='fa fa-chart-pie'> </i> </button></td>
             <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
             <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
 
@@ -576,40 +573,7 @@
 </script>
 
 <style lang="scss" scoped>
-.action-panel{
-    display:flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    padding-bottom: .25em;
-    border-bottom: 3px solid #4285f4;
-}
-.action-panel-button{
-        display: flex;
-    justify-content: center;
-    flex-wrap: nowrap;
-}
-.action-panel-button button,
-.export-button  {
-     border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 50px;
-    height: 3em;
-}
 
-.export-button i{
-    color: #337ab7;
-    font-size: 20pt;
-}
-.export-button i:hover {
-    cursor: pointer;
-    color: #ed9b19;
-}
 
 .title{
     width:100%;

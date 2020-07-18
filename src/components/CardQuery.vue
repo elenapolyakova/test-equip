@@ -89,9 +89,9 @@
       <div slot="modal-footer">
         <div class ="query-card-footer">
           <label class='query-error'></label>
-          <button class="modal-button" v-if="rights.edit || rights.add" @click="saveQuery" title='Сохранить заявку'><i class = 'fa fa-save' ></i> Сохранить</button>
-           <button class="modal-button" v-if="rights.delete && queryData.queryId !== -1"  @click="deleteQuery" title='Удалить заявку'><i class = 'fa fa-trash-alt'></i> Удалить</button>
-          <button class="modal-button" @click="$emit('close')" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
+          <button class="modal-button" v-if="rights.edit || rights.add" @click="saveQuery" title='Сохранить заявку'>Сохранить</button>
+           <button class="modal-button" v-if="rights.delete && queryData.queryId !== -1"  @click="deleteQuery" title='Удалить заявку'> Удалить</button>
+          <button class="modal-button" @click="$emit('close')" title='закрыть'>Закрыть</button>
           </div>
       </div>  
 
@@ -187,7 +187,8 @@
                })
                .catch(error => {
                   this.$emit('loading', false);
-                   alert ('Ошибка при получении данных о промежутках заявок: ' + error);
+                  this.$alert('Ошибка при получении данных о промежутках заявок: '+ error, '', 'error', {allowOutsideClick: false});
+                   //alert ('Ошибка при получении данных о промежутках заявок: ' + error);
                })
         }
       }
@@ -259,13 +260,15 @@
                         })
                         .catch(error =>  {
                             this.$emit('loading', false);
-                            alert ('Ошибка при получении данных о договорах: ' + error);
+                            this.$alert('Ошибка при получении данных о договорах: '+ error, '', 'error', {allowOutsideClick: false});
+                            //alert ('Ошибка при получении данных о договорах: ' + error);
                             
                         })
                })
                .catch(error =>  {
                   this.$emit('loading', false);
-                   alert ('Ошибка при получении данных о пользователях: ' + error);
+                  this.$alert('Ошибка при получении данных о пользователях: '+ error, '', 'error', {allowOutsideClick: false});
+                   //alert ('Ошибка при получении данных о пользователях: ' + error);
                   
                })
             this.queryTypeList = getQueryType();
@@ -359,11 +362,13 @@
                 this.showAddCon = false;
                 this.contractData = {};
                 this.$emit('loading', false);
-                alert ('Договор сохранён!');
+                this.$alert('Договор сохранён!', '', 'success', {allowOutsideClick: false});
+                //alert ('Договор сохранён!');
               })
             .catch(error => {
                this.$emit('loading', false);
-               alert('Ошибка при добавлении нового договора: '+ error);
+               this.$alert('Ошибка при добавлении нового договора: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при добавлении нового договора: '+ error);
                return;
             });
  
@@ -421,13 +426,15 @@
                  });
 
                  this.$emit('loading', false);
-                 alert ('Данные сохранены!');
+                 this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                 //alert ('Данные сохранены!');
                  this.$emit('save', this.updateQueryData);
                 
               })
             .catch(error => {
                this.$emit('loading', false);
-               alert('Ошибка при добавлении новой заявки: '+ error);
+               this.$alert('Ошибка при добавлении новой заявки: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при добавлении новой заявки: '+ error);
                return;
             });
 
@@ -440,13 +447,15 @@
                   query.dateStart = this.updateQueryData.dateStart;
                   query.dateEnd =  this.updateQueryData.dateEnd;
                   this.$emit('loading', false);
-                  alert ('Данные сохранены!');
+                  this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                  //alert ('Данные сохранены!');
                   this.$emit('save', this.updateQueryData);
 
               })
               .catch(error => {
                 this.$emit('loading', false);
-                alert('Ошибка при редактировании заявки:  '+ error);
+                this.$alert('Ошибка при редактировании заявки: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert('Ошибка при редактировании заявки:  '+ error);
                 return;
             });
         }
@@ -467,7 +476,8 @@
               })
            .catch(error => {
                 this.$emit('loading', false);
-               alert('Ошибка при удалении заявки:  '+ error);
+                this.$alert('Ошибка при удалении заявки: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении заявки:  '+ error);
             });
          
        }
@@ -482,10 +492,10 @@
     width: 800px;
     text-align: center;
     margin: auto;
-    border-bottom: 3px solid #4285f4;
+    border-bottom: 3px solid #e21a1a;
 }
 .query-card-contract{
-    border: 1px solid #ced4da;
+    border: 1px solid #e21a1a;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
     border-radius:  .25em;
@@ -500,19 +510,18 @@
     max-width: 200px;
     margin-left: auto;
     margin-right: .5em;
-    font-style: italic;
     font-size: 12pt;
-    color:#337ab7;
+    color:#000000;
   }
    .query-card-contract label{
      max-width: 70px;
    }
    .query-card-content-item i{
-     color: #337ab7;
+     color: #e21a1a;
      width: 200px;
    }
   .query-card-content-item i:hover {
-      color: #ed9b19;
+      color: #000000;
       cursor: pointer;
   }
 .query-card-content-item select,
@@ -520,7 +529,6 @@
 .query-card-content-item textarea,
 .query-card-content-item p
   {
-    border: 1px solid #ced4da;
     position: relative;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
@@ -591,19 +599,20 @@
   }
 
 .modal-button { 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
+      color: #ffffff;
+      background: #e21a1a;
       position: relative;
       padding: .425em .5em;
       -moz-border-radius: .25em;
       -webkit-border-radius:  .25em;
       border-radius:  .25em;
       cursor: pointer;
-      width: 10rem;
+      width: 200px;
       margin: 0 .5em;
   }
 .modal-button:hover{
-    color: #337ab7;
-    border-color: #337ab7;
+    color: #000000;
   }
   .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
@@ -613,7 +622,7 @@
   }
   .query-error
 	{
-		color: red;
+		color: #e21a1a;
 		display: inline-block;
 		font-size: small;
   }

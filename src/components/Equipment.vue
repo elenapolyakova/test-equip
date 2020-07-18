@@ -3,12 +3,15 @@
     <loading :active.sync="isLoading"
     :can-cancel="false"
     :is-full-page="true"
-    color='#337ab7'>
+    color='#e21a1a'>
     </loading>
    <filter-equipment 
                   @filterData="filterData"
                   @clearFilter="clearFilter"
-                   :fData="fData" 
+                  @actionAddClick="actionAddClick"
+                  :hasAddButton="hasAddButton"
+                  :hasAddQueryButton="false"
+                  :fData="fData" 
                   :eqNameList="eqNameList"
                   :eqDevisionList="eqDevisionList"
                   :eqTypeList="eqTypeList"
@@ -20,9 +23,7 @@
    </filter-equipment> 
 
       <div class="eqContent">
-        <div v-if="rights.add && !isArchive">
-            <button class="add-button" @click="actionAddClick"><i class='fa fa-plus'> </i> Добавить оборудование</button></td>
-        </div>
+      
         <DataTable
             :header-fields="headerFields"
             :data="eqData || []"
@@ -162,16 +163,16 @@
                       </div>
                </div>
                <div class ="eq-card-footer">
-                <button class="modal-button"  v-if="eqCard.id != -1 && activetab===0" @click='cardShow' title='печать карточки'><i class = 'fa fa-print'></i> Печать</button>
-                <button class="modal-button"  v-if="actionMode !=='view' && activetab===0" @click = 'saveModal' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
-                <button class="modal-button" @click = "closeModal" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
+                <button class="modal-button"  v-if="eqCard.id != -1 && activetab===0" @click='cardShow' title='печать карточки'> Печать</button>
+                <button class="modal-button"  v-if="actionMode !=='view' && activetab===0" @click = 'saveModal' title='сохранить'> Сохранить</button>
+                <button class="modal-button" @click = "closeModal" title='закрыть'> Закрыть</button>
               </div>
           </div> 
     
         </stack-modal> 
          <stack-modal
                     :show="showAddDoc"
-                    @close="showAddDoc=false"
+                    @close=""
                     :modal-class="{[modal2Class]: true}" 
                     :saveButton= "{title: 'Сохранить'}"
                     :cancelButton= "{title: 'Отмена'}"
@@ -195,8 +196,8 @@
             <div slot="modal-footer">
               <div class ="eq-add-doc-footer">
                 <label class='modal-doc-error'></label>
-                <button class="modal-button"  @click='saveDocument' title='сохранить'><i class = 'fa fa-save'></i> Сохранить</button>
-                <button class="modal-button" @click='showAddDoc=false' title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
+                <button class="modal-button"  @click='saveDocument' title='сохранить'> Сохранить</button>
+                <button class="modal-button" @click='showAddDoc=false' title='закрыть'> Закрыть</button>
               </div>
             </div>
 
@@ -223,6 +224,7 @@
                             @save="saveCardMet"
                             @close="closeCardMet"
                             @loading="loading"/>
+
         
   </div>
 </template>
@@ -255,8 +257,8 @@
   import '../css/stackable-modal.scss'
   import '../css/tab-pages.css'
   import 'vue-loading-overlay/dist/vue-loading.css'
-  import '../css/background-color.css'
-
+  import '../css/common.css'
+  import '../css/common-report.css'
    
 
   export default {
@@ -291,6 +293,7 @@
         workingModeList:[],
         docTypeList: [],
         responsibleList: [],
+        hasAddButton: false,
         
         //filter
         fData: {
@@ -332,13 +335,13 @@
           { name: "eqName", label: "Наименование",  sortable: true} ,
           { name: "eqDevisionName", label: "Подразделение",  sortable: true} ,
           { name: "eqTypeName", label: "Вид/категория",  sortable: true },
-          { name: "factDateFormat", label: "Дата выпуска", sortable: true },
+          { name: "factDateFormat", label: "Год выпуска", sortable: true },
           { name: "responsibleName", label: "Ответственный",  sortable: true },
           { name: "eqReadinessName", label: "Тех. состояние",  sortable: true }
         ],
        rowCurrentIndex: 0,
        datatableCss: {
-        table: 'table table-bordered table-hover table-striped table-center equipment-table',
+        table: 'table table-hover table-center equipment-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
         tbodyTr: 'body-row'
@@ -354,6 +357,10 @@
        showEqCard: false,
        modalClass: 'modal-90per',
        modal2Class: 'modal-xl',
+       modal3Class: 'modal-xl',
+       showModal: false,
+       hasCancelButton: false,
+       modalMessage: '',
        activetab: 0,
        file: '',
        rights: {},
@@ -395,7 +402,7 @@
      
     },
     methods: {
-
+  
       getDictionaries: async function(){
           if (!this.isDictLoading)
           {
@@ -415,8 +422,12 @@
                   this.isDictLoad = true;
                 })
                 .catch(error => {
-                this.isLoading = false;
-                alert ('Ошибка при получении справочников: ' + error);
+                  this.isLoading = false;
+                  this.isDictLoad = true;
+
+                   this.$alert('Ошибка при получении справочников: ' + error, '', 'error', {allowOutsideClick: false});
+                
+                 //alert ('Ошибка при получении справочников: ' + error);
               
             });
           }
@@ -424,6 +435,7 @@
       },
       initData: function(){
         this.isLoading = true;
+
         if (!this.isDictLoad)
         {
             this.getDictionaries();
@@ -496,12 +508,14 @@
                 this.rowCurrentIndex = 0;
                 this.initCard(this.eqData[this.rowCurrentIndex]);
                 //this.eqCard = this.eqData[this.rowCurrentIndex];
+               
                 this.isLoading = false;
               })
               .catch(error => 
               {
                 this.isLoading = false;
-                  alert ('Ошибка при получении данных об оборудовании: ' + error);
+                this.$alert('Ошибка при получении справочников: ' + error, '', 'error', {allowOutsideClick: false});
+                 //alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
         }
@@ -523,7 +537,7 @@
      },
      cardShow: function(){
          let eqId =  this.eqCard.id;
-         this.$router.push({name:'rEqCardF', component: rEqCardF,  
+         this.$router.push({name:'rEqCard', component: rEqCard,  
               params: {
                 eqId: eqId,
               }
@@ -597,12 +611,14 @@
                 this.eqNameList = this.fillDict(this.eqNameList , 'eqName');
                 this.eqProducerList = this.fillDict(this.eqProducerList , 'eqProducer');
                 this.isLoading = false;
-                alert ('Данные сохранены!');
+                this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                //alert ('Данные сохранены!');
                 
               })
             .catch(error => {
                this.isLoading = false;
-               alert('Ошибка при добавлении нового оборудования: '+ error);
+               this.$alert('Ошибка при добавлении нового оборудования: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при добавлении нового оборудования: '+ error);
                return;
             });
 
@@ -617,12 +633,14 @@
                   this.eqNameList = this.fillDict(this.eqNameList , 'eqName');
                   this.eqProducerList = this.fillDict(this.eqProducerList , 'eqProducer');
                   this.isLoading = false;
-                  alert ('Данные сохранены!');
+                   this.$alert('Данные сохранены!', '', 'success', {allowOutsideClick: false});
+                  //alert ('Данные сохранены!');
 
               })
               .catch(error => {
                 this.isLoading = false;
-                alert('Ошибка при редактировании оборудования:  '+ error);
+                this.$alert('Ошибка при редактировании оборудования: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert('Ошибка при редактировании оборудования:  '+ error);
                 return;
             });
         }
@@ -640,10 +658,15 @@
         let isCardChanged = !_.isEqual(this.oldCard, this.eqCard);
         if (isCardChanged)
         {
-           if (confirm('Вы уверены, что хотите закрыть карточку?')){
-              this.showEqCard = false;
-              this.activetab = 0;
-          }
+            this.$confirm('Вы уверены, что хотите закрыть карточку?', '', 'question', {allowOutsideClick: false, cancelButtonText: 'Отменить'})
+            .then(() => {
+                this.showEqCard = false;
+                this.activetab = 0;
+            })
+           //if (confirm('Вы уверены, что хотите закрыть карточку?')){
+           //   this.showEqCard = false;
+           //   this.activetab = 0;
+          //}
         }
         else {
             this.showEqCard = false;
@@ -724,7 +747,8 @@
               })
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при удалении оборудования:  '+ error);
+              this.$alert('Ошибка при удалении оборудования: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении оборудования:  '+ error);
             });
       },
       initCard: function(params){
@@ -816,7 +840,8 @@
                   })
                   .catch(error => {
                     this.isLoading = false;
-                    alert('Ошибка при загрузке фотографий: '+ error);
+                    this.$alert('Ошибка при загрузке фотографий: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert('Ошибка при загрузке фотографий: '+ error);
                   });
             
             api().
@@ -833,7 +858,8 @@
                 })
                 .catch(error => {
                   this.isLoading = false;
-                  alert('Ошибка при загрузке схемы расположения:  '+ error);
+                  this.$alert('Ошибка при загрузке схемы расположения:'+ error, '', 'error', {allowOutsideClick: false});
+                  //alert('Ошибка при загрузке схемы расположения:  '+ error);
                 });
 
             api().
@@ -848,7 +874,8 @@
                 })
                 .catch(error => {
                   this.isLoading = false;
-                  alert('Ошибка при загрузке документов:  '+ error);
+                  this.$alert('Ошибка при загрузке документов: ' + error, '', 'error', {allowOutsideClick: false});
+                  //alert('Ошибка при загрузке документов:  '+ error);
                 });
           
 
@@ -935,7 +962,8 @@
               })
               .catch(error => {
                 this.isLoading = false;
-                alert('Ошибка при удалении фотографии: '+error);
+                this.$alert('Ошибка при удалении фотографии: ' + error, '', 'error', {allowOutsideClick: false});
+                //alert('Ошибка при удалении фотографии: '+error);
               });
           }
           else this.isLoading = false;
@@ -958,7 +986,8 @@
              })
              .catch(error => {
                this.isLoading = false;
-                alert('Ошибка при удалении документа:  '+error);
+               this.$alert('Ошибка при удалении документа: ' + error, '', 'error', {allowOutsideClick: false});
+                //alert('Ошибка при удалении документа:  '+error);
              });
           
       },
@@ -1006,7 +1035,8 @@
               })
             .catch(error => {
                this.isLoading = false;
-               alert('Ошибка при сохранении документа: '+ error);
+               this.$alert('Ошибка при сохранении документа: ' + error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при сохранении документа: '+ error);
                return;
             });
          }
@@ -1049,7 +1079,8 @@
             })
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при сохранении документа:  '+ error);
+              this.$alert('Ошибка при сохранении документа: ' + error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при сохранении документа:  '+ error);
             });
       },
       handleFileDocUpload: function(params){
@@ -1083,7 +1114,8 @@
             })
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при сохранении документа:  '+ error);
+              this.$alert('Ошибка при сохранении документа: ' + error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при сохранении документа:  '+ error);
             });
       },
       handleImageUpload:  function(params){
@@ -1118,12 +1150,14 @@
                   imageList.push({idPhoto: idPhoto, path: filename})
                   //alert ('Файл добавлен!')
                 }
-                else alert (response.data);
+                else this.$alert(response.data, '', 'error', {allowOutsideClick: false});
+                //alert (response.data);
                 this.isLoading = false;
             })
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при сохранении фотографии:  '+error);
+              this.$alert('Ошибка при сохранении фотографии:  ' + error, '', 'error', {allowOutsideClick: false});
+              // alert('Ошибка при сохранении фотографии:  '+error);
             });
       },
       showModalDoc: function()
@@ -1244,6 +1278,7 @@
 
           this.rights = getFunRight(this.funShortName);
         if (this.isArchive){
+          this.hasAddButton = false;
             this.datatableCss.tbodyTd += ' edit-hide'
             this.datatableCss.theadTh += ' edit-hide'
             this.datatableCss.tbodyTd += ' copy-hide'
@@ -1253,13 +1288,15 @@
 
         }
         else{
+             this.hasAddButton = this.rights.add;
+
             if (!this.rights.view || this.rights.edit){
               this.datatableCss.tbodyTd += ' view-hide'
               this.datatableCss.theadTh += ' view-hide'
             }
             if (!this.rights.edit){
               this.datatableCss.tbodyTd += ' edit-hide'
-              this.datatableCss.theadTh += ' edit-hide'
+              this.datatableCss.theadTh += ' edit-hide' 
             }
             if (!this.rights.add){
               this.datatableCss.tbodyTd += ' copy-hide'
@@ -1270,8 +1307,9 @@
               this.datatableCss.theadTh += ' delete-hide'
            // }
         }
-
-        
+        this.$nextTick(() => {
+          $('.equipment-table .header-item:visible').first().addClass('first-th')
+        })
         this.initData();
       }
     },
@@ -1289,41 +1327,29 @@
   .eqContent {
     display: block; 
     overflow: auto;
+    padding: 15px;
   }
 
    .modal-button { 
-      border: 1px solid #ced4da;
+      color: #ffffff;
+      background-color: #E21A1A;
+      border: none;
       position: relative;
       padding: .425em .5em;
       -moz-border-radius: .25em;
       -webkit-border-radius:  .25em;
       border-radius:  .25em;
       cursor: pointer;
-      width: 10rem;
+      width: 200px;
       margin: 0 .5em;
   }
-  .modal-button:hover,
-  .add-button:hover
+  .modal-button:hover
   {
-    color: #337ab7;
-    border-color: #337ab7;
-  }
-  .btn-act{
-     color: #337ab7;
-     cursor: pointer;
-  }
-  .add-button
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
+    color: #000000;
     cursor: pointer;
-    margin: 10px;
-    width: 15em
   }
+
+  
 
  .div-15{
     display: inline-block;
@@ -1335,7 +1361,7 @@
   }
 .eq-card-header
 {
-    border-bottom: 3px solid #4285f4;
+    border-bottom: 3px solid #E21A1A;
     margin-top: .5rem;
     width: 100%;
     text-align: center
@@ -1364,7 +1390,6 @@
 .eq-card-col-25 input,
 .eq-card-col-25 p{
   width: 65%;
-  border: 1px solid #ced4da;
   -moz-border-radius: .25em;
   -webkit-border-radius:  .25em;
   border-radius:  .25em;
@@ -1405,13 +1430,12 @@
 .eq-card-navigation-item{
 
    margin: 0 .5em;
-   font-style: italic;
-   color:#337ab7;
+   color:#e21A1A;
    font-size: 12pt;
 }
 .eq-card-navigation-item.clicked:hover{
 
-   color: #ed9b19;
+   color: #000000;
    cursor: pointer;
 }
 
@@ -1422,7 +1446,7 @@
 }
 
 .eq-card-navigation-item.bordered{
-   border: 1px solid #ced4da;
+   border: 1px solid #e21a1a;
   -moz-border-radius: .25em;
   -webkit-border-radius:  .25em;
   border-radius:  .25em;
@@ -1439,7 +1463,8 @@
 
  
   .eq-card-footer,
-  .eq-add-doc-footer {
+  .eq-add-doc-footer,
+  .modal-footer {
     padding-bottom: 1em;
     display: flex;
     justify-content: flex-end;
@@ -1452,16 +1477,17 @@
  }
 
 .label-file { 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
       position: relative;
       padding: .425em .5em;
       -moz-border-radius: .25em;
       -webkit-border-radius:  .25em;
       border-radius:  .25em;
       cursor: pointer;
+      text-align: center;
       width: 30%;
       margin: 0 .5em;
-      color: #337ab7;
+      color: #e21a1a;
   }
 .add_document_content
 {
@@ -1469,7 +1495,7 @@
 }
 .add_document_content select
   {
-    border: 1px solid #ced4da;
+    border: 1px solid #e21a1a;
     position: relative;
     -moz-border-radius: .25em;
     -webkit-border-radius:  .25em;
@@ -1483,14 +1509,14 @@
   }
  
 .label-file:hover{
-    color: #ed9b19;
+    color: #000000;
   }
  .has-file {
     color: green;
   }
   .modal-doc-error
   {
-    color: red;
+    color: #e21a1a;
     display: block;
     font-size: small;
     visibility: hidden;

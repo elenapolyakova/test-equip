@@ -3,43 +3,44 @@
      <loading :active.sync="isLoading"
           :can-cancel="false"
           :is-full-page="true"
-          color='#337ab7'>
+          color='#e21a1a'>
       </loading>
         <div v-if="rights.add">
-            <button class="add-button" @click="actionAddClick" ><i class='fa fa-plus'> </i> Добавить договор</button></td>
+            <button class="add-button" @click="actionAddClick" >Добавить договор</button></td>
         </div>
-        <label class='contract-tip'>Выберите договор для объединения</label>
-        <label class='contract-error'></label>
-        <DataTable
-            :header-fields="headerFields"
-            :data="contractData || []"
-            :css="datatableCss"
-            @on-update="dtUpdateSort"> 
-           <template v-slot:actionsEdit="props">
-              <button v-if="!isEdit(props)" class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
-              <button v-if="isEdit(props)" class="btn btn-act" @click="actionSaveClick(props);" title='cохранить'><i class = 'fa fa-save'></i></button>
-          </template>
-          <template v-slot:actionsDelete="props">
-              <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
-          </template>
-          <template v-slot:actionsUnite="props">
-              <button v-if="!isUnite(props)" class="btn btn-act" @click="actionUniteClick(props);" title='Объединить'><i class = 'fa fa-link'></i></button>
-              <button v-if="isUnite(props)" class="btn btn-act" @click="actionCancelClick(props);" title='Отменить'><i class = 'fa fa-reply'></i></button>
-          </template>
-          <div slot="Num" slot-scope="props">
-              <p v-if="!isEdit(props)"> {{props.rowData.Num}}</p>
-              <input v-if="isEdit(props)" v-model="props.rowData.Num"></input>
-          </div>
-          <div slot="conDate" slot-scope="props">
-              <span v-if="!isEdit(props)">{{formatDate(props.rowData.Date)}}</span>
-               <date-picker v-if="isEdit(props)" v-model="props.rowData.Date" format='DD.MM.YYYY' popup-class='calPopup'></date-picker>
-          </div> 
-          <div slot="conPurpose" slot-scope="props">
-              <p v-if="!isEdit(props)"> {{props.rowData.Purpose}}</p>
-              <textarea v-if="isEdit(props)" v-model="props.rowData.Purpose"></textarea>
-          </div>
-          
-        </DataTable>
+        <div class="conract-content">
+          <label class='contract-tip'>Выберите договор для объединения</label>
+          <label class='contract-error'></label>
+          <DataTable
+              :header-fields="headerFields"
+              :data="contractData || []"
+              :css="datatableCss"
+              @on-update="dtUpdateSort"> 
+            <template v-slot:actionsEdit="props">
+                <button v-if="!isEdit(props)" class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
+                <button v-if="isEdit(props)" class="btn btn-act" @click="actionSaveClick(props);" title='cохранить'><i class = 'fa fa-save'></i></button>
+            </template>
+            <template v-slot:actionsDelete="props">
+                <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
+            </template>
+            <template v-slot:actionsUnite="props">
+                <button v-if="!isUnite(props)" class="btn btn-act" @click="actionUniteClick(props);" title='Объединить'><i class = 'fa fa-link'></i></button>
+                <button v-if="isUnite(props)" class="btn btn-act" @click="actionCancelClick(props);" title='Отменить'><i class = 'fa fa-reply'></i></button>
+            </template>
+            <div slot="Num" slot-scope="props">
+                <p v-if="!isEdit(props)"> {{props.rowData.Num}}</p>
+                <input v-if="isEdit(props)" v-model="props.rowData.Num"></input>
+            </div>
+            <div slot="conDate" slot-scope="props">
+                <span v-if="!isEdit(props)">{{formatDate(props.rowData.Date)}}</span>
+                <date-picker v-if="isEdit(props)" v-model="props.rowData.Date" format='DD.MM.YYYY' popup-class='calPopup'></date-picker>
+            </div> 
+            <div slot="conPurpose" slot-scope="props">
+                <p v-if="!isEdit(props)"> {{props.rowData.Purpose}}</p>
+                <textarea v-if="isEdit(props)" v-model="props.rowData.Purpose"></textarea>
+            </div>
+          </DataTable>
+         </div>
   </div>
 </template>
 
@@ -90,7 +91,7 @@
        msgErrorUnite: "Необходимо завершить объединение",
        rowCurrentIndex: 0,
        datatableCss: {
-        table: 'table table-bordered table-hover table-striped table-center contract-table',
+        table: 'table table-hover table-center contract-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
         tbodyTr: 'body-row'
@@ -121,7 +122,8 @@
               .catch(error => 
               {
                 this.isLoading = false;
-                alert ('Ошибка при получении данных о договорах: ' + error);
+                this.$alert('Ошибка при получении данных о договорах: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert ('Ошибка при получении данных о договорах: ' + error);
                   
               })
 
@@ -178,7 +180,8 @@
             }) 
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при добавлении договора '+ error);
+              this.$alert('Ошибка при добавлении договора: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при добавлении договора '+ error);
             });
          }
          else { //редактируем существующий договор
@@ -191,7 +194,8 @@
                 })
             .catch(error => { //ошибка при обновлении данных о договоре
               this.isLoading = false;
-               alert('Ошибка при обновлении данных о договоре '+ error);
+              this.$alert('Ошибка при обновлении данных о договоре: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при обновлении данных о договоре '+ error);
             });
          }
       },
@@ -209,7 +213,8 @@
             })
             .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при удалении договора  '+ error);
+              this.$alert('Ошибка при удалении договора: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении договора  '+ error);
             });
         }
 
@@ -245,7 +250,8 @@
                $('.contract-error').removeClass('has-error').html('');
               $('.contract-tip').removeClass('visible');
               this.isLoading = false;
-               alert('Ошибка при объединении договоров  '+ error);
+              this.$alert('Ошибка при объединении договоров: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при объединении договоров  '+ error);
             });
         }
 
@@ -292,6 +298,9 @@
           this.datatableCss.tbodyTd += ' unite-hide'
           this.datatableCss.theadTh += ' unite-hide'
         }
+         this.$nextTick(() => {
+          $('.contract-table .header-item:visible').first().addClass('first-th')
+        });
         this.initData();
       
       }
@@ -300,51 +309,53 @@
 </script>
 
 <style lang="scss" scoped>
-   .add-button
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 250px;
+     .add-button{ 
+      border: 1px solid #e21a1a;
+      position: relative;
+      margin-left: 15px;
+      margin-top: 15px;
+      margin-bottom: 0;
+      text-align:center;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
+      cursor: pointer;
+      background-color: #e21a1a;
+      color: #ffffff;
+      width: 250px;
+      height: 39px;
   }
   .add-button:hover
   {
-    color: #337ab7;
+    color: #000000;
   }
-  .act-btn i{
-    color: #337ab7;
-    cursor: pointer;
+ 
+  .conract-content{
+    margin-left: 15px;
   }
-  .act-btn i:hover{
-    color: #ed9b19
+  .contract-error
+	{
+		color: #e21a1a;
+		display: inline-block;
+    font-size: small;
+     visibility: hidden;
   }
-  .contract-table input,
+   .contract-table input,
   .contract-table textarea
   {
-    border: 1px solid #ced4da;
     position: relative;
     margin: .25em 0;
-    border-radius: .25em;
     cursor: text;
     display: inline-block;
     text-align: left;
     width: 100%;
     height: 2em;
   }
-  .contract-table textarea
+   .contract-table textarea
   {
     height: 4em;
   }
-  .contract-error
-	{
-		color: red;
-		display: inline-block;
-    font-size: small;
-     visibility: hidden;
-  }
+
   .contract-tip
   	{
 		color: green;

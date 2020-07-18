@@ -15,7 +15,7 @@
       </div>
       <div slot="modal-footer">
         <div class ="history-query-footer">
-            <button class="modal-button" @click="$emit('close')" title='закрыть'><i class = 'fa fa-times'></i> Закрыть</button>
+            <button class="modal-button" @click="$emit('close')" title='закрыть'>Закрыть</button>
         </div>
       </div>  
 
@@ -83,7 +83,8 @@ $(window).on('resize', function(){
                })
                .catch(error => {
                   this.$emit('loading', false);
-                   alert ('Ошибка при получении данных об истории заявки: ' + error);
+                  this.$alert('Ошибка при получении данных об истории заявки: '+ error, '', 'error', {allowOutsideClick: false});
+                   //alert ('Ошибка при получении данных об истории заявки: ' + error);
                })
         }
 
@@ -105,7 +106,7 @@ $(window).on('resize', function(){
           { name: "eventDateFormat", label: "Дата операции"},
           { name: "change", label: "Изменения"}],
         datatableCss: {
-            table: 'table table-bordered table-hover table-striped table-center history-table',
+            table: 'table table-hover  table-center history-table',
             theadTh: 'header-item',
             tbodyTd: 'body-item',
             tbodyTr: 'body-row'
@@ -138,7 +139,8 @@ $(window).on('resize', function(){
                 })
                 .catch(error =>  {
                     this.$emit('loading', false);
-                    alert ('Ошибка при получении данных о договорах: ' + error);
+                    this.$alert('Ошибка при получении данных о договорах: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert ('Ошибка при получении данных о договорах: ' + error);
                             
                 })
             this.queryTypeList = getQueryType();
@@ -195,7 +197,7 @@ $(window).on('resize', function(){
     text-align: center;
     margin: auto;
     overflow: auto;
-    border-bottom: 3px solid #4285f4;
+    border-bottom: 3px solid #e21a1a;
 }
 
 @media screen and (max-width: 980px) {
@@ -218,19 +220,20 @@ $(window).on('resize', function(){
   }
 
 .modal-button { 
-      border: 1px solid #ced4da;
+      border: 1px solid #e21a1a;
+      color: #ffffff;
+      background: #e21a1a;
       position: relative;
       padding: .425em .5em;
       -moz-border-radius: .25em;
       -webkit-border-radius:  .25em;
       border-radius:  .25em;
       cursor: pointer;
-      width: 10rem;
+      width: 200px;
       margin: 0 .5em;
   }
 .modal-button:hover{
-    color: #337ab7;
-    border-color: #337ab7;
+    color: #000000;
   }
   
 </style>

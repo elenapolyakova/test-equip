@@ -1,20 +1,47 @@
-   .v-datatable-light .header-item {
+   .v-datatable-light .header-item,
+   .table-summary th,
+   .table-eq-work th,
+   .table-eq-cont th{
     cursor: pointer;
-    color:#337ab7;
+    color:#ffffff;
     transition: color 0.15s ease-in-out;
-    border: 1pt solid hsl(218, 25%, 79%);
+    border: 1pt solid #ffffff;
     text-align: center;
     vertical-align: middle;
+    background-color: #000000;;
   }
   .v-datatable-light .header-item:hover {
-    color: #ed9b19;
+    color: #e21a1a;
   }
   .v-datatable-light .header-item.no-sortable{
     cursor: default;
   }
   .v-datatable-light .header-item.no-sortable:hover {
-    color: #337ab7;
+    color: #ffffff;
   }
+  .v-datatable-light th:nth-last-child(1),
+  .table-summary th:nth-last-child(1),
+  .table-eq-work th:nth-last-child(1),
+  .table-eq-cont th:nth-last-child(1) {
+    -moz-border-radius: 0 .5em .5em 0 !important;
+    -webkit-border-radius: 0 .5em .5em 0 !important;
+    border-radius:  0 .5em .5em 0 !important;
+    border-right: none !important;
+  }
+
+  .first-th,
+  .history-table th:nth-child(1),
+  .eqlist-table th:nth-child(1),
+  .eqAge-table th:nth-child(1),
+  .table-summary th:nth-child(1),
+  .table-eq-work th:nth-child(1),
+  .table-eq-cont th:nth-child(1) {
+    -moz-border-radius: .5em 0 0 .5em !important;
+    -webkit-border-radius: .5em 0 0 .5em !important;
+    border-radius: .5em 0 0 .5em !important;
+    border-left: none !important;
+  }
+
   
   .v-datatable-light ,
   .v-datatable-light .body-item
@@ -23,6 +50,21 @@
   vertical-align: middle;
   padding: 0 .5em;
   }
+  .v-datatable-light .body-item,
+  .table-summary td,
+  .table-eq-work td,
+  .table-eq-cont td
+  {
+    border-right: 1pt solid hsl(217, 32%, 92%);
+    border-top: 1pt solid hsl(217, 32%, 92%);
+    border-bottom: 1pt solid hsl(217, 32%, 92%);
+  }
+  .body-item:nth-last-child(1),
+  .table-summary td:nth-last-child(1),
+  .table-eq-work td:nth-last-child(1),
+  .table-eq-cont td:nth-last-child(1){
+    border-right: none !important;
+  }
   .v-datatable-light .btn-act
   {
     cursor: pointer;
@@ -30,11 +72,11 @@
     width: 30px;
     height: 30px;
     padding: 0 .4em;
-    color:  #337ab7;
+    color:  #e21a1a;
    }
    .v-datatable-light .btn-act:hover
    {
-    color: #ed9b19;
+    color: #000000;
    }
 
     .equipment-table .view-hide:nth-child(1),

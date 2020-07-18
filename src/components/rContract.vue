@@ -3,7 +3,7 @@
     <loading :active.sync="isLoading"
         :can-cancel="false"
         :is-full-page="true"
-        color='#337ab7'>
+        color='#e21a1a'>
     </loading>
       <div class="action-panel">
         <div class="action-panel-filter">
@@ -50,25 +50,23 @@
                                         placeholder=''/>
                             </div>
                       </div>
-
-                      <div class="btns">
-                          <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
-                          <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button>
-                      </div>
-
+                      <div class="action-panel-filter-item">
+                        <div class="action-panel-filter-button">
+                            <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
+                            <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button>
+                            <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
+                            <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
+                        </div>
+                     </div>
                   </div>
 
  
 
-
-          <div class="action-panel-btn">
-            <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
-            <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
-         </div>
       </div>
+      <div class="report-content">
         <div class='title'>{{report_name}}</div>
-        
-         <table class="table table-bordered table-hover table-striped table-center table-eq-cont" id="table-eq-cont">
+         
+         <table class="table table-hover table-center table-eq-cont" id="table-eq-cont">
             <thead>
               <tr>
                 <th style="width: 20%">Договор</th>
@@ -80,6 +78,7 @@
             </thead>
             <tbody></tbody>
           </table>
+        </div>
   </div>
 </template>
 
@@ -423,7 +422,8 @@
                  })
                 .catch(error => {
                     this.isLoading = false;
-                    alert ('Ошибка при получении данных о договорах: ' + error);
+                    	this.$alert('Ошибка при получении данных о договорах: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert ('Ошибка при получении данных о договорах: ' + error);
                     
                 });
         },
@@ -476,13 +476,15 @@
                 .catch(error => 
                 {
                     this.isLoading = false;
-                    alert ('Ошибка при получении данных об оборудовании: ' + error);
+                    this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert ('Ошибка при получении данных об оборудовании: ' + error);
                     
                 })
             })
             .catch(error => {
                 this.isLoading = false;
-                alert ('Ошибка при получении справочников: ' + error);
+                this.$alert('Ошибка при получении справочников: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert ('Ошибка при получении справочников: ' + error);
                 
             });
         },
@@ -599,111 +601,16 @@
 </script>
 
 <style lang="scss" scoped>
-.action-panel {
-    display:flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    padding-bottom: .25em;
-    border-bottom: 3px solid #4285f4;
-}
-.action-panel-filter {
-    display:flex;
-    justify-content: flex-start;
-    width: calc(100vw - 300px);
-    flex-wrap: nowrap;
-    align-content: flex-end;
-}
-.action-panel-filter-item{
-    display: block;
-    width: 400px;
-    min-width: 320px;
-    padding: 0 1.5em; 
-}
-.action-panel-filter-calendar-item{
-    display: block;
-    width: 100%;
-}
-.action-panel-filter-button{
-    display: inline-block;
-    padding-left: 1.5em;
-    text-align: center;
-    vertical-align: bottom;
-}
-.action-panel-filter-item-label{
-    display: inline-block;
-    min-width: 120px;
-    width: 100%;
-    text-align: center;
-    font-style: italic;
-    color:#337ab7;
-    font-size: 12pt;
-    padding-top: .5em;
-}
-.filter-button,
-.export-button {
-     border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 50px;
-    height: 3em;
-}
-.action-panel-filter-item-select{
-   
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-}
-.action-panel-btn{
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-around;
-    margin-right: 1.5em;
-    margin-left: 1.5em;
-    width: 130px;
-}
 
-.export-button i{
-    
-    color: #337ab7;
-    font-size: 20pt;
-}
-
-.filter-button:hover{
-    color: #337ab7;
-    border-color: #337ab7;
-}
-.export-button i:hover {
-    cursor: pointer;
-    color: #ed9b19;
-}
-
-.title{
-    width:100%;
-    font-size: 18px;
-    text-align: center;
-}
-
-.mx-datepicker-range{
-    width: 100% !important;
-}
 
 .table-eq-cont th {
   text-align: center !important;
   vertical-align: middle !important;
-  color:#337ab7;
 }
 .table-eq-cont td {
   vertical-align: middle !important;
 }
-  .btns{
-    display : flex;
-    flex-wrap: nowrap;
-  }
+
 @media screen and (max-width: 1500px) {
    .action-panel-filter{
      flex-wrap: wrap;
@@ -726,24 +633,9 @@
     {
         display: block;
         width: 100%;
-
-    }
-    .action-panel-filter-item{
         text-align: center;
-         width: 100%;
-    }
-  .action-panel-btn{
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        justify-content:center;
-    }
 
-    .action-panel
-   {
-        display: block;
-         text-align: center;
-   }
+    }
     
 }
 

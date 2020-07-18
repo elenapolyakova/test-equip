@@ -1,7 +1,7 @@
 <template lang="html">
   <div>
-        <div v-if="rights.add && !isArchive">
-            <button class="add-button" @click="actionAddClick" ><i class='fa fa-plus'> </i> Добавить  аттестацию/поверку</button></td>
+        <div v-if="rights.add && !isArchive" class="pb-2"> 
+            <button class="add-button" @click="actionAddClick" > Добавить  аттестацию/поверку</button></td>
         </div>
         <DataTable
             :header-fields="headerFields"
@@ -82,7 +82,7 @@
         ],
        rowCurrentIndex: 0,
        datatableCss: {
-        table: 'table table-bordered table-hover table-striped table-center metrology-table',
+        table: 'table table-hover table-center metrology-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
         tbodyTr: 'body-row'
@@ -169,7 +169,8 @@
               .catch(error => 
               {
                 this.$emit('loading', false);
-                alert ('Ошибка при получении данных об аттестации/поверке: ' + error);
+                this.$alert('Ошибка при получении данных об аттестации/поверке: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert ('Ошибка при получении данных об аттестации/поверке: ' + error);
                   
               })
 
@@ -215,7 +216,8 @@
               })
             .catch(error => {
               this.$emit('loading', false);
-               alert('Ошибка при удалении аттестации/поверки:  '+ error);
+              this.$alert('Ошибка при удалении аттестации/поверки: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении аттестации/поверки:  '+ error);
             });
       },
       initCard: function(params)
@@ -275,6 +277,9 @@
             this.datatableCss.theadTh += ' delete-hide'
           }
         }
+         this.$nextTick(() => {
+          $('.metrology-table .header-item:visible').first().addClass('first-th')
+        });
         this.initData();
       
       }
@@ -283,27 +288,31 @@
 </script>
 
 <style lang="scss" scoped>
-   .add-button
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-     -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 300px;
+   .add-button{ 
+      border: 1px solid #e21a1a;
+      position: relative;
+      padding-left: .5em;
+      padding-right: .5em;
+      margin-bottom: 0;
+      text-align:center;
+      -moz-border-radius: .25em;
+      -webkit-border-radius:  .25em;
+      border-radius:  .25em;
+      cursor: pointer;
+      background-color: #e21a1a;
+      color: #ffffff;
+      width: 250px;
+      height: 39px;
   }
   .add-button:hover
   {
-    color: #337ab7;
+    color: #000000;
   }
   .act-btn i{
-    color: #337ab7;
+    color: #e21a1a;
     cursor: pointer;
   }
   .act-btn i:hover{
-    color: #ed9b19
+    color: #000000
   }
 </style>

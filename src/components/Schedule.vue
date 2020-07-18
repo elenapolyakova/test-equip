@@ -27,8 +27,8 @@
 							<div class='query-item' :name="'queryId_' + query.queryId">
 								<p>{{query.timeStart}} - {{query.timeEnd}} <br/>
 								{{query.title}}</p>
-								<p v-if="isFit(query)"><button class="history-item" @click.stop="showHistory(query)"><i class="fa fa-history"></i> История изменений</button></p>
-								<p>{{query.dayOf}} <i class="fa fa-history" @click.stop="showHistory(query)" v-if="!isFit(query)" title="История изменений" style="font-size: 12pt"></i></p>
+								<p v-if="isFit(query)"><button class="history-item" @click.stop="showHistory(query)"> История изменений</button></p>
+								<p>{{query.dayOf}} <i class="fa fa-history history-item-small" @click.stop="showHistory(query)" v-if="!isFit(query)" title="История изменений" style="font-size: 12pt"></i></p>
 							</div>
 					</li>
 					<li class="query-list-item add-item hidden-item" :style="styleObjAdd" @click="addItemClick">
@@ -166,17 +166,19 @@
 		-moz-border-radius: .25em;
       	-webkit-border-radius:  .25em;
 		border-radius:  .25em;
-		border: 1px solid #ced4da;
-		color: #000000;
+		border: 1px solid #e21a1a;
+		background: #e21a1a;
+		color: #ffffff;
 		font-size: 9pt;
 		margin: 0 .5em !important;
 	
 	}
 	.history-item:hover{
-		border:#337ab7;
-		color: #337ab7;
+		color: #000000;
 	}
-
+	 .history-item-small {
+		color: #e21a1a;
+	}
 	.blink {
 	  -webkit-animation: blinker 2s 3;
       -moz-animation: blinker 2s 3;
@@ -271,7 +273,8 @@ export default {
 					.catch(error => 
 					{
 						this.$emit('loading', false);
-						alert ('Ошибка при получении данных об оборудовании: ' + error);
+						this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+						//alert ('Ошибка при получении данных об оборудовании: ' + error);
 						
 					})
 			}
@@ -450,8 +453,9 @@ export default {
                })
                .catch(error => 
                {
-                   this.$emit('loading', false);
-                   alert ('Ошибка при получении данных о заявках: ' + error);
+				   this.$emit('loading', false);
+				   this.$alert('Ошибка при получении данных о заявках: '+ error, '', 'error', {allowOutsideClick: false});
+                   //alert ('Ошибка при получении данных о заявках: ' + error);
                   
                })
 			 }
@@ -543,7 +547,7 @@ export default {
 								left: (dateTime.day-1)*this.queryWidth + this.offsetTime.left + 'px',
 								height: this.queryHeight + 'px',
 								top: (dateTime.time* this.queryHeight) + this.offsetTime.top + 'px',
-								backgroundColor: '#4285f4'
+								backgroundColor: '#e21a1a'
 						}
 						this.addTime = ('0' + (dateTime.time + this.pageTimeGround[0].split(":")[0]*1)).slice(-2) + ':00';
 						$(".add-item").removeClass("hidden-item");

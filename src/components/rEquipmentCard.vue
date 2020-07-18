@@ -3,18 +3,18 @@
     <loading :active.sync="isLoading"
         :can-cancel="false"
         :is-full-page="true"
-        color='#337ab7'>
+        color='#e21a1a'>
     </loading>
       <label v-if="!hasEquip()" class="equip-error">Необходимо выбрать оборудование</label>
-      <div class="action-panel" v-if="hasEquip()">
+      <div class="action-panel-end" v-if="hasEquip()">
         <div class="action-panel-btn">
             <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
             <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
         </div>
       </div>
-      <div id="report" v-if="hasEquip()" class="report-container">
+      <div id="report" v-if="hasEquip()" class="report-content eq-card">
         <div class="header">
-              <div class="logo"><img src="../logo.png" id="imgLogo"/> </div>
+              <div class="header-logo"><img src="../logo.png" id="imgLogo"/> </div>
               <div class="header-devision">Подразделение:<span class="">{{eqData.devision}}</span><span>{{empty_underline}}</span></div>
         </div>
         <div class="title">{{report_name}}</span></div>
@@ -38,7 +38,7 @@
             <tr><td><div class="cell" style="height: 25px">Техническое состояние: </div></td>
                 <td><div class="cell">{{eqData.eqTechState}}</div></td></tr>
             <tr><td><div class="cell" style="height: 25px">Наличие графика проведения ТО: </div></td>
-                <td class="editable-td"><div class="cell"><textarea class="editable-cell"></textarea></div></td></tr>
+                <td class="editable-td"  style="height: 25px"><div class="cell" style="height: 100%"><textarea class="editable-cell"></textarea></div></td></tr>
             <tr><td colspan='2' class="tr_header">НАЛИЧИЕ ТЕХНИЧЕСКОЙ ДОКУМЕНТАЦИИ</td></tr>
             <tr><td><div class="cell" style="height: 25px">Паспорт: </div></td>
                 <td><div class="cell link">
@@ -77,7 +77,7 @@
         <div id="footer">
         <div class="footer-row">
             <div>Дата заполнения </div>
-              <div class="underline footer-item" style="width:50px">"<input v-model="curDate.day"></input>"</div> 
+              "<div class="underline footer-item" style="width:40px"><input v-model="curDate.day"></input></div>"
               <div class="underline footer-item" style="width:150px"><input v-model="curDate.month"></input></div>
               <div class="footer-item">{{curDate.year}} г.</div>
         </div>
@@ -204,13 +204,15 @@
               .catch(error => 
               {
                 this.isLoading = false;
-                  alert ('Ошибка при получении данных об оборудовании: ' + error);
+                this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+                  //alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
           })
           .catch(error => {
             this.isLoading = false;
-            alert ('Ошибка при получении справочников: ' + error);
+            this.$alert('Ошибка при получении справочников: '+ error, '', 'error', {allowOutsideClick: false});
+            //alert ('Ошибка при получении справочников: ' + error);
             
           });
         
@@ -665,7 +667,7 @@
   flex-wrap: nowrap;
   width: 100%
 }
-.logo
+.header-logo
 {
   margin-left: 20px;
 
@@ -675,56 +677,13 @@
     height: auto;
     width: auto\9; /* ie8 */
  }
-.title{
-    width:100%;
-    font-size: 18px;
-     font-weight: 600;
-    text-align: center;
-}
+
 .cardNum-num{
     font-weight: 600;
   //  text-decoration:underline;
 
 }
-.action-panel {
-    display:flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    padding-bottom: .5em;
-    border-bottom: none;
-    width: 100%;
-}
-.export-button {
-     border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 50px;
-    height: 3em;
-}
 
-.export-button i{
-    color: #337ab7;
-    font-size: 20pt;
-}
-
-.export-button i:hover {
-    cursor: pointer;
-    color: #ed9b19;
-}
-
-.action-panel-btn{
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-around;
-    margin-right: 1.5em;
-    margin-left: 1.5em;
-    width: 130px;
-}
 .header-devision{
   text-align: right;
   vertical-align: text-bottom;
@@ -766,14 +725,8 @@
   height: 50px;
   font-weight: 600;
 }
-.editable-cell{
-  border: none;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-.report-container {
+
+.report-content.eq-card {
   width: 1000px;
 }
 .footer-row {
@@ -792,6 +745,7 @@
 }
 .footer-item{
   margin-left: .25em;
+  text-align: center;
 }
 .fio{
   display: block;
@@ -807,12 +761,33 @@
 		font-size: small;
 	}
 
-@media screen and (max-width:1000px) {
- 
-    .action-panel {
-      justify-content: flex-start;
-    }
 
+@media screen and (max-width: 1500px) {
+   .action-panel-filter{
+     flex-wrap: wrap;
+     justify-content: space-around;
+   }
+}
+
+@media screen and (max-width: 900px) {
+ 
+   
+    .action-panel-filter-item,
+    .action-panel-filter-button{
+        width: 320px;
+        padding: 0;
+    }
+    
+}
+@media screen and (max-width: 600px) {
+     .action-panel-filter
+    {
+        display: block;
+        width: 100%;
+        text-align: center;
+
+    }
+    
 }
 
 </style>

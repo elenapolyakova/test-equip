@@ -3,11 +3,14 @@
       <loading :active.sync="isLoading"
           :can-cancel="false"
           :is-full-page="true"
-          color='#337ab7'>
+          color='#e21a1a'>
       </loading>
     <filter-equipment
              @filterData="filterData"
              @clearFilter="clearFilter"
+             @actionAddQueryClick="actionAddClick"
+             :hasAddButton="false"
+             :hasAddQueryButton="hasAddQueryButton"
              :fData="fData" 
              :eqNameList="eqNameList"
              :eqDevisionList="eqDevisionList"
@@ -17,10 +20,8 @@
              :responsibleList=[]
              :hasExtended="false">
     </filter-equipment>
-    <div class="equeryContent">
-      <div v-if="rights.add">
-          <button class="add-button" @click="actionAddClick"><i class='fa fa-plus'> </i> Добавить заявку</button>
-      </div>
+    <div class="query-content">
+    
      <DataTable
             :header-fields="headerFields"
             :data="queryData || []"
@@ -67,6 +68,7 @@
          queryTypeList: [],
          queryData: [],
          queryInitialList: [],
+         hasAddQueryButton: false,
 
           fData: {
           cardNum: '', 
@@ -103,7 +105,7 @@
             ],
             rowCurrentIndex: 0,
             datatableCss: {
-              table: 'table table-bordered table-hover table-striped table-center query-table',
+              table: 'table table-hover table-center query-table',
               theadTh: 'header-item',
               tbodyTd: 'body-item',
               tbodyTr: 'body-row'
@@ -143,7 +145,8 @@
               })
            .catch(error => {
               this.isLoading = false;
-               alert('Ошибка при удалении заявки:  '+ error);
+              this.$alert('Ошибка при удалении заявки: '+ error, '', 'error', {allowOutsideClick: false});
+               //alert('Ошибка при удалении заявки:  '+ error);
             });
       },
       actionAddClick: function(){
@@ -233,13 +236,15 @@
                .catch(error => 
                {
                  this.isLoading = false;
-                   alert ('Ошибка при получении данных о заявках: ' + error);
+                 this.$alert('Ошибка при получении данных о заявках: '+ error, '', 'error', {allowOutsideClick: false});
+                   //alert ('Ошибка при получении данных о заявках: ' + error);
                   
                })
            })
            .catch(error => {
              this.isLoading = false;
-             alert ('Ошибка при получении справочников: ' + error);
+             this.$alert('Ошибка при получении справочников: '+ error, '', 'error', {allowOutsideClick: false});
+             //alert ('Ошибка при получении справочников: ' + error);
             
            });
      },
@@ -267,6 +272,7 @@
         
         this.rights = getFunRight(this.funShortName);
 
+         this.hasAddQueryButton = this.rights.add;
          if (!this.rights.edit){
              this.datatableCss.tbodyTd += ' edit-hide'
             this.datatableCss.theadTh += ' edit-hide'
@@ -277,6 +283,10 @@
             this.datatableCss.theadTh += ' delete-hide'
           }
 
+         this.$nextTick(() => {
+          $('.query-table .header-item:visible').first().addClass('first-th')
+        })
+
          this.initData();
       }
 
@@ -284,29 +294,11 @@
 </script>
 
 <style lang="scss" scoped>
- .queryContent {
+ .query-content {
     display: block; 
     overflow: auto;
+    padding: 15px;
   }
-   .btn-act{
-     color: #337ab7;
-     cursor: pointer;
-  }
-  .add-button
-  {
-    border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 15em
-  }
-   .add-button:hover
-  {
-    color: #337ab7;
-    border-color: #337ab7;
-  }
+  
+ 
 </style>

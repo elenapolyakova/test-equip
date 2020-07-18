@@ -3,7 +3,7 @@
     <loading :active.sync="isLoading"
         :can-cancel="false"
         :is-full-page="true"
-        color='#337ab7'>
+        color='#e21a1a'>
     </loading>
       <div class="action-panel">
           <div class="action-panel-filter">
@@ -44,19 +44,21 @@
                                 placeholder=''/>
                     </div>
               </div>
-               <div class="action-panel-filter-button">
-                   <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
+               <div class="action-panel-filter-item">
+                <div class="action-panel-filter-button">
+                    <button class="filter-button" @click="getReport" title='Применить фильтр'><i class='fa fa-check'> </i> </button>
                     <button class="filter-button" @click="clearFilter" title='Сбросить фильтр'><i class='fa fa-eraser'> </i> </button>
-              </div>
+                    <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
+                    <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
 
+                </div>
+              </div>
           </div>
-          <div class="action-panel-btn">
-            <button class="export-button" @click="exportExcel"><i class="fa fa-file-excel" title="Экспорт в excel"></i></button>
-            <button class="export-button" @click="exportPDF"><i class="fa fa-file-pdf" title="Экспорт в pdf"></i></button>
-         </div>
+          
       </div>
+      <div class="report-content">
         <div class='title'>{{report_name}}</div>
-        <div>
+        
              <DataTable
                 :header-fields="headerFields"
                 :data="eqData || []"
@@ -115,7 +117,7 @@
             { name: "note", label: "Примечание", sortable: true }
         ],
        datatableCss: {
-        table: 'table table-bordered table-hover table-striped table-center equipment-table',
+        table: 'table table-hover table-center eqlist-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
         tbodyTr: 'body-row'
@@ -342,7 +344,7 @@
                         eqItem.location = item.eq_place ? item.eq_place.trim() : '';
                         eqItem.invNum = item.inv_num ? item.inv_num.trim() : '';
                         eqItem.comDate =  item.eq_comdate ? new Date(item.eq_comdate) : '';
-                        eqItem.comDateYear = eqItem.comDate.getFullYear();
+                        eqItem.comDateYear = item.eq_comdate ? eqItem.comDate.getFullYear(): '';
                         eqItem.resValue = toCost(item.eqprice);
                         eqItem.note = item.remark ? item.remark.trim() : '';
                         eqItem.eqReadiness = item.is_ready;
@@ -357,13 +359,15 @@
                 .catch(error => 
                 {
                     this.isLoading = false;
-                    alert ('Ошибка при получении данных об оборудовании: ' + error);
+                    this.$alert('Ошибка при получении данных об оборудовании: '+ error, '', 'error', {allowOutsideClick: false});
+                    //alert ('Ошибка при получении данных об оборудовании: ' + error);
                     
                 })
             })
             .catch(error => {
                 this.isLoading = false;
-                alert ('Ошибка при получении справочников: ' + error);
+                this.$alert('Ошибка при получении справочников: '+ error, '', 'error', {allowOutsideClick: false});
+                //alert ('Ошибка при получении справочников: ' + error);
                 
             });
         },
@@ -382,95 +386,35 @@
 </script>
 
 <style lang="scss">
-.action-panel {
-    display:flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    padding-bottom: .25em;
-    border-bottom: 3px solid #4285f4;
-}
-.action-panel-filter {
-    display:flex;
-    justify-content: flex-start;
-    width: calc(100vw - 300px);
-    flex-wrap: nowrap;
-    align-content: flex-end;
-}
-.action-panel-filter-item{
-    display: block;
-    width: calc((100vw - 620px)/3);
-    padding: 0 1.5em; 
-}
-.action-panel-filter-button{
-    display: flex;
-    justify-content: center;
-    flex-wrap: nowrap;
-}
-.action-panel-filter-item-label{
-    display: inline-block;
-    min-width: 120px;
-    width: 100%;
-    text-align: center;
-    font-style: italic;
-    color:#337ab7;
-    font-size: 12pt;
-    padding-top: .5em;
-}
-.filter-button,
-.export-button  {
-     border: 1px solid #ced4da;
-    position: relative;
-    padding: .425em .5em;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius: .25em;
-    cursor: pointer;
-    margin: 10px;
-    width: 50px;
-    height: 3em;
-}
-.action-panel-filter-item-select{
-   
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-}
-.action-panel-btn{
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-around;
-    margin-right: 1.5em;
-    margin-left: 1.5em;
-    width: 130px;
-}
-.export-button i{
-    color: #337ab7;
-    font-size: 20pt;
+
+
+
+@media screen and (max-width: 1500px) {
+   .action-panel-filter{
+     flex-wrap: wrap;
+     justify-content: space-around;
+   }
 }
 
-.filter-button:hover{
-    color: #337ab7;
-    border-color: #337ab7;
-}
-.export-button i:hover {
-    cursor: pointer;
-    color: #ed9b19;
-}
-
-.title{
-    width:100%;
-    font-size: 18px;
-    text-align: center;
-    padding-top: .5em;
-}
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 900px) {
  
-    .action-panel-filter{
-        flex-wrap: wrap;
+   
+    .action-panel-filter-item,
+    .action-panel-filter-button{
+        width: 320px;
+        padding: 0;
     }
-    .action-panel-filter-item{
+    
+}
+@media screen and (max-width: 600px) {
+     .action-panel-filter
+    {
+        display: block;
         width: 100%;
+        text-align: center;
+
     }
+    
 }
 
 </style>

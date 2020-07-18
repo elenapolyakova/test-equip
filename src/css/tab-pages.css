@@ -39,37 +39,37 @@
     cursor: pointer;
     padding: 12px 24px;
     transition: background-color 0.2s;
-    border: 1px solid #ccc;
+    border: 1px solid #E21A1A;
     border-right: none;
     background-color: #f1f1f1;
     border-radius: 10px 10px 0 0;
     font-weight: bold;
 }
 .tabs a:last-child { 
-    border-right: 1px solid #ccc;
+    border-right: 1px solid #E21A1A;
 }
 
 /* Change background color of tabs on hover */
 .tabs a:hover {
     background-color: #aaa;
-    color: #ed9b19;
+    color: #000000;
 }
 .tabs a.active:hover {
-    color: #ed9b19;
+    color: #000000;
 }
 
 /* Styling for active tab */
 .tabs a.active {
-    background-color: #fff;
-    color: #337ab7;
-    border-bottom: 2px solid #fff;
+    background-color: #E21A1A;
+    color: #ffffff;
+    border-bottom: 2px solid #E21A1A;
     cursor: default;
 }
 
 /* Style the tab content */
 .tabcontent {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #E21A1A;
     border-radius: 10px;
     box-shadow: 3px 3px 6px #e1e1e1;
     height: 100%;

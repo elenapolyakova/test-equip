@@ -5,7 +5,7 @@ import App from './App'
 import axios from 'axios'
 import Vue2TouchEvents from 'vue2-touch-events'
 import VueApexCharts from 'vue-apexcharts'
-
+import VueSimpleAlert from 'vue-simple-alert'
 
 
 
@@ -13,6 +13,7 @@ const _ = require('lodash');
 
 //Vue.use(axios);
 Vue.component('apexchart', VueApexCharts);
+Vue.use(VueSimpleAlert);
 
 Vue.use(Vue2TouchEvents, {disableClick: false,
   touchClass: '',

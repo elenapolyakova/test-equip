@@ -1,0 +1,177 @@
+input,
+.vue-dynamic-select,
+textarea:not(.editable-cell),
+select,
+.eq-card-item p,
+.eq-card-col-25 p
+{
+   border: 1.5px solid #e21a1a !important;
+   background-color: #ffffff !important;
+   -moz-border-radius: .25em !important;
+   -webkit-border-radius:  .25em !important;
+   border-radius:  .25em !important;
+ }
+
+ .editable-cell{
+    border: none;
+    background-color: rgb(228, 201, 201);
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .editable-td{
+      padding: 0 !important;
+  }
+ .vue-dynamic-select input{
+  border: none !important;
+  background-color: #ffffff !important;
+ }
+ .vue-dynamic-select i,
+ .mx-datepicker i {
+   color: #e21a1a;
+ }
+ .mx-input{ 
+  height: 39px !important;
+  color: #000000;
+}
+.mx-datepicker-range{
+    width: 100% !important;
+    height: 39px !important;
+}
+.in-range{
+    background-color:#e7a6a6b4 !important;
+}
+ .eq-card-item p,
+ .user-card-item p,
+ .query-card-content-item p
+{
+  border: 1.5px solid #e21a1a !important;
+  background-color: #ffffff !important;
+  -moz-border-radius: .25em !important;
+  -webkit-border-radius:  .25em !important;
+  border-radius:  .25em !important;
+ }
+
+ input[type="checkbox"]:checked, 
+ input[type="checkbox"]:not(:checked)
+ {
+     position: absolute;
+     left: -9999px;
+
+ }
+
+input[type="checkbox"]:checked + label, 
+input[type="checkbox"]:not(:checked) + label {
+    display: inline-block;
+    position: relative;
+    padding-left: 32px;
+    line-height: 40px;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked + label:before, 
+input[type="checkbox"]:not(:checked) + label:before {
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #E21A1A;
+    background-color: #ffffff;
+}
+
+input[type="checkbox"]:checked + label:before, 
+input[type="checkbox"]:not(:checked) + label:before {
+    border-radius: 2px;
+}
+
+
+
+input[type="checkbox"]:checked + label:after, 
+input[type="checkbox"]:not(:checked) + label:after {
+    content: "";
+    position: absolute;
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    -o-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked + label:after, 
+input[type="checkbox"]:not(:checked) + label:after {
+    left: 5px;
+    top: 4px;
+    width: 18px;
+    height: 13px;
+    border-radius: 1px;
+    border-left: 4px solid #E21A1A;
+    border-bottom: 4px solid #E21A1A;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+
+
+input[type="checkbox"]:not(:checked) + label:after {
+    opacity: 0;
+}
+
+input[type="checkbox"]:checked + label:after {
+    opacity: 1;
+}
+
+.vue-dynamic-select{
+
+    padding: 0.25em 0.5em !important;
+  }
+
+.mx-input{
+  text-align: center !important;
+}
+
+.mx-calendar-content .cell.active {
+    background-color: #E21A1A;
+}
+.mx-time-option.active,
+.mx-table-date .today,
+.mx-btn-text,
+.VuePassword__Toggle-Icon{
+    color: #E21A1A;
+}
+.mx-datepicker-btn-confirm{
+    border: 1px solid #e21a1a;
+    position: relative;
+    padding-left: .5em;
+    padding-right: .5em;
+    margin-bottom: 0;
+    text-align:center;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
+    cursor: pointer;
+    background-color: #e21a1a;
+    color: #ffffff;
+}
+
+.mx-datepicker-btn-confirm:hover{
+    color: #000000;
+    border: 1px solid #e21a1a;
+}
+
+.mx-btn-text:hover,
+.VuePassword__Toggle-Icon:hover {
+        color: #000000;
+}
+.VuePassword__Input{
+    height: 39px !important;
+ }
+
+ .swal2-styled.swal2-confirm{
+    background-color: #e21a1a !important;
+    border: 1px solid #e21a1a !important;
+ }
