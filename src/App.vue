@@ -64,7 +64,7 @@ function resizeHeader() {
   $(function() {
     setTimeout(resizeHeader, 100);
    });
-   
+
   export default {
     name: "app",
     data () {
@@ -122,7 +122,7 @@ function resizeHeader() {
          $('.func-content').css("height", ($(window).height() - header) + 'px');
        },
       getMenuList: function(){
-        this.resizeHeader();
+        
         let userRights = this.$store.getters.userRights;
         
         this.menu = [];
@@ -154,7 +154,9 @@ function resizeHeader() {
           if (hasRight('au'))
             this.menu.push({title: 'АДМИНИСТРИРОВАНИЕ',  name:'au', href: { path: '/AdminUser',  name: "adminuser"}});    
 
-
+          this.$nextTick(()=>{
+            this.resizeHeader();
+          })
 
 
       },
