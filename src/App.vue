@@ -233,8 +233,10 @@ function resizeHeader() {
          submenu.hide();
       },
       setFunName: function(funName){
-
         this.funName = funName;
+         this.$nextTick(()=>{
+            this.resizeHeader();
+          })
       }
 
     }
