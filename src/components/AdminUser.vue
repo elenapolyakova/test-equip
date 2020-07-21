@@ -307,7 +307,7 @@ $(window).on('resize', function(){
                           let userItem = {};
                               userItem.idUser = item.id_user;
                               userItem.login = item.us_login ? item.us_login.trim() : '';
-                              userItem.password = item.us_pswd ? item.us_pswd.trim() : '';
+                              userItem.oldPassword = item.us_pswd ? item.us_pswd.trim() : '';
                               userItem.roleList = item.rolelist ? item.rolelist.split(',') : [];
                               userItem.rolesName = this.rolesName(userItem.roleList);
                               userItem.surname = item.us_surname ? item.us_surname.trim() : '';
@@ -317,7 +317,7 @@ $(window).on('resize', function(){
                               userItem.position = item.us_position ? item.us_position.trim() : '';
                               userItem.devision = item.id_dicdev_dicdevision;
                               userItem.devisionName = this.devisionName(userItem.devision);
-                              userItem.email = item.email ? item.email.trim() : '';
+                              userItem.email = item.us_email ? item.us_email.trim() : '';
                               this.userInitData.push(userItem);
                           });
                           this.rowCurrentIndex = 0;
@@ -400,7 +400,7 @@ $(window).on('resize', function(){
             surname: params? params.rowData.surname : '',
             name: params? params.rowData.name : '',
             patname: params? params.rowData.patname :'',
-            oldPassword: params ? params.rowData.password: '',
+            oldPassword: params ? params.rowData.oldPassword: '',
             password: '',
            /* company: {
               id: params? params.rowData.company : '',
@@ -415,7 +415,6 @@ $(window).on('resize', function(){
             email:  params? params.rowData.email : ''
         
          }
-
          this.oldUserCard = _.cloneDeep(this.userCard);
          //this.userRoleList =  params? params.rowData.roleList.split(',') : [];
         this.isLoading = false;
@@ -524,8 +523,11 @@ $(window).on('resize', function(){
              post('/user', {userData: userData})
               .then(response => {
                  let newId = response.data.idUser;
+                 let pswd = response.data.pswd;
                  userData.idUser = newId;
+                 userData.oldPassword = pswd;
                  this.userCard.idUser =  userData.idUser; 
+                 this.userCard.oldPassword = userData.oldPassword; 
                  userData.roleList =  userData.roleList.split(','); 
 
                 this.userInitData.push(userData);
@@ -550,7 +552,11 @@ $(window).on('resize', function(){
             api().
               put('/user/' + userData.idUser, {userData: userData})
               .then(response => {
+                  let pswd = response.data.pswd;
                   var oldValue =_.find(this.userInitData, {idUser: userData.idUser});
+
+                  userData.oldPassword = pswd;
+                  this.userCard.oldPassword = userData.oldPassword;
 
                   userData.roleList =  userData.roleList.split(','); 
 

@@ -17,7 +17,7 @@
       <div class="navigation" v-if="$store.getters.isAuthenticated">
         <div><p class='logo-place'></p></div>
         <div class='menu'>
-            <div class="menu-item" v-for="menuItem in menu">
+            <div class="menu-item" v-for="menuItem in menu" :key="menuItem.title">
               <router-link v-if="menuItem.href"
                 :to="{path: menuItem.href.path}"
                 active-class="menu-link-active"
@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="submenu">
-              <div class="submenu-item" v-for="childItem in child">
+              <div class="submenu-item" v-for="childItem in child" :key="childItem.title">
                    <router-link v-if="childItem.href"
                     :to="{path: childItem.href.path}"
                     active-class="menu-link-active"

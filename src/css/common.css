@@ -164,7 +164,8 @@ input[type="checkbox"]:checked + label:after {
 }
 
 .mx-btn-text:hover,
-.VuePassword__Toggle-Icon:hover {
+.VuePassword__Toggle-Icon:hover,
+.vgs__close:hover {
         color: #000000;
 }
 .VuePassword__Input{
@@ -174,4 +175,20 @@ input[type="checkbox"]:checked + label:after {
  .swal2-styled.swal2-confirm{
     background-color: #e21a1a !important;
     border: 1px solid #e21a1a !important;
+ }
+ .vgs__container
+ {
+   height: 80vh !important;
+ } 
+ .vgs__close{
+     font-size: 14pt  !important;
+     width: 200px  !important;
+     border: 1px solid #e21a1a !important;
+     background-color: #e21a1a !important;
+     -moz-border-radius: .25em !important;
+     -webkit-border-radius:  .25em !important;
+     border-radius: .25em !important;
+     cursor: pointer !important;
+     color: #ffffff;
+     height: 39px !important;
  }

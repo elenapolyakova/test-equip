@@ -369,7 +369,7 @@ $(window).on('resize', function(){
             if ($('.vgs__container').length > 0) $('.vgs__container').css({top: 0, marginTop: 0});
             let img = $('.vgs__container__img');
              $('.vgs__close').css({top: img.offset().top, left: img.offset().left + img.width()-  $('.vgs__close').width() - 12});
-            $('.vgs__close').html('X закрыть')
+            $('.vgs__close').html('Закрыть')
             
             }, 100);
          },
