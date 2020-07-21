@@ -128,6 +128,8 @@
                   <div v-if="activetab===2" class='tabcontent'>
                         <repair :idEq="eqCard.id"
                                 @loading="loading"
+                                @delRep="getActualDate"
+                                @saveRep="getActualDate"
                                 :isArchive="isArchive"></repair>
                   </div>
                   <div v-if="activetab===3" class='tabcontent'>
@@ -137,6 +139,7 @@
                                 @editMet="editMet"
                                 @addMet="addMet"
                                 @viewMet="viewMet"
+                                @delMet="getActualDate"
                                 :isArchive="isArchive"
                               ></metrology>
 
@@ -1249,9 +1252,36 @@
         this.metCard = params;
         this.showMetrologyCard = true;
       },
+      getActualDate: function(){
+        let idEq = this.eqCard.id 
+          api().
+            get('/equipment/actualDate/' + idEq,
+              ).then(response => 
+              {
+                let data = response.data; 
+                
+                this.eqCard.eqAtt = data.eqatt ? formatDate(new Date(data.eqatt)): '';
+                this.eqCard.eqVer = data.eqver ? formatDate(new Date(data.eqver)): '';
+                this.eqCard.repDate = data.repdate ? new Date(data.repdate): '';
+                this.eqCard.repDateFormat = this.eqCard.repDate ? this.eqCard.repDate.getFullYear(): '';
+
+                var oldValue =_.find(this.eqInitialList, {id: idEq});
+                oldValue.eqAtt = this.eqCard.eqAtt;
+                oldValue.eqVer = this.eqCard.eqVer;
+                oldValue.repDate = this.eqCard.repDate;
+                oldValue.repDateFormat = this.eqCard.repDateFormat;
+                 // Object.assign(oldValue, this.eqDataItem);
+              })
+                .catch(error => {
+                 //this.$alert('Ошибка при получении новых дат аттестации/поверки: ' + error, '', 'error', {allowOutsideClick: false});
+              
+            });
+      },
       saveCardMet(updatedMetData){
         this.updatedMetData=updatedMetData;
         this.showMetrologyCard = false;
+        this.getActualDate();
+      
       },
       closeCardMet(){
          this.showMetrologyCard = false;

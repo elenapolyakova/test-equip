@@ -189,6 +189,7 @@
                  let idRep = response.data.idRep;
                  params.rowData.idRep = idRep;
                  
+                 this.$emit('saveRep');
                  if (this.file) { //если добавили файл
                    this.sendFile(params); 
                    
@@ -209,6 +210,8 @@
            api().
               put('/repair/' + idRep, {repairData: params.rowData})
               .then(response => {
+
+                this.$emit('saveRep');
                  if (this.file) { // если добавили файл
                       this.sendFile(params);
                 }
@@ -269,6 +272,7 @@
            api().
               delete('/repair/' + idRep)
               .then(response => { 
+                this.$emit('delRep');
                 this.eqRepairData = _.reject(this.eqRepairData, {idRep: idRep});
                 this.actionMode='view';
                 this.$emit('loading', false);

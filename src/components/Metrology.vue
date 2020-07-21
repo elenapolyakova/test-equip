@@ -211,7 +211,7 @@
               delete('/metrology/' + metId)
               .then(response => { 
                 this.eqMetrologyData = _.reject(this.eqMetrologyData, {metId: metId});
-     
+                this.$emit('delMet');
                 this.$emit('loading', false);
               })
             .catch(error => {
