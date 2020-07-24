@@ -46,7 +46,7 @@
   .v-datatable-light ,
   .v-datatable-light .body-item
   {
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
   padding: 0 .5em;
   }
@@ -73,6 +73,10 @@
     height: 30px;
     padding: 0 .4em;
     color:  #e21a1a;
+   }
+   .td-center{
+      width: 100%;
+      text-align: center !important;
    }
    .v-datatable-light .btn-act:hover
    {

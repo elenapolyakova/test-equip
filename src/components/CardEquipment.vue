@@ -115,7 +115,10 @@
                 <div class="eq-card-col-30-doc" v-for="(doc, i) in docList">
                     <!-- <div class="doc-container"> -->
                         <div class="doc-item">
-                            <div class="doc-name">{{fileName(doc.docTypeId)!=null ? fileName(doc.docTypeId) : doc.name}}</div>
+                            <div class="doc-name">{{fileName(doc.docTypeId)!=null ? fileName(doc.docTypeId) : doc.name}}
+                                {{doc.docNum ? ' №'+ doc.docNum : ''}}
+                                {{doc.docDate ? ' от '+ formatDate(doc.docDate) : ''}}
+                            </div>
                             <div class="doc-button">
                                 <a v-if="doc.path !== ''" :href='doc.path' target='_blank'><i  class="fa fa-download" title="скачать документ" ></i></a>
                                 <label v-if ="addEnable && doc.path === ''" for="input__file_doc" class="mb-0 label-file">
@@ -140,6 +143,13 @@
                     <p name="regNum" v-if="actionMode =='view'">{{eqCard.regNum}}</p>
                 </div>
             </div>
+             <div class="eq-card-col-25">
+                <div class="eq-card-label eq-card-small"><label class="mb-0">Заводской номер</label></label></div>
+                <div class="eq-card-item eq-card-small"> 
+                    <input type="text" v-model="eqCard.factNum" v-if="actionMode !=='view'"></input>
+                    <p name="factNum" v-if="actionMode =='view'">{{eqCard.factNum}}</p>
+                </div>
+            </div>
             <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Аттестация от</label></div>
                 <div class="eq-card-item eq-card-small"> <p name="eqAtt">{{eqCard.eqAtt}}</p></div>
@@ -148,6 +158,10 @@
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Поверка до</label></div>
                 <div class="eq-card-item eq-card-small"><p name="eqVer">{{eqCard.eqVer}}</p></div>
             </div>
+           
+        </div>
+        <div class="eq-card-col-100 eq-card-container">
+           
             <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">МПИ/МАИ (мес.)</label></div>
                 <div class="eq-card-item eq-card-small"> 
@@ -155,8 +169,6 @@
                     <p name="eqCalInterval" v-if="actionMode =='view'">{{eqCard.eqCalInterval}}</p>
                 </div>
             </div>
-        </div>
-        <div class="eq-card-col-100 eq-card-container">
               <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Остаточная стоимость, ₽</label></label></div>
                 <div class="eq-card-item eq-card-small">
@@ -178,7 +190,10 @@
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Затраты на содержание</label></div>
                 <div class="eq-card-item eq-card-small"> <p name="eqCostKeep">{{eqCard.eqCostKeep}}</p></div>
             </div>
-             <div class="eq-card-col-25">
+           
+        </div>
+        <div class="eq-card-col-100 eq-card-container">
+              <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Стоимость нормо-часа, ₽</label></label></div>
                 <div class="eq-card-item eq-card-small">
                     <input type="text" name="costLaborTime" v-model="eqCard.costLaborTime" v-if="actionMode !=='view'" 
@@ -188,9 +203,6 @@
                     <p name="costLaborTime" v-if="actionMode =='view'">{{eqCard.costLaborTime}}</p>
                 </div>
             </div>
-        </div>
-        <div class="eq-card-col-100 eq-card-container">
-             
             <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Минимальное время заказа</label></div>
                 <div class="eq-card-item eq-card-small"> 
@@ -224,6 +236,16 @@
                     <p name="TOInterval" v-if="actionMode =='view'"><span>{{eqCard.TOInterval}}</span></p>
                 </div>
             </div>
+             </div>
+            <div class="eq-card-col-100 eq-card-container">
+              <div class="eq-card-col-50">
+                   <div class="eq-card-label eq-card-small"><label class="mb-0">Адрес местоположения</label></div>
+                <div class="eq-card-item eq-card-small">
+                    <input type="text" name="placeAddr" v-if ="actionMode !=='view'" v-model="eqCard.placeAddr"></input>
+                    <p name="placeAddr" v-if="actionMode =='view'">{{eqCard.placeAddr}}</p>
+                </div>
+               
+            </div>
              <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Наличие в паспорте ИЦ</label></div>
                 <div class="eq-card-item eq-card-small">
@@ -234,18 +256,11 @@
                     </div>
                 </div>
             </div>
-              <div class="eq-card-col-50">
+             <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Примечание</label></div>
                 <div class="eq-card-item eq-card-small">
                     <input type="text" name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote"></input>
                     <p name="eqNote" v-if="actionMode =='view'">{{eqCard.eqNote}}</p>
-                </div>
-            </div>
-              <div class="eq-card-col-50">
-                <div class="eq-card-label eq-card-small"><label class="mb-0">Адрес местоположения</label></div>
-                <div class="eq-card-item eq-card-small">
-                    <input type="text" name="placeAddr" v-if ="actionMode !=='view'" v-model="eqCard.placeAddr"></input>
-                    <p name="placeAddr" v-if="actionMode =='view'">{{eqCard.placeAddr}}</p>
                 </div>
             </div>
         </div>
@@ -297,6 +312,7 @@
   import 'vue2-datepicker/locale/ru'
   import VueGallerySlideshow from 'vue-gallery-slideshow'
   import {toCost, toFloatView} from '../utils/commonJS'
+  import {formatDate} from '../utils/date'
   
   var _ = require('lodash');
 
@@ -393,7 +409,11 @@ $(window).on('resize', function(){
            if(this.fileDoc !== '')
                 this.$emit('handleFileDocUpload', {idDoc: this.currentIdDoc, ref: this.$refs.fileDoc});
 
+       },
+       formatDate: function(value){
+           return formatDate(value);
        }
+
 
     },
     mounted: function(){

@@ -181,20 +181,44 @@
                     :cancelButton= "{title: 'Отмена'}"
                     >
             <div slot="modal-header"></div>
-            <div class='add_document_content'>
-              <div class="label"> Тип документа</div>
-              <select v-model="selectedDocType" onchange="$('.modal-doc-error').html('').removeClass('has-error')">
-                <option disabled value="">Не выбрано</option>
-                <option v-for="docType in docTypeList" :value="docType.id">
-                    {{docType.name}}
-                </option>
-              </select>
-              <input type="file" name="file" id="input__file" ref='file' class="input input__file" v-on:change='handleFileUpload'/>
-              <!-- accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,text/plain, application/pdf, image/*" -->
-              <label for="input__file" class="label-file">
-                <i class="fa fa-upload"></i>
-                <span class="js-fileName">Загрузить файл</span>
-              </label>
+            <div class='add-doc-content'>
+              <div class="add-doc-col-50">
+                <div class="add-doc-label"><label class="mb-0">Тип документа</label></div>
+                <div class="add-doc-item">
+                  <select v-model="selectedDocType" onchange="$('.modal-doc-error').html('').removeClass('has-error')">
+                    <option disabled value="">Не выбрано</option>
+                    <option v-for="docType in docTypeList" :value="docType.id">
+                        {{docType.name}}
+                    </option>
+                  </select>
+                  </div>
+              </div>
+              <div class="add-doc-col-50">
+                <div class="add-doc-item">
+                  <input type="file" name="file" id="input__file" ref='file' class="input input__file" v-on:change='handleFileUpload'/>
+                  <!-- accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,text/plain, application/pdf, image/*" -->
+                  <label for="input__file" class="label-file">
+                    <i class="fa fa-upload"></i>
+                    <span class="js-fileName">Загрузить файл</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="add-doc-col-50">
+                <div class="add-doc-label"><label class="mb-0">Номер документа</label></div>
+                <div class="add-doc-item">
+                      <input type="text" v-model="docNum"></input>
+                      <!-- <p v-if="actionMode =='view'">{{metCard.attNum}}</p>       -->
+                </div>
+              </div>
+              
+              <div class="add-doc-col-50">
+                <div class="add-doc-label"><label class="mb-0">Дата документа</label></div>
+                <div class="add-doc-item">
+                      <date-picker v-model="docDate" popup-class='calPopup' format='DD.MM.YYYY'></date-picker>
+                      <!-- <p name="comDate" v-if="actionMode =='view'">{{metCard.attDateFormat}}</p> -->
+                </div>
+              </div>
             </div>
             <div slot="modal-footer">
               <div class ="eq-add-doc-footer">
@@ -254,6 +278,8 @@
   import DynamicSelect from 'vue-dynamic-select'
   import rEqCard from '../components/rEquipmentCard'
   import rEqCardF from '../components/rEquipmentCardWithFilter'
+  import DatePicker from 'vue2-datepicker'
+  import 'vue2-datepicker/locale/ru'
 
   import 'vue2-datepicker/index.css'
   import '../css/v-datatable-light.css'
@@ -278,7 +304,8 @@
       CardQuery,
       DynamicSelect,
       CardMetrology,
-      HistoryQuery
+      HistoryQuery,
+      DatePicker,
 
     },
     data() {
@@ -388,7 +415,10 @@
 
        isDictLoad: false,
        isDictLoading: false,
-       oldCard: {}
+       oldCard: {},
+       sortList: [],
+       docDate: null,
+       docNum: '',
       }
  
     }, 
@@ -508,8 +538,12 @@
                 this.eqNameList = this.fillDict(this.eqNameList , 'eqName');
                 this.eqProducerList = this.fillDict(this.eqProducerList , 'eqProducer');
                 this.eqData = this.eqInitialList ;
-                this.rowCurrentIndex = 0;
-                this.initCard(this.eqData[this.rowCurrentIndex]);
+                this.sortList = [];
+                //if ( this.eqData.length > 0){
+               // this.rowCurrentIndex = 0;
+               
+                //this.initCard(this.eqData[this.rowCurrentIndex]);
+              //}
                 //this.eqCard = this.eqData[this.rowCurrentIndex];
                
                 this.isLoading = false;
@@ -517,7 +551,7 @@
               .catch(error => 
               {
                 this.isLoading = false;
-                this.$alert('Ошибка при получении справочников: ' + error, '', 'error', {allowOutsideClick: false});
+                this.$alert('Ошибка при получении данных об оборудовании: ' + error, '', 'error', {allowOutsideClick: false});
                  //alert ('Ошибка при получении данных об оборудовании: ' + error);
                   
               })
@@ -586,7 +620,7 @@
               TOInterval: this.eqCard.TOInterval,
               orderTime: this.eqCard.orderTime ? this.eqCard.orderTime.id : '',
               orderTimeName: this.eqCard.orderTime ? this.eqCard.orderTime.name: '',
-              workingMode: this.eqCard.workingMode ? this.eqCard.workingMode.id : '',
+              workingMode: this.eqCard.workingMode ? this.eqCard.workingMode.id : 1,
               workingModeName: this.eqCard.workingMode ? this.eqCard.workingMode.name : '',
               eqDocumentation: this.eqCard.eqDocumentation,
               eqCostKeep: this.eqCard.eqCostKeep,
@@ -666,6 +700,7 @@
                 this.showEqCard = false;
                 this.activetab = 0;
             })
+            .catch(() => {})
            //if (confirm('Вы уверены, что хотите закрыть карточку?')){
            //   this.showEqCard = false;
            //   this.activetab = 0;
@@ -703,8 +738,14 @@
         let responsibleItem = _.find(this.responsibleList, {id: _id});
         return responsibleItem ? responsibleItem.name: '';
       },
+      sortData: function() {
+         this.sortList.forEach((sortItem) => {
+          this.eqData  = _.orderBy(this.eqData, sortItem.sortField, sortItem.sort);
+        })
+      },
       dtUpdateSort: function({ sortField, sort }) {
         const sortedData = _.orderBy(this.eqData, [sortField],[sort]);
+        this.sortList.push({sortField: sortField, sort: sort});
         this.eqData = sortedData;
       },
       actionAddClick: function()
@@ -824,7 +865,7 @@
         this.imagesLoc = [];
         this.imagesLocList = [];
         this.docList = [];
-
+        
         if (this.actionMode === 'edit' ||  this.actionMode === 'view'){
           let hasLoad = 0;
            let idEq =  params.id;
@@ -869,6 +910,7 @@
               get('/equipment/docList/' + idEq)
               .then(response => {
                     this.docList = response.data;
+                    console.log(JSON.stringify(this.docList));
                     this.docList.forEach((item, i) =>{
                           item.path = item.path && item.path !== '' ? `${endpoint}${item.path}` : '';
                     })
@@ -886,6 +928,7 @@
           else this.isLoading = false;
         }
         else this.isLoading = false;
+
       },
       clearFilter: function(){
           this.fData = {
@@ -902,9 +945,14 @@
           responsible: null,
           eqReadiness: null
         };
+        this.sortList = [];
+
         this.filterData(true);
+
+        
       },
       filterData: function(showLoading){
+
         if (showLoading)
           this.isLoading = true;
         this.eqData = this.eqInitialList;
@@ -933,6 +981,10 @@
         if (this.fData.eqReadiness) 
           this.eqData = _.filter(this.eqData, {'eqReadiness': this.fData.eqReadiness.id})
         this.eqData.push({}); this.eqData.pop(); //костыль: без этого не обновлялись данные в таблице, если редактировала карточку для нового оборудования? 
+        
+        this.sortData();
+       
+        //this.sortList = [];
         if (showLoading)
           this.isLoading = false;
       },
@@ -1008,6 +1060,8 @@
           $label.removeClass('has-file').find('.js-fileName').html('Загрузить файл');
       },
       saveDocument: function(){
+        let docNum = this.docNum;
+        let docDate = this.docDate ? this.docDate : '';
         if (this.selectedDocType === ''){
              $('.modal-doc-error').addClass('has-error').html('Выберите тип документа');
               return;
@@ -1020,6 +1074,8 @@
                   {
                     idEq: this.eqCard.id,
                     docTypeId: this.selectedDocType,
+                    docNum: docNum,
+                    docDate: docDate,
                     funShortName: this.funShortName
                   }
                 })
@@ -1029,7 +1085,9 @@
                     {
                       idDoc: idDoc, 
                       path: '',
-                      docTypeId: this.selectedDocType
+                      docTypeId: this.selectedDocType,
+                      docNum: docNum,
+                      docDate: docDate
                     });
                   //alert ('Файл добавлен!')
                   this.showAddDoc = false;
@@ -1048,6 +1106,8 @@
       submitFile: function(){
 
           this.isLoading = true;
+          let docNum = this.docNum;
+          let docDate = this.docDate ? this.docDate : '';
           let formData = new FormData();
           formData.append('file',  this.file);
           api().
@@ -1059,7 +1119,9 @@
                     idEq: this.eqCard.id,
                     docTypeId: this.selectedDocType,
                     idDoc: -1,
-                    funShortName: this.funShortName
+                    funShortName: this.funShortName,
+                    docNum: docNum,
+                    docDate: docDate
                   }
                 }
             ).then(response => {
@@ -1071,7 +1133,9 @@
                     {
                       idDoc: idDoc, 
                       path: `${endpoint}${filename}`,
-                      docTypeId: this.selectedDocType
+                      docTypeId: this.selectedDocType,
+                      docNum: docNum,
+                      docDate: docDate
                     });
                   //alert ('Файл добавлен!')
                   this.showAddDoc = false;
@@ -1167,6 +1231,8 @@
       {
         this.selectedDocType = '';
         this.file ='';
+        this.docNum = '';
+        this.docDate = null;
         this.showAddDoc = true;
       },
 
@@ -1215,7 +1281,7 @@
       },
       deleteCardQuery(updatedQueryData)
       {
-        this.updatedQueryData=updatedQueryData;
+        this.updatedQueryData=updatedQueryData; 
         this.showQueryCard = false;
       },
       closeCardQuery(){
@@ -1232,7 +1298,7 @@
        getOrderTimeParams(){
          
          let orderTime = this.eqCard.orderTime ?  this.eqCard.orderTime.id : 0;
-         let workingMode = this.eqCard.workingMode ?  this.eqCard.workingMode.id :1; 
+         let workingMode = this.eqCard.workingMode && this.eqCard.workingMode.id !== '' ?  this.eqCard.workingMode.id : 1; 
          let hours = getOrderTimeHours(orderTime, workingMode );
 
          return {hours: hours, workingMode:workingMode};
@@ -1332,7 +1398,7 @@
               this.datatableCss.tbodyTd += ' copy-hide'
               this.datatableCss.theadTh += ' copy-hide'
             }
-           // if (!this.rights.delete){
+            //if (!this.rights.delete){
               this.datatableCss.tbodyTd += ' delete-hide'
               this.datatableCss.theadTh += ' delete-hide'
            // }
@@ -1515,29 +1581,11 @@
       border-radius:  .25em;
       cursor: pointer;
       text-align: center;
-      width: 30%;
+      width: 100%;
       margin: 0 .5em;
       color: #e21a1a;
   }
-.add_document_content
-{
-  display: flex
-}
-.add_document_content select
-  {
-    border: 1px solid #e21a1a;
-    position: relative;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    cursor: text;
-    margin-left: 10px;
-    display: inline-block;
-    text-align: left;
-    width: 60%;
-    height: 3em;
-  }
- 
+
 .label-file:hover{
     color: #000000;
   }
@@ -1555,6 +1603,68 @@
   {
     visibility: visible;
   }
-  
+  .add-doc-content{
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+     
+}
+.add-doc-col-50{
+   width: 50%;
+    text-align: center;
+    min-width: 360px;
+}
+.add-doc-label {
+    display: inline-block;
+    min-width: 360px;
+    width: 100%;
+    text-align: left;
+    padding-left: 15px;
+    color:#000000;
+    font-size: 12pt;
+    padding-top: .5em;
+  }
+  .add-doc-item{
+      display: block;
+      width: 100%;
+      min-width: 360px;
+      padding-left: 15px;
+      padding-right: 15px;
+  }
+
+.add-doc-item  select,
+.add-doc-item input[type=text]
+  {
+    position: relative;
+    -moz-border-radius: .25em;
+    -webkit-border-radius:  .25em;
+    border-radius:  .25em;
+    cursor: text;
+    display: block;
+    text-align: left;
+    width: 100%;
+    min-height: 2.5em;
+  }
+
+  .mx-datepicker{
+    width: 100%;
+  }
+
+@media screen and (max-width: 800px) {
+
+    .add-doc-col-50{
+        width: 100%;
+    }
+
+}
+
+@media screen and (max-width: 480px) {
+   html {
+      -webkit-text-size-adjust: none;
+   }
+}
+
 
 </style>

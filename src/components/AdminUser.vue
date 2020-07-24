@@ -270,7 +270,8 @@ $(window).on('resize', function(){
        },
        modalClass: 'modal-90per',
        actionMode: '',
-       oldUserCard: {}
+       oldUserCard: {},
+        sortList: [],
       }
     },
     methods: {
@@ -353,8 +354,15 @@ $(window).on('resize', function(){
 
 
         },
+         sortData: function() {
+         this.sortList.forEach((sortItem) => {
+            this.userData  = _.orderBy(this.userData, sortItem.sortField, sortItem.sort);
+        })
+      },
         dtUpdateSort: function({ sortField, sort }) {
+
         this.userData = _.orderBy(this.userData, [sortField],[sort]);
+        this.sortList.push({sortField: sortField, sort: sort});
       },
       actionAddClick: function()
       {
@@ -454,11 +462,10 @@ $(window).on('resize', function(){
         if (this.fData.role) 
              this.userData = _.filter(this.userData, user => (user.roleList.indexOf(this.fData.role.id.toString()) > -1));
         
-         
-        
-        
         this.userData.push({}); this.userData.pop(); //костыль: без этого не обновлялись данные в таблице, если редактировала карточку для нового оборудования? 
-        if (showLoading)
+
+        this.sortData();
+       if (showLoading)
           this.isLoading = false;
       },
       clearFilter: function(){
@@ -467,6 +474,7 @@ $(window).on('resize', function(){
                 devision: null,
                 role: null
               };
+        this.sortList = [];
         this.filterData(true);
       },
       saveUser: function(){
@@ -590,6 +598,7 @@ $(window).on('resize', function(){
             .then(() => {
                this.showCard = false;
             })
+            .catch(() => {})
             // if (confirm('Вы уверены, что хотите закрыть карточку?')) 
             //     this.showCard = false;
         }

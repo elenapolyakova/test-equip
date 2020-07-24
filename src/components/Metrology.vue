@@ -9,21 +9,27 @@
             :css="datatableCss"
             @on-update="dtUpdateSort"> 
             <template v-slot:actionsView="props">
-              <button class="btn btn-act" @click="actionViewClick(props);" title='просмотр'><i class = 'fa fa-search'></i></button>
+              <div class="td-center">
+                <button class="btn btn-act" @click="actionViewClick(props);" title='просмотр'><i class = 'fa fa-search'></i></button>
+              </div>
           </template>
           <template v-slot:actionsEdit="props">
+             <div class="td-center">
               <button class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
+              </div>
           </template>
           <template v-slot:actionsDelete="props">
+             <div class="td-center">
               <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
+            </div>
           </template>
           <div slot="attDoc" slot-scope="props">
-            <div v-if="props.rowData.attDocPath !==''" class='act-btn'>
+            <div v-if="props.rowData.attDocPath !==''" class='act-btn td-center'>
                 <a :href="props.rowData.attDocPath" target="_blank"><i class="fa fa-download" title="Загрузить аттестат/св-во о поверке" ></i></a> 
             </div>
           </div> 
           <div slot="protocolDoc" slot-scope="props">
-            <div v-if="props.rowData.protocolDocPath !==''" class='act-btn'>
+            <div v-if="props.rowData.protocolDocPath !==''" class='act-btn td-center'>
                 <a :href="props.rowData.protocolDocPath" target="_blank"><i class="fa fa-download" title="Загрузить протокол" ></i></a> 
             </div>
           </div> 

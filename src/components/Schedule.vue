@@ -1,11 +1,22 @@
 <template>
     <div>
+			<div class="day-fix" v-if="false">
+					<div v-for="(day, index) in dayGround" class="day-item">
+						<span>{{day}}</span>
+					</div>
+				</div>
+				<div class="time-fix" v-if="false">
+					 <div v-for="time in pageTimeGround" class="time-item">
+						<span>{{time}}</span>
+					</div>
+				</div>
         <div class="header">
             <div class="header-item month">
                 <label for="Month">Месяц</label><date-picker v-model="Month"  type="month"  format="MMMM YYYY" :editable="false" popup-class='calPopup' @change="monthChange" name="Month"></date-picker>
 				<label v-if="!hasEquip()" class="equip-error">Необходимо выбрать оборудование</label>
             </div>
         </div>
+			
         <div class="schedule" :style="styleShedule">
             <div class="time-ground">
                 <ul @click="addClick" class="mb-0"> 
@@ -189,7 +200,27 @@
 .small-history{
 	padding: 0 !important;
 }
- 
+.day-fix{
+
+	position: fixed;
+	left: 107px !important;
+	display: flex;
+	color:red;
+}
+.time-fix{
+
+	position: absolute;
+	top: 100px;
+	display: block;
+	color:red;
+}
+.day-item{
+    width: 100px;
+}
+
+.time-item{
+    height: 70px;
+}
    @keyframes blinker {
     0% { opacity: 1; }
     50% { opacity: .5; }

@@ -6,7 +6,7 @@
         <div class='logo' @click="goHome"> <img src="../src/NEW_logo.png" /> </div>
         <div><p class='logo-place'></p></div>
         <div class='header-title'>
-          <h6>ИСПЫТАТЕЛЬНЫЙ ЦЕНТР ЖЕЛЕЗНОДОРОЖНОЙ ТЕХНИКИ АО "ВНИИЖТ"</h6>
+          <h6>АО "ВНИИЖТ"</h6>
           <h5>СИСТЕМА УПРАВЛЕНИЯ ИСПЫТАТЕЛЬНЫМ ОБОРУДОВАНИЕМ</h5>
         </div>
         <div class="logout" v-if="$store.getters.isAuthenticated" @click.stop="showLogoutMenu" >

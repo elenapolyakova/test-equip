@@ -348,7 +348,7 @@
                         eqItem.resValue = toCost(item.eqprice);
                         eqItem.note = item.remark ? item.remark.trim() : '';
                         eqItem.eqReadiness = item.is_ready;
-                        eqItem.number = ++i;
+                        eqItem.number = item.card_num;//++i;
                         this.eqInitialList.push(eqItem);
                     });
                     this.locationList = this.fillDict(this.locationList , 'location');

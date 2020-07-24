@@ -10,15 +10,21 @@
             :css="datatableCss"
             @on-update="dtUpdateSort"> 
           <template v-slot:actionsEdit="props">
+            <div class="td-center">
               <button v-if="!isEdit(props)" class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
               <button v-if="isEdit(props)" class="btn btn-act" @click="actionSaveClick(props);" title='cохранить'><i class = 'fa fa-save'></i></button>
+            </div>
           </template>
           <template v-slot:actionsDelete="props">
+            <div class="td-center">
               <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
+            </div>
           </template>
           <div slot="repDateItem" slot-scope="props">
               <span v-if="!isEdit(props)">{{formatDate(props.rowData.repDate)}}</span>
-               <date-picker v-if="isEdit(props)" v-model="props.rowData.repDate" format='DD.MM.YYYY' popup-class='calPopup'></date-picker>
+            <div class="td-center" v-if="isEdit(props)">
+               <date-picker v-model="props.rowData.repDate" format='DD.MM.YYYY' popup-class='calPopup'></date-picker>
+            </div>
           </div> 
           <div slot="repTypeNameItem" slot-scope="props">
             <p name="repType" v-if="!isEdit(props)">{{repTypeName(props.rowData.repType)}}</p>   
@@ -38,6 +44,7 @@
               <input class="input-repair-master" v-if="isEdit(props)" v-model="props.rowData.repMasterFIO"></input>
           </div>
          <div slot="repDocAct" slot-scope="props">
+           <div class="td-center">
             <div v-if="!isEdit(props) && props.rowData.repDocPath !==''" class='act-btn'>
               <a :href="props.rowData.repDocPath" target="_blank"><i class="fa fa-download" title="загрузить документ" ></i></a>
             </div>
@@ -51,6 +58,7 @@
                 </label>
             </div>
           </div> 
+          </div>
         </DataTable>
       </div>
 </template>
