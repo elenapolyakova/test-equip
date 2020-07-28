@@ -265,10 +265,10 @@
             </div>
         </div>
          <div class="eq-card-col-100 eq-card-top-container">
-            <div class="eq-card-col-50" v-if="addEnable">
+            <div class="eq-card-col-50" >
                 <div class="eq-card-label"><label class="mb-0">Фото оборудования</label></div>
                 <div class="eq-card-item-image">
-                    <div class="eq-card-image-button">
+                    <div class="eq-card-image-button" v-if="addEnable">
                         <input type="file" name="file" id="input__file_image" ref='fileImage' class="eq-card-input-file" accept="image/x-png,image/gif,image/jpeg" v-on:change="$emit('handleImageUpload', {imageArr: imagesEq, ref: $refs.fileImage, phototype: 1})"/>
                         <label for="input__file_image"> 
                             <i  class="fa fa-plus" title="добавить фото"></i>
@@ -284,10 +284,10 @@
                 
             </div>
             <vue-gallery-slideshow :images="imagesEq" :index="indexEq" @close="indexEq = null"></vue-gallery-slideshow>
-            <div class="eq-card-col-50" v-if="addEnable">
+            <div class="eq-card-col-50">
                 <div class="eq-card-label"><label class="mb-0">Схема расположения</label></div>
                 <div class="eq-card-item-image">
-                    <div class="eq-card-image-button">
+                    <div class="eq-card-image-button" v-if="addEnable">
                         <input type="file" name="file" id="input__file_loc" ref='fileLoc' class="eq-card-input-file" accept="image/x-png,image/gif,image/jpeg" v-on:change="$emit('handleImageUpload', {imageArr: imagesLoc, ref: $refs.fileLoc, phototype: 2})"/>
                         <label for="input__file_loc"> 
                             <i class="fa fa-plus" title="добавить схему"> </i>

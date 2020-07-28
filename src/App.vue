@@ -134,22 +134,22 @@ function resizeHeader() {
         if (hasRight('q'))
           this.menu.push({title: 'ЗАЯВКИ',  name:'q', icon:  'fa fa-list-alt', 
                       child: [
-                        { title: 'Список', name:'q', href: {path: '/queryList', name: "query"}},
+                        { title: 'Список', name:'q', href: {path: '/queriesList', name: "query"}},
                         { title: 'Загрузка оборудования', name:'q',href: {path: '/plan', name: "plan"}}
                       ]});
         if (hasRight('con'))
-          this.menu.push({title: 'ДОКУМЕНТЫ',  name:'con', href: {path: '/contract', name: "contract"}});
+          this.menu.push({title: 'ДОКУМЕНТЫ',  name:'con', href: {path: '/contractList', name: "contract"}});
         
       if (hasRight('rpt'))
         this.menu.push({title: 'ОТЧЁТЫ',  name:'rpt', 
                         child: [
-                          { title: 'Перечень оборудования',  name:'rpt', href: { path: '/rEqList',  name: "rEqList"}},
-                          { title: 'Возраст оборудования',  name:'rpt', href: { path: '/rEqAge',  name: "rEqAge"}},
-                          { title: 'Анализ работы оборудования',  name:'rpt', href: {path: '/rEqAnalysis', name: "rEqAnal"}},
-                          { title: 'Статистика загрузки оборудования',  name:'rpt', href: {path: '/rEqStat', name: "rEqStat"}},
-                          { title: 'Сводные данные по работе ИО',  name:'rpt', href: {path: '/rSummary', name: "rSummary"}},
-                          { title: 'О работе лабораторного ИО',  name:'rpt',  href: {path: '/rEqWork', name: "rEqWork"}},
-                          { title: 'Стоимость работы по договорам',  name:'rpt',   href: { path: '/rContract',  name: "rContract"}},
+                          { title: 'Перечень оборудования',  name:'rpt', href: { path: '/repEqList',  name: "rEqList"}},
+                          { title: 'Возраст оборудования',  name:'rpt', href: { path: '/repEqAge',  name: "rEqAge"}},
+                          { title: 'Анализ работы оборудования',  name:'rpt', href: {path: '/repEqAnalysis', name: "rEqAnal"}},
+                          { title: 'Статистика загрузки оборудования',  name:'rpt', href: {path: '/repEqStat', name: "rEqStat"}},
+                          { title: 'Сводные данные по работе ИО',  name:'rpt', href: {path: '/repSummary', name: "rSummary"}},
+                          { title: 'О работе лабораторного ИО',  name:'rpt',  href: {path: '/repEqWork', name: "rEqWork"}},
+                          { title: 'Стоимость работы по договорам',  name:'rpt',   href: { path: '/repContract',  name: "rContract"}},
                         ]});
           if (hasRight('au'))
             this.menu.push({title: 'АДМИНИСТРИРОВАНИЕ',  name:'au', href: { path: '/AdminUser',  name: "adminuser"}});    
