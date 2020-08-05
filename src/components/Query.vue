@@ -108,7 +108,7 @@
               table: 'table table-hover table-center query-table',
               theadTh: 'header-item',
               tbodyTd: 'body-item',
-              tbodyTr: 'body-row'
+              tbodyTr: 'body-row query-row'
             },
             sort: 'asc',
       }
@@ -131,6 +131,32 @@
               }
           });
       },
+       addDblClick: function(){
+       this.$nextTick(()=>{
+          $('.query-row').unbind('dblclick', false);
+
+          $('.query-row').dblclick((event) => {
+                        let tr = event.currentTarget;
+                        if (tr.rowIndex)
+                        {
+                            this.rowCurrentIndex = tr.rowIndex-1;
+                            let queryItem = this.queryData[this.rowCurrentIndex];
+                           if (this.rights.edit){
+                              this.$router.push({name:'plan', component: Plan,  
+                                    params: {
+                                      action: "edit",
+                                      queryId: queryItem.queryId,
+                                      eqId: queryItem.eqId,
+                                      dateStart: queryItem.dateStartOriginal
+                                    }
+                                });
+                           }
+                          
+                        }
+                  });
+          })
+       },
+
       actionDeleteClick: function(props){
           this.isLoading = true;
           let queryId = props.rowData.queryId;
@@ -188,6 +214,8 @@
           this.queryData = _.filter(this.queryData, {'devision': this.fData.devision.id})
         if (this.fData.eqName) 
           this.queryData = _.filter(this.queryData, {'eqName': this.fData.eqName.name})
+
+           this.addDblClick();
        
         //this.queryData.push({}); this.queryData.pop(); //костыль: без этого не обновлялись данные в таблице, если редактировала карточку для нового оборудования? 
         if (showLoading)
@@ -231,6 +259,7 @@
                  this.eqNameList = this.fillDict(this.eqNameList , 'eqName');
                  this.queryData = this.queryInitialList ;
                  this.rowCurrentIndex = 0;
+                 this.addDblClick();
                  this.isLoading = false;
                })
                .catch(error => 

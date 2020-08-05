@@ -266,7 +266,7 @@ $(window).on('resize', function(){
         table: 'table table-hover table-center admin-user-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
-        tbodyTr: 'body-row'
+        tbodyTr: 'body-row admin-user-row'
        },
        modalClass: 'modal-90per',
        actionMode: '',
@@ -326,6 +326,7 @@ $(window).on('resize', function(){
                          // this.userCard = this.userData[this.rowCurrentIndex];
                          this.companyList = this.fillDict(this.companyList , 'company');
                           this.$emit('resizeHeader');
+                          this.addDblClick();
                           this.isLoading = false;
                         })
                     .catch(error => 
@@ -358,6 +359,7 @@ $(window).on('resize', function(){
          this.sortList.forEach((sortItem) => {
             this.userData  = _.orderBy(this.userData, sortItem.sortField, sortItem.sort);
         })
+        this.addDblClick();
       },
         dtUpdateSort: function({ sortField, sort }) {
 
@@ -373,13 +375,13 @@ $(window).on('resize', function(){
       },
       actionEditClick: function (params) {
          this.actionMode = 'edit';
-         this.initCard(params);
+         this.initCard(params.rowData);
          this.rowCurrentIndex = params.rowIndex;
          this.showCard = true;
       },
       actionViewClick: function(params){
            this.actionMode = 'view';
-           this.initCard(params);
+           this.initCard(params.rowData);
            this.rowCurrentIndex = params.rowIndex;
            this.showCard = true;
       },
@@ -399,28 +401,47 @@ $(window).on('resize', function(){
                //alert('Ошибка при удалении пользователя:  '+ error);
             });
       },
+       addDblClick: function(){
+       this.$nextTick(()=>{
+          $('.admin-user-row').unbind('dblclick', false);
+
+          $('.admin-user-row').dblclick((event) => {
+                        let tr = event.currentTarget;
+                        if (tr.rowIndex)
+                        {
+                            this.rowCurrentIndex = tr.rowIndex-1;
+                            this.initCard(this.userData[this.rowCurrentIndex]);
+                           if (this.rights.edit)
+                             this.actionMode = 'edit';
+                           else  this.actionMode = 'view';
+                           this.showCard = true;
+                        }
+                  });
+          })
+       },
+
        initCard: function(params){
         this.isLoading = true;
           this.userCard = {
-            idUser: params? params.rowData.idUser : -1,
-            login: params? params.rowData.login : '',
-            roleList: params? params.rowData.roleList : [],
-            surname: params? params.rowData.surname : '',
-            name: params? params.rowData.name : '',
-            patname: params? params.rowData.patname :'',
-            oldPassword: params ? params.rowData.oldPassword: '',
+            idUser: params? params.idUser : -1,
+            login: params? params.login : '',
+            roleList: params? params.roleList : [],
+            surname: params? params.surname : '',
+            name: params? params.name : '',
+            patname: params? params.patname :'',
+            oldPassword: params ? params.oldPassword: '',
             password: '',
            /* company: {
               id: params? params.rowData.company : '',
               name: params? params.rowData.company : ''
             },*/
-            company: params? params.rowData.company : '',
-            position: params? params.rowData.position : '',
+            company: params? params.company : '',
+            position: params? params.position : '',
             devision: {
-              id: params? params.rowData.devision : '',
-              name: params? params.rowData.devisionName : ''
+              id: params? params.devision : '',
+              name: params? params.devisionName : ''
             },
-            email:  params? params.rowData.email : ''
+            email:  params? params.email : ''
         
          }
          this.oldUserCard = _.cloneDeep(this.userCard);

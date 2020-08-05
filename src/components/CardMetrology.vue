@@ -420,6 +420,7 @@ import DynamicSelect from 'vue-dynamic-select'
   .met-card-item  p
   {
       margin-bottom: 0;
+      padding-left: 5px;
   }
 
 .met-card-input-file {

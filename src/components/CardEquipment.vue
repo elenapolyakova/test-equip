@@ -5,7 +5,7 @@
         <div class="eq-card-col-50 eq-card-container">
             <div class="eq-card-label"><label class="mb-0">Наименование оборудования</label></div>
             <div class="eq-card-item"> 
-                <textarea name="eqName" v-if ="actionMode !=='view'" v-model="eqCard.eqName"></textarea>
+                <textarea name="eqName" v-if ="actionMode !=='view'" v-model="eqCard.eqName" class="eq-textarea"></textarea>
                 <p name="eqName" v-if="actionMode =='view'">{{eqCard.eqName}}</p>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="eq-card-col-50 eq-card-container">
             <div class="eq-card-label"><label class="mb-0">Назначение</label></div>
             <div class="eq-card-item">
-                 <textarea name="eqPurpose" v-if ="actionMode !=='view'" v-model="eqCard.eqPurpose"></textarea>
+                 <textarea name="eqPurpose" v-if ="actionMode !=='view'" v-model="eqCard.eqPurpose" class="eq-textarea"></textarea>
                 <p name="eqPurpose" v-if="actionMode =='view'">{{eqCard.eqPurpose}}</p>
             </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="eq-card-col-50 eq-card-container">
             <div class="eq-card-label"><label class="mb-0">Паспортные характеристики</label></div>
             <div class="eq-card-item"> 
-                <textarea name="eqPassport" v-if ="actionMode !=='view'" v-model="eqCard.eqPassport"></textarea>
+                <textarea name="eqPassport" v-if ="actionMode !=='view'" v-model="eqCard.eqPassport" class="eq-textarea"></textarea>
                 <p name="eqPassport" v-if="actionMode =='view'">{{eqCard.eqPassport}}</p>
             </div>
         </div>
@@ -259,7 +259,7 @@
              <div class="eq-card-col-25">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Примечание</label></div>
                 <div class="eq-card-item eq-card-small">
-                    <input type="text" name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote"></input>
+                    <textarea type="text" name="eqNote" v-if ="actionMode !=='view'" v-model="eqCard.eqNote" class='note-textarea'></textarea>
                     <p name="eqNote" v-if="actionMode =='view'">{{eqCard.eqNote}}</p>
                 </div>
             </div>
@@ -546,8 +546,11 @@ $(window).on('resize', function(){
     color: #000000;
   }
  
-.eq-card-item textarea{
+.eq-textarea {
     height: 100px;
+}
+.note-textarea{
+    height: 2.5em;
 }
 .eq-card-input-file {
   opacity: 0;
@@ -642,8 +645,11 @@ $(window).on('resize', function(){
     .eq-card-col-100{
         width: 100%;
     }
-    .eq-card-item textarea{
+    .eq-textarea {
         height: 50px;
+    }
+    .note-textarea{
+        height: 2.5em;
     }
   .eq-card-small label {
      font-size: 10pt;

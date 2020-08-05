@@ -9,10 +9,14 @@
             :data="eqRepairData || []"
             :css="datatableCss"
             @on-update="dtUpdateSort"> 
+        <template v-slot:actionsView="props">
+              <div class="td-center">
+                <button class="btn btn-act" @click="actionViewClick(props);" title='просмотр'><i class = 'fa fa-search'></i></button>
+              </div>
+          </template>
           <template v-slot:actionsEdit="props">
             <div class="td-center">
-              <button v-if="!isEdit(props)" class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
-              <button v-if="isEdit(props)" class="btn btn-act" @click="actionSaveClick(props);" title='cохранить'><i class = 'fa fa-save'></i></button>
+              <button class="btn btn-act" @click="actionEditClick(props);" title='редактировать'><i class = 'fa fa-edit'></i></button>
             </div>
           </template>
           <template v-slot:actionsDelete="props">
@@ -20,45 +24,12 @@
               <button class="btn btn-act" @click="actionDeleteClick(props);" title='удалить'><i class = 'fa fa-trash-alt'></i></button>
             </div>
           </template>
-          <div slot="repDateItem" slot-scope="props">
-              <span v-if="!isEdit(props)">{{formatDate(props.rowData.repDate)}}</span>
-            <div class="td-center" v-if="isEdit(props)">
-               <date-picker v-model="props.rowData.repDate" format='DD.MM.YYYY' popup-class='calPopup'></date-picker>
+         <div slot="repDocPath" slot-scope="props">
+            <div v-if="props.rowData.repDocPath !==''" class='act-btn td-center'>
+                <a :href="props.rowData.repDocPath" target="_blank"><i class="fa fa-download" title="Загрузить протокол" ></i></a> 
             </div>
           </div> 
-          <div slot="repTypeNameItem" slot-scope="props">
-            <p name="repType" v-if="!isEdit(props)">{{repTypeName(props.rowData.repType)}}</p>   
-            <select name="repType" v-if="isEdit(props)" v-model="props.rowData.repType">
-                <option disabled value="">Не выбрано</option>
-                <option v-for="repType in repTypeList" :value="repType.id">
-                    {{repType.name}}
-                </option>
-            </select>              
-           </div> 
-          <div slot="execWorkItem" slot-scope="props">
-              <p v-if="!isEdit(props)"> {{props.rowData.execWork}}</p>
-              <textarea v-if="isEdit(props)" v-model="props.rowData.execWork"></textarea>
-          </div>
-          <div slot="repMasterFIOItem" slot-scope="props">
-              <p v-if="!isEdit(props)"> {{props.rowData.repMasterFIO}}</p>
-              <input class="input-repair-master" v-if="isEdit(props)" v-model="props.rowData.repMasterFIO"></input>
-          </div>
-         <div slot="repDocAct" slot-scope="props">
-           <div class="td-center">
-            <div v-if="!isEdit(props) && props.rowData.repDocPath !==''" class='act-btn'>
-              <a :href="props.rowData.repDocPath" target="_blank"><i class="fa fa-download" title="загрузить документ" ></i></a>
-            </div>
-            <div v-if="isEdit(props)">
-              <input type="file" name="file" id="input__file" ref='file' class="input input__file" v-on:change='handleFileUpload'/>
-                <!-- accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,text/plain, application/pdf, image/*" -->
-                <label for="input__file" class="label-file">
-                  <i class="fa fa-upload"></i>
-                  <span v-if="props.rowData.repDocPath !==''" class="js-fileName">Обновить файл</span>
-                  <span v-if="props.rowData.repDocPath ===''" class="js-fileName">Загрузить файл</span>
-                </label>
-            </div>
-          </div> 
-          </div>
+         
         </DataTable>
       </div>
 </template>
@@ -86,9 +57,34 @@
     },
     props: {
              idEq: {type: Number, required: true},
+             updatedRepData: {type:Object, required:false},
              isArchive: {type: Boolean, required: false},
     },
     watch:{
+      
+      updatedRepData(value){
+          let eqRepItem = {};
+          eqRepItem.idRep = value.idRep;
+          eqRepItem.repDate = value.repDate ? new Date(value.repDate) : '';
+          eqRepItem.repDateFormat = formatDate(eqRepItem.repDate);
+          
+          eqRepItem.repType = value.repType.id; 
+          eqRepItem.repTypeName = value.repType.name
+          eqRepItem.execWork = value.execWork;
+          eqRepItem.repMasterFIO = value.repMasterFIO;
+          eqRepItem.repDocPath = value.repDocPath;
+          if ( this.rowCurrentIndex === -1){
+           this.eqRepairData.push(eqRepItem);
+          }
+          else{
+             var oldValue =_.find(this.eqRepairData, {idRep: eqRepItem.idRep});
+             Object.assign(oldValue, eqRepItem);
+            this.eqRepairData.push({});  this.eqRepairData.pop();
+          }
+
+          this.addDblClick();
+
+      },
         idEq(value) {
             this.initData();
         }
@@ -98,29 +94,25 @@
          repTypeList: [],
          eqRepairData: [],
          headerFields: [
+          "__slot:actions:actionsView",
           "__slot:actions:actionsEdit",
           "__slot:actions:actionsDelete",
-          { name: "repDate", label: "Дата" /*, format: formatDate*/,  sortable: true, customElement: "repDateItem" },
-          { name: "repType", label: "Вид ремонта",  sortable: true,  customElement: "repTypeNameItem" },
-          { name: "execWork", label: "Выполненные работы",  sortable: true, customElement: "execWorkItem" },
-          { name: "repMasterFIO", label: "ФИО мастера",  sortable: true, customElement: "repMasterFIOItem" },
-          { name: "repDocPath", label: "Акт", sortable: false, customElement: "repDocAct"}
+          { name: "repDateFormat", label: "Дата" /*, format: formatDate*/,  sortable: true },
+          { name: "repTypeName", label: "Вид ремонта",  sortable: true },
+          { name: "execWork", label: "Выполненные работы",  sortable: true},
+          { name: "repMasterFIO", label: "ФИО мастера",  sortable: true},
+          { name: "repDocPath", label: "Акт", sortable: false, customElement: "repDocPath"}
         ],
        rowCurrentIndex: 0,
        datatableCss: {
         table: 'table table-hover table-center repair-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
-        tbodyTr: 'body-row'
+        tbodyTr: 'body-row repair-row'
        },
-       repDate: '',
        rights: {},
-       actionMode: 'view',
-       currentId: -1,
-       nextId: 0,
-       msgError: "Необходимо завершить редактирование",
        funShortName: 'rep',
-       file: ''
+       repCard: {idRep: -1},
       }
     },
     methods: {
@@ -142,13 +134,15 @@
                      repItem.idRep = item.id_rep;
                      repItem.repDocPath = item.act_docpath && item.act_docpath !== '' ? `${endpoint}${item.act_docpath.trim()}` : '';
                      repItem.repDate = item.rep_date ? new Date(item.rep_date) : '';
+                     repItem.repDateFormat = formatDate(repItem.repDate);
                      repItem.repType = item.rep_type ? item.rep_type : '';
+                     repItem.repTypeName = this.repTypeName(item.rep_type);
                      repItem.execWork = item.rep_maintenance ? item.rep_maintenance.trim() : '';
                      repItem.repMasterFIO = item.rep_masterfio ? item.rep_masterfio.trim() : '';
                      this.eqRepairData.push(repItem);
                  })
                   this.$emit('loading', false);
-                
+                  this.addDblClick();
             })
             .catch(error => {
                this.$emit('loading', false);
@@ -165,114 +159,59 @@
         return repType.name;
       },
       actionAddClick: function() {
-        if (!this.checkEdit()) return;
-
-        this.actionMode = "edit";
-        this.currentId = -1;
-        this.file = '';
-        this.eqRepairData.push({
-          idRep: -1, 
-          repDate: null, 
-          execWork: '',
-          repMasterFIO: '',
-          repDocPath: '',
-          repType: ''});
-      },
-      actionEditClick: function (params) {
-        if (!this.checkEdit()) return;
-         this.file = '';
-         this.currentId =  params.rowData.idRep;
-         this.actionMode = 'edit'
-      },
-      actionSaveClick: function (params) {
-         let idRep = params.rowData.idRep;
-         params.rowData.idEq = this.idEq;
-         params.rowData.funId = getFunId (this.funShortName);
-         this.$emit('loading', true);
-         if(idRep == -1) //добавляем новый ремонт
-         {
-            api().
-              post('/repair', {repairData: params.rowData})
-              .then(response => {
-                 let idRep = response.data.idRep;
-                 params.rowData.idRep = idRep;
-                 
-                 this.$emit('saveRep');
-                 if (this.file) { //если добавили файл
-                   this.sendFile(params); 
-                   
-                 }
-                 else {
-                   this.$emit('loading', false);
-                    this.actionMode = 'view';
-                    $('.repair-error').removeClass('has-error').html('');
-                 }
-            })
-            .catch(error => {
-              this.$emit('loading', false);
-              this.$alert('Ошибка при добавлении ремонта: '+ error, '', 'error', {allowOutsideClick: false});
-               //alert('Ошибка при добавлении ремонта '+ error);
-            });
-         }
-         else { //редактируем существующий ремонт
-           api().
-              put('/repair/' + idRep, {repairData: params.rowData})
-              .then(response => {
-
-                this.$emit('saveRep');
-                 if (this.file) { // если добавили файл
-                      this.sendFile(params);
-                }
-                else{
-                    this.$emit('loading', false);
-                    this.actionMode = 'view';
-                    $('.repair-error').removeClass('has-error').html('');
-                }
-               
-            })
-            .catch(error => { //ошибка при обнолении данных о ремонте
-            this.$alert('Ошибка при обновлении данных о ремонте: '+ error, '', 'error', {allowOutsideClick: false});
-               //alert('Ошибка при обновлении данных о ремонте '+ error);
-            });
-         }
-
+         this.initCard(null);
+         this.rowCurrentIndex = -1;
+         this.$emit('addRep', this.repCard)
        
       },
-      sendFile: function(params)
-      { 
-        let formData = new FormData(); //добавляем новый 
-        formData.append('file', this.file);
-        api().
-          post('/file',
-            formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }, 
-              params:{ 
-                idRep: params.rowData.idRep,
-                docTypeId: -1,
-                funShortName: this.funShortName
-              }
-            }
-          ).then(response => {
-            var filename = response.data.filename;
-            
-            if (filename){
-              params.rowData.repDocPath = `${endpoint}${filename}`;
-              this.actionMode = 'view';
-              $('.repair-error').removeClass('has-error').html('');
-            }
-            this.$emit('loading', false);
-          })
-        .catch(error => {//ошибка при добавлении файла
-          this.$emit('loading', false);
-          	this.$alert('Ошибка при сохранении файла: '+ error, '', 'error', {allowOutsideClick: false});
-          //alert('Ошибка при сохранении файла '+ error);
-        })
+      actionEditClick: function (params) {
+         this.initCard(params.rowData);
+         this.rowCurrentIndex = params.rowIndex;
+         this.$emit('editRep', this.repCard)
       },
+        actionViewClick: function(params){
+           this.initCard(params.rowData);
+           this.rowCurrentIndex = params.rowIndex;
+           this.$emit('viewRep', this.repCard)
+      },
+      addDblClick: function(){
+       this.$nextTick(()=>{
+          $('.repair-row').unbind('dblclick', false);
+
+          $('.repair-row').dblclick((event) => {
+                        let tr = event.currentTarget;
+                        if (tr.rowIndex)
+                        {
+                            this.rowCurrentIndex = tr.rowIndex-1;
+                            this.initCard(this.eqRepairData[this.rowCurrentIndex]);
+                           if (this.rights.edit && !this.isArchive)
+                             this.$emit('editRep', this.repCard)
+                           else this.$emit('viewRep', this.repCard)
+                        }
+                  });
+          })
+     },
+       initCard: function(params)
+      {
+         this.repCard = {
+            idEq: this.idEq,
+            idRep: params? params.idRep : -1,
+            repDate: params? params.repDate : '',
+            repDateFormat:  params? params.repDateFormat : '',
+            repType: {
+              id: params? params.repType : '',
+              name: params? params.repTypeName : ''
+            },
+            execWork: params? params.execWork : '',
+            repMasterFIO: params? params.repMasterFIO : '',
+            repDocPath: params? params.repDocPath : '',
+
+            funId: getFunId (this.funShortName)
+         }
+      },
+      
       actionDeleteClick: function (params) {
-         if (!this.checkEdit()) return;
-         
+
          this.$emit('loading', true);
         let idRep = params.rowData.idRep;
         if (idRep != -1) 
@@ -293,32 +232,10 @@
         }
 
       },
-      handleFileUpload: function()
-      {
-         this.file = this.$refs.file.files[0];
-        
-        if (this.file) {
-             $('.label-file').addClass('has-file').find('.js-fileName').html(this.file.name); 
-        }
-        else 
-           $('.label-file').removeClass('has-file').find('.js-fileName').html('Загрузить файл');
-      },
-      isEdit: function(params)
-      {
-        if (this.actionMode === 'view' || this.currentId !== params.rowData.idRep) return false; 
-        if (this.actionMode === "edit" && this.currentId == params.rowData.idRep) return true;
-      },
+     
       formatDate: function(date)
       {
         return formatDate(date);
-      },
-      checkEdit: function(){
-         if (this.actionMode === 'edit'){
-         $('.repair-error').addClass('has-error').html(this.msgError);
-          return false;
-        }
-        $('.repair-error').removeClass('has-error').html('');
-        return true;
       }
     },
     mounted: function() {
@@ -330,6 +247,11 @@
             this.datatableCss.theadTh += ' delete-hide'
         }
         else {
+          if (!this.rights.view || this.rights.edit){
+            this.datatableCss.tbodyTd += ' view-hide'
+            this.datatableCss.theadTh += ' view-hide'
+          }
+
            if (!this.rights.edit){
             this.datatableCss.tbodyTd += ' edit-hide'
             this.datatableCss.theadTh += ' edit-hide'

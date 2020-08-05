@@ -3,7 +3,9 @@ input,
 textarea:not(.editable-cell),
 select,
 .eq-card-item p,
-.eq-card-col-25 p
+.eq-card-col-25 p,
+.met-card-item p,
+.rep-card-item p
 {
    border: 1.5px solid #e21a1a !important;
    background-color: #ffffff !important;
@@ -44,7 +46,9 @@ select,
 }
  .eq-card-item p,
  .user-card-item p,
- .query-card-content-item p
+ .query-card-content-item p,
+ .met-card-item p,
+ .rep-card-item p
 {
   border: 1.5px solid #e21a1a !important;
   background-color: #ffffff !important;

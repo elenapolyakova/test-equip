@@ -74,7 +74,7 @@
          metCard: {metId: -1},
 
         headerFields: [
-        //  "__slot:actions:actionsView",
+          "__slot:actions:actionsView",
           "__slot:actions:actionsEdit",
           "__slot:actions:actionsDelete",
           { name: "recDateFormat", label: "Дата",  sortable: true},
@@ -91,7 +91,7 @@
         table: 'table table-hover table-center metrology-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
-        tbodyTr: 'body-row'
+        tbodyTr: 'body-row metrology-row'
        },
       }
     },
@@ -125,6 +125,8 @@
              Object.assign(oldValue, eqMetItem);
             this.eqMetrologyData.push({});  this.eqMetrologyData.pop();
           }
+
+          this.addDblClick();
 
       },
       idEq(value){
@@ -170,6 +172,8 @@
                 });
                 this.rowCurrentIndex = 0;
                 this.metCard = this.eqMetrologyData[this.rowCurrentIndex];
+
+                this.addDblClick();
                  this.$emit('loading', false);
               })
               .catch(error => 
@@ -201,12 +205,12 @@
          this.$emit('addMet', this.metCard)
       },
       actionEditClick: function (params) {
-         this.initCard(params);
+         this.initCard(params.rowData);
          this.rowCurrentIndex = params.rowIndex;
          this.$emit('editMet', this.metCard)
       },
       actionViewClick: function(params){
-           this.initCard(params);
+           this.initCard(params.rowData);
            this.rowCurrentIndex = params.rowIndex;
            this.$emit('viewMet', this.metCard)
       },
@@ -226,33 +230,50 @@
                //alert('Ошибка при удалении аттестации/поверки:  '+ error);
             });
       },
+     addDblClick: function(){
+       this.$nextTick(()=>{
+          $('.metrology-row').unbind('dblclick', false);
+
+          $('.metrology-row').dblclick((event) => {
+                        let tr = event.currentTarget;
+                        if (tr.rowIndex)
+                        {
+                            this.rowCurrentIndex = tr.rowIndex-1;
+                            this.initCard(this.eqMetrologyData[this.rowCurrentIndex]);
+                           if (this.rights.edit && !this.isArchive)
+                             this.$emit('editMet', this.metCard)
+                           else this.$emit('viewMet', this.metCard)
+                        }
+                  });
+          })
+     },
       initCard: function(params)
       {
          this.metCard = {
             idEq: this.idEq,
-            metId: params? params.rowData.metId : -1,
-            recDate: params? params.rowData.recDate : '',
-            recDateFormat:  params? params.rowData.recDateFormat : '',
-            attDate: params? params.rowData.attDate : '',
-            attDateFormat:  params? params.rowData.attDateFormat : '',
-            protocolDate: params? params.rowData.protocolDate : '',
-            protocolDateFormat:  params? params.rowData.protocolDateFormat : '',
+            metId: params? params.metId : -1,
+            recDate: params? params.recDate : '',
+            recDateFormat:  params? params.recDateFormat : '',
+            attDate: params? params.attDate : '',
+            attDateFormat:  params? params.attDateFormat : '',
+            protocolDate: params? params.protocolDate : '',
+            protocolDateFormat:  params? params.protocolDateFormat : '',
             M_Type: {
-              id: params? params.rowData.M_Type : '',
-              name: params? params.rowData.M_TypeName : ''
+              id: params? params.M_Type : '',
+              name: params? params.M_TypeName : ''
             },
             attType: {
-              id: params? params.rowData.attType : '',
-              name: params? params.rowData.attTypeName : ''
+              id: params? params.attType : '',
+              name: params? params.attTypeName : ''
             },
-            attNum: params? params.rowData.attNum : '',
-            protocolNum: params? params.rowData.protocolNum : '',
-            eqEnable:  params? params.rowData.eqEnable : false,
-            eqEnableName:  params? params.rowData.eqEnableName : 'нет',
-            attEnd: params? params.rowData.attEnd : '',
-            attEndFormat: params? params.rowData.attEndFormat : '',
-            attDocPath: params? params.rowData.attDocPath : '',
-            protocolDocPath: params? params.rowData.protocolDocPath : '',
+            attNum: params? params.attNum : '',
+            protocolNum: params? params.protocolNum : '',
+            eqEnable:  params? params.eqEnable : false,
+            eqEnableName:  params? params.eqEnableName : 'нет',
+            attEnd: params? params.attEnd : '',
+            attEndFormat: params? params.attEndFormat : '',
+            attDocPath: params? params.attDocPath : '',
+            protocolDocPath: params? params.protocolDocPath : '',
             funId: getFunId (this.funShortName)
 
          }
@@ -263,10 +284,6 @@
       {
         this.rights = getFunRight(this.funShortName);
 
-        // if (!this.rights.view || this.rights.edit){
-        //   this.datatableCss.tbodyTd += ' view-hide'
-        //   this.datatableCss.theadTh += ' view-hide'
-        // }
         if (this.isArchive){
             this.datatableCss.tbodyTd += ' edit-hide'
             this.datatableCss.theadTh += ' edit-hide'
@@ -274,6 +291,11 @@
             this.datatableCss.theadTh += ' delete-hide'
         }
         else {
+          
+          if (!this.rights.view || this.rights.edit){
+            this.datatableCss.tbodyTd += ' view-hide'
+            this.datatableCss.theadTh += ' view-hide'
+          }
           if (!this.rights.edit){
             this.datatableCss.tbodyTd += ' edit-hide'
             this.datatableCss.theadTh += ' edit-hide'

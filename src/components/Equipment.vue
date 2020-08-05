@@ -5,6 +5,7 @@
     :is-full-page="true"
     color='#e21a1a'>
     </loading>
+
    <filter-equipment 
                   @filterData="filterData"
                   @clearFilter="clearFilter"
@@ -127,9 +128,12 @@
                   </div>
                   <div v-if="activetab===2" class='tabcontent'>
                         <repair :idEq="eqCard.id"
+                                :updatedRepData="updatedRepData"
                                 @loading="loading"
+                                @editRep="editRep"
+                                @addRep="addRep"
+                                @viewRep="viewRep"
                                 @delRep="getActualDate"
-                                @saveRep="getActualDate"
                                 :isArchive="isArchive"></repair>
                   </div>
                   <div v-if="activetab===3" class='tabcontent'>
@@ -251,6 +255,14 @@
                             @save="saveCardMet"
                             @close="closeCardMet"
                             @loading="loading"/>
+         <card-repair
+                            
+                            :repCard="repCard"
+                            :actionMode="actionModeRepair"
+                            :showRepairCard="showRepairCard"
+                            @save="saveCardRep"
+                            @close="closeCardRep"
+                            @loading="loading"/>
 
         
   </div>
@@ -258,6 +270,7 @@
 
 
 <script>
+
   import FilterEquipment from './FilterEquipment'
   import CardEquipment from './CardEquipment'
   import Repair from './Repair'
@@ -274,6 +287,7 @@
   import CardQuery from './CardQuery'
   import HistoryQuery from './HistoryQuery'
   import CardMetrology from './CardMetrology'
+  import CardRepair from './CardRepair'
   import {toCost, toFloat} from '../utils/commonJS'
   import DynamicSelect from 'vue-dynamic-select'
   import rEqCard from '../components/rEquipmentCard'
@@ -298,6 +312,7 @@
       DataTable,
       StackModal,
       Repair,
+      CardRepair,
       Metrology,
       Loading,
       Schedule, 
@@ -374,7 +389,7 @@
         table: 'table table-hover table-center equipment-table',
         theadTh: 'header-item',
         tbodyTd: 'body-item',
-        tbodyTr: 'body-row'
+        tbodyTr: 'body-row equipment-row'
        },
        imagesEq:[],
        imagesLoc:[],
@@ -412,6 +427,11 @@
        showMetrologyCard: false,
        metCard: {metId: -1},
        updatedMetData: {},
+
+      actionModeRepair: '',
+      showRepairCard: false,
+      repCard: {idRep: -1},
+       updatedRepData: {},
 
        isDictLoad: false,
        isDictLoading: false,
@@ -545,8 +565,11 @@
                 //this.initCard(this.eqData[this.rowCurrentIndex]);
               //}
                 //this.eqCard = this.eqData[this.rowCurrentIndex];
-               
+                
                 this.isLoading = false;
+                
+                this.addDblClick();
+                
               })
               .catch(error => 
               {
@@ -557,6 +580,25 @@
               })
         }
         
+     },
+     addDblClick: function(){
+       this.$nextTick(()=>{
+          $('.equipment-row').unbind('dblclick', false);
+
+          $('.equipment-row').dblclick((event) => {
+                        let tr = event.currentTarget;
+                        if (tr.rowIndex)
+                        {
+                            this.rowCurrentIndex = tr.rowIndex-1;
+                            if (this.rights.edit && !this.isArchive)
+                              this.actionMode = 'edit';
+                             else this.actionMode = 'view';
+                             this.initCard(this.eqData[this.rowCurrentIndex]);
+                            this.eqCard.id = this.eqData[this.rowCurrentIndex].id;
+                             this.showEqCard = true;
+                        }
+                  });
+          })
      },
      fillDict: function(list, key){
        list = [];
@@ -690,8 +732,8 @@
      },
       closeModal: function()
       {
-        //console.log('old:____' + JSON.stringify(this.oldCard));
-        //console.log('new:____' + JSON.stringify(this.eqCard));
+       // console.log('old:____' + JSON.stringify(this.oldCard));
+       // console.log('new:____' + JSON.stringify(this.eqCard));
         let isCardChanged = !_.isEqual(this.oldCard, this.eqCard);
         if (isCardChanged)
         {
@@ -742,6 +784,8 @@
          this.sortList.forEach((sortItem) => {
           this.eqData  = _.orderBy(this.eqData, sortItem.sortField, sortItem.sort);
         })
+          this.addDblClick();
+
       },
       dtUpdateSort: function({ sortField, sort }) {
         const sortedData = _.orderBy(this.eqData, [sortField],[sort]);
@@ -857,6 +901,7 @@
          }
 
          this.oldCard = _.cloneDeep(this.eqCard);//JSON.parse(JSON.stringify(this.eqCard));
+         
         let orderTimeParams = this.getOrderTimeParams();
         this.orderTimeHours = orderTimeParams.hours;
         this.workingMode = orderTimeParams.workingMode;
@@ -865,10 +910,12 @@
         this.imagesLoc = [];
         this.imagesLocList = [];
         this.docList = [];
+
         
         if (this.actionMode === 'edit' ||  this.actionMode === 'view'){
           let hasLoad = 0;
            let idEq =  params.id;
+    
            if (idEq){
               api().
                 get('/equipment/imgList/' + idEq)
@@ -880,14 +927,16 @@
 
                       })
                       hasLoad++;
-                      this.isLoading = (hasLoad < 3)
+                      this.isLoading = (hasLoad < 3);
+                      if (hasLoad == 3)
+                        this.addDblClick();
                   })
                   .catch(error => {
                     this.isLoading = false;
                     this.$alert('Ошибка при загрузке фотографий: '+ error, '', 'error', {allowOutsideClick: false});
                     //alert('Ошибка при загрузке фотографий: '+ error);
                   });
-            
+ 
             api().
               get('/equipment/locList/' + idEq)
               .then(response => {
@@ -898,7 +947,8 @@
                     })
                     hasLoad++;
                     this.isLoading = (hasLoad < 3)
-                   
+                    if (hasLoad == 3)
+                      this.addDblClick();
                 })
                 .catch(error => {
                   this.isLoading = false;
@@ -910,12 +960,13 @@
               get('/equipment/docList/' + idEq)
               .then(response => {
                     this.docList = response.data;
-                    console.log(JSON.stringify(this.docList));
                     this.docList.forEach((item, i) =>{
                           item.path = item.path && item.path !== '' ? `${endpoint}${item.path}` : '';
                     })
                     hasLoad++;
                     this.isLoading = (hasLoad < 3)
+                    if (hasLoad == 3)
+                      this.addDblClick();
                 })
                 .catch(error => {
                   this.isLoading = false;
@@ -926,6 +977,7 @@
 
           }
           else this.isLoading = false;
+
         }
         else this.isLoading = false;
 
@@ -982,6 +1034,7 @@
           this.eqData = _.filter(this.eqData, {'eqReadiness': this.fData.eqReadiness.id})
         this.eqData.push({}); this.eqData.pop(); //костыль: без этого не обновлялись данные в таблице, если редактировала карточку для нового оборудования? 
         
+      
         this.sortData();
        
         //this.sortList = [];
@@ -1318,6 +1371,21 @@
         this.metCard = params;
         this.showMetrologyCard = true;
       },
+       editRep(params){
+        this.actionModeRepair = 'edit';
+        this.repCard = params;
+        this.showRepairCard = true;
+      },
+      addRep(params){
+        this.actionModeRepair = 'add';
+        this.repCard = params;
+        this.showRepairCard = true;
+      },
+       viewRep(params){
+        this.actionModeRepair = 'view';
+        this.repCard = params;
+        this.showRepairCard = true;
+      },
       getActualDate: function(){
         let idEq = this.eqCard.id 
           api().
@@ -1351,6 +1419,15 @@
       },
       closeCardMet(){
          this.showMetrologyCard = false;
+      },
+
+      saveCardRep(updatedRepData){
+        this.updatedRepData=updatedRepData;
+        this.showRepairCard = false;
+        this.getActualDate();
+      },
+      closeCardRep(){
+         this.showRepairCard = false;
       },
       loading(isLoading)
       {
@@ -1394,10 +1471,10 @@
               this.datatableCss.tbodyTd += ' edit-hide'
               this.datatableCss.theadTh += ' edit-hide' 
             }
-            if (!this.rights.add){
+          //  if (!this.rights.add){
               this.datatableCss.tbodyTd += ' copy-hide'
               this.datatableCss.theadTh += ' copy-hide'
-            }
+          //  }
             //if (!this.rights.delete){
               this.datatableCss.tbodyTd += ' delete-hide'
               this.datatableCss.theadTh += ' delete-hide'
@@ -1496,6 +1573,7 @@
 
 .eq-card-col-25 p{
   margin: 0 !important;
+  padding-left: 5px;
 }
 
 .eq-card-dyn-select {

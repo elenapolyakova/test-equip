@@ -50,6 +50,7 @@
           </div>
           <div id="chartPie" class="chartPie">
             <apexchart type="pie" width="380" :options="chartPieOptions" :series="seriesPie"></apexchart>
+            <div class='total-title'><span>Всего {{totalCount}} ед.</span></div>
           </div>
       </div>
       <div class="report-content">
@@ -101,6 +102,7 @@
          devisionList: [],
          readinessList: [],
          locationList: [],
+         totalCount: 0,
          fData: {
             devision: null,
             location: null
@@ -114,7 +116,7 @@
             { name: "devisionName", label: "Подразделение",  sortable: true },
             { name: "name", label: "Название оборудования",  sortable: true} ,
             { name: "invNum", label: "Инвентарный номер",  sortable: true },
-            { name: "comDateYear", label: "Год ввода в эксплуат.",  sortable: true },
+            { name: "factDateYear", label: "Год выпуска",  sortable: true },
             { name: "age", label: `Возраст в ${(new Date).getFullYear()}`,  sortable: true },
         ],
        datatableCss: {
@@ -223,8 +225,8 @@
             width: 15
           },
           {
-            key: "comDateYear",
-            header: "Год ввода в эксплуат.",
+            key: "factDateYear",
+            header: "Год выпуска",
             width: 10
           },
           {
@@ -497,7 +499,10 @@
                         eqItem.invNum = item.inv_num ? item.inv_num.trim() : '';
                         eqItem.comDate =  item.eq_comdate ? new Date(item.eq_comdate) : '';
                         eqItem.comDateYear = item.eq_comdate ? eqItem.comDate.getFullYear() : '';
-                        eqItem.age = (new Date).getFullYear() - eqItem.comDateYear;
+                        eqItem.factDate =  item.fact_date ? new Date(item.fact_date) : '';
+                        eqItem.factDateYear = item.fact_date ? eqItem.factDate.getFullYear() : '';
+                        // eqItem.age =  ((new Date).getFullYear() - eqItem.factDateYear);
+                        eqItem.age = eqItem.factDate ? ((new Date).getFullYear() - eqItem.factDateYear) : 0;
                         this.eqInitialList.push(eqItem);
                         
                     });
@@ -533,7 +538,12 @@
               data: newData
           }]
           this.seriesPie =  newData;
-          this.isLoading = false;
+          this.totalCount = this.eqData.length;
+
+          // this.chartPieOptions = {...this.chartPieOptions, ...{
+          //   title: {text: `Возраст Оборудования`},
+          // }}
+           this.isLoading = false;
           setTimeout(() => {
               
               this.renderImage('chartBar', 'imgBar');
@@ -610,6 +620,10 @@
    display: none;
  }
 
+.total-title{
+  text-align: center;
+  width:100%;
+}
 @media screen and (max-width: 1500px) {
    .action-panel-filter{
      flex-wrap: wrap;

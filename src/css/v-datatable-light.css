@@ -90,24 +90,26 @@
         display: none;
     }
 
-    .repair-table .edit-hide:nth-child(1),
-    .repair-table .delete-hide:nth-child(2){ 
+    .repair-table .view-hide:nth-child(1),
+    .repair-table .edit-hide:nth-child(2),
+    .repair-table .delete-hide:nth-child(3){ 
         display: none;
     }
     .repair-table td:nth-child(1),
-    .repair-table td:nth-child(2)
+    .repair-table td:nth-child(2),
+    .repair-table td:nth-child(3)
    {
       width: 5em
     }
-
-    .query-table .edit-hide:nth-child(1),
-    .query-table .delete-hide:nth-child(2){ 
+    .query-table .edit-hide:nth-child(2),
+    .query-table .delete-hide:nth-child(3){ 
       display: none;
     }
 
     /* .metrology-table .view-hide:nth-child(1), */
-    .metrology-table .edit-hide:nth-child(1),
-    .metrology-table .delete-hide:nth-child(2){ 
+    .metrology-table .view-hide:nth-child(1),
+    .metrology-table .edit-hide:nth-child(2),
+    .metrology-table .delete-hide:nth-child(3){ 
         display: none;
     }
 
