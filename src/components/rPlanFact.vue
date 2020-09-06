@@ -18,7 +18,7 @@
         <div class='title'>{{report_name}}</div>
          <div id ="chart" class="chart">
           <div id="chartBar" class="chartBar">
-              <apexchart width="500" type="bar" :options="chartBarOptions" :series="seriesBar"></apexchart>
+              <apexchart width="1000" type="bar" :options="chartBarOptions" :series="seriesBar"></apexchart>
               
           </div>
           <img id="imgBar" class="img-hidden"></img>
@@ -190,7 +190,7 @@
 }
 .chartBar{
   margin-top: .5em;
-  width: 500px;
+  width: 1000px;
 }
 
  img {
