@@ -150,6 +150,7 @@ function resizeHeader() {
                           { title: 'Сводные данные по работе ИО',  name:'rpt', href: {path: '/repSummary', name: "rSummary"}},
                           { title: 'О работе лабораторного ИО',  name:'rpt',  href: {path: '/repEqWork', name: "rEqWork"}},
                           { title: 'Стоимость работы по договорам',  name:'rpt',   href: { path: '/repContract',  name: "rContract"}},
+                          { title: 'План и факт работы обуродования',  name:'rpt',   href: { path: '/repPlanFact',  name: "rPlanFact"}},
                         ]});
           if (hasRight('au'))
             this.menu.push({title: 'АДМИНИСТРИРОВАНИЕ',  name:'au', href: { path: '/AdminUser',  name: "adminuser"}});    

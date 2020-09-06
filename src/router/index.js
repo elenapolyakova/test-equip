@@ -18,6 +18,8 @@ import rEqStat from '../components/rEquipmentStat'
 import rSummary from '../components/rSummary'
 import rEqWork from '../components/rEquipmentWork'
 import rContract from '../components/rContract'
+import rPlanFact from '../components/rPlanFact'
+
 /*import rRepair from '../components/rRepair'*/
 
 import store  from '../../store'
@@ -35,7 +37,7 @@ const router = new Router({
       { path: '/contractList', name:'contract', component: Contract },
       { path: '/metrologyList', name:'metrology', component: Metrology},
       { path: '/adminuser', name:'adminuser', component: AdminUser},
-       { path: '/repEqList', name:'rEqList', component: rEqList},
+      { path: '/repEqList', name:'rEqList', component: rEqList},
       { path: '/repEqAge', name:'rEqAge', component: rEqAge},
       { path: '/repEqCardF', name:'rEqCardF', component: rEqCardF,  props: true},
       { path: '/repEqCard/:eqId', name:'rEqCard', component: rEqCard,  props: true},
@@ -44,6 +46,7 @@ const router = new Router({
       { path: '/repSummary', name:'rSummary', component: rSummary},
       { path: '/repEqWork', name:'rEqWork', component: rEqWork},
       { path: '/repContract', name:'rContract', component: rContract},
+      { path: '/repPlanFact', name:'rPlanFact', component: rPlanFact},
      /* { path: '/rRepair', name:'rRepair', component: rRepair},*/
       
       

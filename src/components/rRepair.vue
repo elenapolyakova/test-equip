@@ -5,7 +5,7 @@
            <div class="export-button"><i class="fa fa-file-pdf" title="Экспорт в pdf" @click="exportPDF"></i></div>
       </div>
       <div class="report-content">
-        <div class='title'>Журнал технического обслуживания и ремонта (ТОиР)</div>
+        <div class='title'>{{report_name}}</div>
       </div>
   </div>
 </template>
@@ -13,11 +13,12 @@
 <script>
   /* import html2canvas from 'html2canvas'
    import canvg from 'canvg';
-   import '../js/arial-normal.js'
+   
    import api from "../utils/api";
    import { saveAs } from 'file-saver';
    import ExcelJS from 'exceljs'; 
-  //import jsPDF from 'jspdf'; 
+  import pdfMake from 'pdfmake/build/pdfmake'
+  import pdfFonts from 'pdfmake/build/vfs_fonts'
 
    export default {
     name: "rReapir",
@@ -25,7 +26,7 @@
 
     data() {
        return {
-         report_name: '',
+         report_name: 'Журнал технического обслуживания и ремонта (ТОиР)',
        }
     },
     methods: {
