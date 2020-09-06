@@ -73,7 +73,7 @@
 
 
           api().
-              get('/rPlanFact/' + this.curIdEq)
+              get('/rPlanFact/' + this.curEqId)
               .then(response => 
               {
                 this.eqDataWork = response.data;;
