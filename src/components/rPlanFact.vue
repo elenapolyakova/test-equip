@@ -81,7 +81,7 @@
               enabled: false,
               y: {
                 formatter: function (val) {
-                  return  val + ' ч..'
+                  return  val + ' ч.'
                 }
               }
            }
@@ -122,7 +122,7 @@
                 let newData = Array(daysInMonth).fill(0);
                 this.labels = [];
                 for (var i = 1; i<=daysInMonth; i++ ){
-                    labels[i] = i.toString();
+                    this.labels[i] = i.toString();
                 }
             this.chartBarOptions = {...this.chartBarOptions, ...{
                 xaxis: {
