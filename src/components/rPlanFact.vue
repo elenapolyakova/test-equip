@@ -62,7 +62,7 @@
           year: 2020,
            labels: [],
 
-           chartBarOptions: {
+            chartBarOptions: {
            chart: {
              id: 'vuechart-example',
              toolbar: {
@@ -81,7 +81,7 @@
               enabled: false,
               y: {
                 formatter: function (val) {
-                  return  val + ' ч.'
+                  return  val + ' ч..'
                 }
               }
            }
@@ -95,13 +95,13 @@
         filterData(eqData){
           this.curEqId = eqData.eqId;
           if (this.hasEquip()){
-          this.initData();
+            this.initData();
           }
       },
          loading(isLoading)
-      {
-         this.isLoading = isLoading
-      },
+        {
+            this.isLoading = isLoading
+        },
        hasEquip: function(){
 			return (this.curEqId && this.curEqId > -1);
 		},
@@ -170,7 +170,8 @@
                   const dataURL = canvas.toDataURL('image/png');
                  img.src = dataURL;
                
-          });
+                 });
+         }
 
     },
     created: function(){
@@ -178,6 +179,7 @@
         window.html2canvas = html2canvas;
     }
 }
+
 </script>
 
 <style lang="scss" scoped>
