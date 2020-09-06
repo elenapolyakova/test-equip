@@ -30,7 +30,7 @@
     "vue-password": "^3.0.0",
     "vue-runtime-helpers": "^1.1.2",
     "vue-sidebar-menu": "^4.5.3",
-    " ": "^1.1.1",
+    "vue-simple-alert": "^1.1.1",
     "vue2-datepicker": "^3.5.0",
     "vue2-touch-events": "^2.2.1"
   },
