@@ -6,11 +6,11 @@
             color='#e21a1a'>
         </loading>
       <div class="action-panel-end">
-             <filter-plan
+             <filter-plan-date
                 @filterData="filterData"
                 :fData="fData" 
                 @loading="loading"
-            ></filter-plan>
+            ></filter-plan-date>
            <div class="export-button"><i class="fa fa-file-excel" title="Экспорт в excel" @click="exportExcel"></i></div>
            <div class="export-button"><i class="fa fa-file-pdf" title="Экспорт в pdf" @click="exportPDF"></i></div>
       </div>
@@ -31,7 +31,8 @@
   import html2canvas from 'html2canvas'
    import Loading from 'vue-loading-overlay';
    import canvg from 'canvg';
-   import FilterPlan from './FilterPlan'
+  // import FilterPlan from './FilterPlan';
+   import FilterPlanDate from './FilterPlanDate';
    import api from "../utils/api";
    import { saveAs } from 'file-saver';
    import ExcelJS from 'exceljs'; 
@@ -43,7 +44,8 @@
    export default {
     name: "rPlanFact",
     components: {
-       FilterPlan,
+       //FilterPlan,
+       FilterPlanDate,
        Loading
      },
     props: {
@@ -52,15 +54,15 @@
   
     data() {
        return {
-            curEqId: -1,
-            isLoading: false,
-         report_name: 'План и факт работы обуродования',
+          curEqId: -1,
+          isLoading: false,
+          report_name: 'План и факт работы обуродования',
           fData: {},
           eqDataWork: {},
           hasLoadedImg: 0,
-          month: 8,
+          month: 10,
           year: 2020,
-           labels: [],
+          labels: [],
 
             chartBarOptions: {
            chart: {
@@ -112,13 +114,14 @@
 
           api().
               get('/rPlanFact/' + this.curEqId)
+              //get('/rPlanFact/' + this.curEqId+this.month+this.year)
               .then(response => 
               {
                 this.eqDataWork = response.data;
 
-                 this.hasLoadedImg = 0;
+                this.hasLoadedImg = 0;
                  
-                    var daysInMonth = new Date(this.year, this.month - 1, 1).daysInMonth();
+                var daysInMonth = new Date(this.year, this.month - 1, 1).daysInMonth();
                 let newData = Array(daysInMonth).fill(0);
                 this.labels = [];
                 for (var i = 1; i<=daysInMonth; i++ ){

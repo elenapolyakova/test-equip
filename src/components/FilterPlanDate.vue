@@ -1,7 +1,7 @@
 <template lang="html">
-  <div class="filter-plan-container">
+  <div class="filter-plan-date-container">
       <div class="filter-item-container"> 
-           <div class="filter-plan-date-label"><label class="mb-0">Подразделение</label></div>
+           <div class="filter-plan-label"><label class="mb-0">Подразделение</label></div>
            <div class="filter-item">
               <dynamic-select 
                     :options="devisionList"
@@ -13,7 +13,7 @@
             </div>
       </div>
       <div class="filter-item-container"> 
-           <div class="filter-plan-date-label"><label class="mb-0">Наименование</label></div>
+           <div class="filter-plan-label"><label class="mb-0">Наименование</label></div>
            <div class="filter-item">
               <dynamic-select 
                       :options="eqNameList"
@@ -26,7 +26,7 @@
             </div>
       </div>
       <div class="filter-item-container"> 
-          <div class="filter-plan-date-label"><label class="mb-0">Инвентарный номер</label></div>
+          <div class="filter-plan-label"><label class="mb-0">Инвентарный номер</label></div>
            <div class="filter-item">
               <dynamic-select 
                         :options="invNumList"
@@ -37,6 +37,18 @@
                          @input="invNumSelected"/>
             </div>
       </div>
+      <div class="filter-smallitem-container"> 
+          <div class="filter-plan-label"><label class="mb-0">Месяц</label></div>
+           <div class="filter-smallitem">
+              <dynamic-select 
+                        :options="flMonth"
+                        option-value="id"
+                        option-text="name"
+                        placeholder=""
+                        v-model="fData.flMonth"/>
+            </div>
+      </div>
+
 
   </div>
 </template>
@@ -48,7 +60,7 @@
   
 
   export default {
-    name:"filter-plan-date",
+    name:"filter-plan",
      props:  {
           fData: {type: Object, required: true},
           isLoading:{type: Boolean}
@@ -62,6 +74,7 @@
         eqDevisionList: [], //полный справочник подразделений
         eqNameList: [],
         invNumList: [],
+        flMonth:    [],
         filterData: [],
         hasLoadFilterData: false,
         container: $('main')
@@ -219,7 +232,14 @@
      text-align: center;
 
    }
-   .filter-item{
+
+.filter-smallitem-container{
+     width: 180px;
+     text-align: center;
+
+   }  
+
+  .filter-item{
       display: block;
       width: 100%;
       min-width: 300px;
@@ -227,7 +247,15 @@
       padding-right: 15px;
 
   }
-.filter-plan-date-label {
+.filter-smallitem{
+      display: block;
+      width: 100%;
+      min-width: 30px;
+      padding-left: 15px;
+      padding-right: 15px;
+
+  }
+.filter-plan-label {
     display: inline-block;
     min-width: 120px;
     width: 100%;
@@ -237,7 +265,7 @@
     padding-top: .5em;
     padding-left: 15px;
   }
-  .filter-plan-date-item {
+  .filter-plan-item {
       display: block;
       width: 100%;
       min-width: 200px;

@@ -7,7 +7,7 @@
         <div><p class='logo-place'></p></div>
         <div class='header-title'>
           <h6>АО "ВНИИЖТ"</h6>
-          <h5>СИСТЕМА УПРАВЛЕНИЯ ИСПЫТАТЕЛЬНЫМ ОБОРУДОВАНИЕМ</h5>
+          <h5>СИСТЕМА УПРАВЛЕНИЯ ИСПЫТАТЕЛЬНЫМ ОБОРУДОВАНИЕМ (АСУ "СТЕНД")</h5>
         </div>
         <div class="logout" v-if="$store.getters.isAuthenticated" @click.stop="showLogoutMenu" >
               <span> <i class='fa fa-user'></i><b> {{ $store.getters.username }}</b></span>
@@ -145,11 +145,11 @@ function resizeHeader() {
                         child: [
                           { title: 'Перечень оборудования',  name:'rpt', href: { path: '/repEqList',  name: "rEqList"}},
                           { title: 'Возраст оборудования',  name:'rpt', href: { path: '/repEqAge',  name: "rEqAge"}},
-                          { title: 'Анализ работы оборудования',  name:'rpt', href: {path: '/repEqAnalysis', name: "rEqAnal"}},
-                          { title: 'Статистика загрузки оборудования',  name:'rpt', href: {path: '/repEqStat', name: "rEqStat"}},
-                          { title: 'Сводные данные по работе ИО',  name:'rpt', href: {path: '/repSummary', name: "rSummary"}},
-                          { title: 'О работе лабораторного ИО',  name:'rpt',  href: {path: '/repEqWork', name: "rEqWork"}},
-                          { title: 'Стоимость работы по договорам',  name:'rpt',   href: { path: '/repContract',  name: "rContract"}},
+                       //   { title: 'Анализ работы оборудования',  name:'rpt', href: {path: '/repEqAnalysis', name: "rEqAnal"}},
+                       //   { title: 'Статистика загрузки оборудования',  name:'rpt', href: {path: '/repEqStat', name: "rEqStat"}},
+                       //   { title: 'Сводные данные по работе ИО',  name:'rpt', href: {path: '/repSummary', name: "rSummary"}},
+                       //   { title: 'О работе лабораторного ИО',  name:'rpt',  href: {path: '/repEqWork', name: "rEqWork"}},
+                       //   { title: 'Стоимость работы по договорам',  name:'rpt',   href: { path: '/repContract',  name: "rContract"}},
                           { title: 'План и факт работы обуродования',  name:'rpt',   href: { path: '/repPlanFact',  name: "rPlanFact"}},
                         ]});
           if (hasRight('au'))
