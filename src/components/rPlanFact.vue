@@ -36,6 +36,8 @@ import FilterPlanDate from "./FilterPlanDate";
 import api from "../utils/api";
 import { saveAs } from "file-saver";
 import { truncated, forMonth } from "../utils/commonJS";
+import { getWorkingPeriod } from "../utils/dictionary";
+import { DateDiff, HoursDiff } from "../utils/date";
 import ExcelJS from "exceljs";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -63,12 +65,16 @@ export default {
       report_name: "План и факт работы обуродования",
       fData: {},
       eqDataWork: {},
+      queryList: [],
       hasLoadedImg: 0,
       labels: [],
+      equipTime: ["09:00", "18:00"], // время работы оборудования в соответсвии с его режимом (посменная или с 9 до 18)
 
       chartBarOptions: {
         chart: {
           id: "vuechart-example",
+          type: "bar",
+
           toolbar: {
             tools: {
               download: false,
@@ -77,10 +83,28 @@ export default {
         },
         xaxis: {
           categories: [],
-          title: { text: "день месяца" },
+          title: { text: "День месяца" },
         },
         yaxis: {
           title: { text: "Время работы, ч" },
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: 90,
+            dataLabels: {
+              position: "top",
+            },
+          },
+        },
+        dataLabels: {
+          formatter: function (val) {
+            return String(val) == "0" ? "" : val;
+          },
+          offsetY: -20,
+          style: {
+            fontSize: "10px",
+            colors: ["#304758"],
+          },
         },
         tooltip: {
           enabled: false,
@@ -91,7 +115,10 @@ export default {
           },
         },
       },
-      seriesBar: [{ name: "1", data: [] }],
+      seriesBar: [
+        { name: "план", data: [] },
+        { name: "факт", data: [] },
+      ],
     };
   },
   watch: {
@@ -109,8 +136,10 @@ export default {
         let workbookName = `${this.report_name}.xlsx`;
         let worksheetName = this.report_name;
         let ws = wb.addWorksheet(worksheetName, {
-          pageSetup: { paperSize: 9, orientation: "landscape"//, printArea: "A1:P35"
-           },
+          pageSetup: {
+            paperSize: 9,
+            orientation: "landscape", //, printArea: "A1:P35"
+          },
         });
 
         let title = `План и факт работы обуродования за ${this.monthName} ${this.curYear} года`;
@@ -120,10 +149,10 @@ export default {
         const imageBar = wb.addImage({
           base64: imgBar.src,
           extension: "png",
-        }); 
-       
-       ws.mergeCells("A1:P1");
-        let cell = ws.getCell('A1');
+        });
+
+        ws.mergeCells("A1:P1");
+        let cell = ws.getCell("A1");
 
         cell.alignment = {
           horizontal: "center",
@@ -150,48 +179,41 @@ export default {
       }
     },
     exportPDF: function () {
-           this.isLoading = true;
-          if(this.hasLoadedImg == 1){
-            this.isLoading = false;
+      this.isLoading = true;
+      if (this.hasLoadedImg == 1) {
+        this.isLoading = false;
 
-            var imgBar = document.getElementById('imgBar');
-          
-            
-           let title = `План и факт работы обуродования за ${this.monthName} ${this.curYear} года`;
-           
-            
-            var docDefenition = {
-              content: [
-                {text:title, style: 'header'},
-                  {columns:[
-                    {image: imgBar.src, width:700, alignment: 'center' },
-                    
-                  ]
-                  
-                }],
-          
-              styles: {
-                header: {fontSize: 11, alignment: 'center' },
-             
-              },
-              pageOrientation: 'landscape'
-              
-            }
-            pdfMake.createPdf(docDefenition).download(this.report_name + ".pdf");
-         }
-         else{
-           setTimeout(()=>{
-              this.exportPDF();
-           },1000)
-           
-         }
+        var imgBar = document.getElementById("imgBar");
 
+        let title = `План и факт работы обуродования за ${this.monthName} ${this.curYear} года`;
 
+        var docDefenition = {
+          content: [
+            { text: title, style: "header" },
+            {
+              columns: [{ image: imgBar.src, width: 700, alignment: "center" }],
+            },
+          ],
+
+          styles: {
+            header: { fontSize: 11, alignment: "center" },
+          },
+          pageOrientation: "landscape",
+        };
+        pdfMake.createPdf(docDefenition).download(this.report_name + ".pdf");
+      } else {
+        setTimeout(() => {
+          this.exportPDF();
+        }, 1000);
+      }
     },
     filterData(eqData) {
       this.curEqId = eqData.eqId;
       this.curYear = eqData.year;
       this.curMonth = eqData.month;
+      this.equipTime = getWorkingPeriod(eqData.workingMode);
+      console.log(eqData.workingMode);
+      console.log(this.equipTime);
 
       if (this.hasEquip()) {
         this.initData();
@@ -208,56 +230,94 @@ export default {
       this.hasLoadedImg = 0;
 
       api()
-        .get(
-          "/rPlanFact/" ,{params: {
-                            idEq: this.curEqId,
-                            month: this.curMonth + 1,
-                            year: this.curYear,
-                           
-                  }
-                })
-         //  + this.curEqId)
+        .get("/rPlanFact/", {
+          params: {
+            idEq: this.curEqId,
+            month: this.curMonth + 1,
+            year: this.curYear,
+          },
+        })
+        //  + this.curEqId)
         //get('/rPlanFact/' + this.curEqId+this.month+this.year)
         .then((response) => {
           this.eqDataWork = response.data;
 
-          this.hasLoadedImg = 0;
+          let monthStart = new Date(this.curYear, this.curMonth, 1, 0, 0, 0, 0);
 
-          var daysInMonth = new Date(
-            this.curYear,
-            this.curMonth,
-            1
-          ).daysInMonth();
-          let newData = Array(daysInMonth).fill(0);
-          this.labels = [];
-          for (var i = 1; i <= daysInMonth; i++) {
-            this.labels[i] = i.toString();
-          }
-          this.chartBarOptions = {
-            ...this.chartBarOptions,
-            ...{
-              xaxis: {
-                categories: this.labels,
+          let monthEnd = new Date(
+            new Date(this.curYear, this.curMonth + 1, 1, 0, 0, 0, 0).getTime() -
+              1
+          );
+
+          api()
+            .get("/query", {
+              params: {
+                idEq: this.curEqId,
+                dateFrom: monthStart,
+                dateTo: monthEnd,
               },
-            },
-          };
+            })
+            .then((response) => {
+              let data = response.data;
+              this.queryList = [];
 
-          this.eqDataWork.forEach((item) => {
-            newData[new Date(item.days).getDate()] = ( //truncated(
-              item.minute_count / 60
-            ).toFixed(1);
-          });
-          this.seriesBar = [
-            {
-              data: newData,
-            },
-          ];
+              data.forEach((item) => {
+                let queryItem = {
+                  queryId: item.id_eqquery,
+                  eqId: this.eqId,
+                  dateStart: item.date_start ? new Date(item.date_start) : null,
+                  dateEnd: item.date_end ? new Date(item.date_end) : null,
+                  Q_type: item.q_type,
+                  conId: item.id_cont_contract,
+                  userId: item.id_user_users,
+                };
+                this.queryList.push(queryItem);
+              });
 
-          setTimeout(() => {
-            this.renderImage("chartBar", "imgBar");
-          }, 3000);
+              this.hasLoadedImg = 0;
+              var daysInMonth = new Date(
+                this.curYear,
+                this.curMonth,
+                1
+              ).daysInMonth();
+              let factData = Array(daysInMonth).fill(0);
+              let planData = Array(daysInMonth).fill(0);
+              this.labels = [];
+              for (var i = 0; i < daysInMonth; i++) {
+                this.labels[i] = (i + 1).toString();
+                planData[i] = this.getPlanTime(i + 1);
+              }
+              this.chartBarOptions = {
+                ...this.chartBarOptions,
+                ...{
+                  xaxis: {
+                    categories: this.labels,
+                  },
+                },
+              };
 
-          this.isLoading = false;
+              this.eqDataWork.forEach((item) => {
+                factData[new Date(item.days).getDate() - 1] = ( //truncated(
+                  item.minute_count / 60
+                ).toFixed(1);
+              });
+              this.seriesBar = [
+                {
+                  name: "план",
+                  data: planData,
+                },
+                {
+                  name: "факт",
+                  data: factData,
+                },
+              ];
+
+              setTimeout(() => {
+                this.renderImage("chartBar", "imgBar");
+              }, 3000);
+
+              this.isLoading = false;
+            });
         })
         .catch((error) => {
           this.isLoading = false;
@@ -285,7 +345,48 @@ export default {
         this.hasLoadedImg++;
       });
     },
+    getPlanTime: function (day) {
+      let maxTime = this.equipTime[this.equipTime.length - 1];
+      let minTime = this.equipTime[0];
+
+      let dayBegin = new Date(
+        this.curYear,
+        this.curMonth,
+        day,
+        minTime.split(":")[0],
+        minTime.split(":")[1],
+        0,
+        0
+      );
+      let dayEnd = new Date(
+        this.curYear,
+        this.curMonth,
+        day,
+        maxTime.split(":")[0],
+        maxTime.split(":")[1],
+        0,
+        0
+      );
+      let hours = 0;
+      this.queryList.forEach((query) => {
+        if (
+          DateDiff(dayBegin, query.dateEnd) <= 0 &&
+          DateDiff(dayEnd, query.dateStart) >= 0
+        ) {
+          let begin =
+            DateDiff(dayBegin, query.dateStart) >= 0
+              ? dayBegin
+              : query.dateStart;
+          let end =
+            DateDiff(dayEnd, query.dateEnd) >= 0 ? query.dateEnd : dayEnd;
+          hours += HoursDiff(end, begin);
+        }
+      });
+
+      return hours;
+    },
   },
+
   created: function () {
     this.curYear = new Date().getFullYear();
     this.curMonth = new Date().getMonth();
