@@ -19,6 +19,7 @@ import rSummary from '../components/rSummary'
 import rEqWork from '../components/rEquipmentWork'
 import rContract from '../components/rContract'
 import rPlanFact from '../components/rPlanFact'
+import rWorkingEquip from '../components/rWorkingEquip'
 
 /*import rRepair from '../components/rRepair'*/
 
@@ -47,6 +48,8 @@ const router = new Router({
       { path: '/repEqWork', name:'rEqWork', component: rEqWork},
       { path: '/repContract', name:'rContract', component: rContract},
       { path: '/repPlanFact', name:'rPlanFact', component: rPlanFact},
+      { path: '/repWorkingEquip', name:'rWorkingEquip', component: rWorkingEquip},
+      
      /* { path: '/rRepair', name:'rRepair', component: rRepair},*/
       
       
