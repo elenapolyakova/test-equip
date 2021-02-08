@@ -25,10 +25,10 @@
                   </div>
                   <div class="action-panel-filter-item-select">
                         <dynamic-select 
-                                :options="locationList"
+                                :options="placeTypeList"
                                 option-value="id"
                                 option-text="name"
-                                v-model="fData.location"
+                                v-model="fData.placeType"
                                 placeholder=''/>
                     </div>
               </div>
@@ -83,7 +83,7 @@
   import pdfMake from 'pdfmake/build/pdfmake'
   import pdfFonts from 'pdfmake/build/vfs_fonts'
    import DynamicSelect from 'vue-dynamic-select'
-   import {getEqReadiness} from '../utils/dictionary'
+   import {getPlaceType} from '../utils/dictionary'
    import {toCost} from '../utils/commonJS'
    import { DataTable } from 'v-datatable-light'
 
@@ -100,12 +100,13 @@
          eqInitialList: [],
          eqData: [],
          devisionList: [],
-         readinessList: [],
+         placeTypeList: [],
          locationList: [],
          totalCount: 0,
          fData: {
             devision: null,
-            location: null
+            location: null,
+            placeType: null
           },
          sort: 'asc',
          labels: ['0-10 лет', '11-20 лет', '21-30 лет', '31-40 лет', '41-50 лет', '51-60 лет', '61-70 лет', '71-80 лет', '81-90 лет'],
@@ -445,7 +446,8 @@
         clearFilter: function(){
           this.fData = {
             devision: null,
-            location: null
+            location: null,
+            placeType: null
           };
           this.getReport();
         },
@@ -457,6 +459,9 @@
 
             if (this.fData.location) 
                 this.eqData = _.filter(this.eqData, {'location': this.fData.location.name})
+
+            if (this.fData.placeType) 
+                this.eqData = _.filter(this.eqData, {'placeType': this.fData.placeType.id})
 
             this.countAge();
         },
@@ -481,6 +486,7 @@
             .then(response => {
                 let dict = response.data;
                 this.devisionList =  dict.divisionList;
+                this.placeTypeList = getPlaceType();
                 
                 api().
                 get('/equipment')
@@ -488,6 +494,7 @@
                 {
                     let data = response.data;
                     let i = 0;
+                  
                     data.forEach(item =>
                     {
                     let eqItem = {};
@@ -502,6 +509,7 @@
                         eqItem.factDate =  item.fact_date ? new Date(item.fact_date) : '';
                         eqItem.factDateYear = item.fact_date ? eqItem.factDate.getFullYear() : '';
                         // eqItem.age =  ((new Date).getFullYear() - eqItem.factDateYear);
+                        eqItem.placeType = item.eq_placetype;
                         eqItem.age = eqItem.factDate ? ((new Date).getFullYear() - eqItem.factDateYear) : 0;
                         this.eqInitialList.push(eqItem);
                         

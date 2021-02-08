@@ -18,14 +18,15 @@
                   :eqTypeList="eqTypeList"
                   :eqProducerList="eqProducerList"
                   :eqReadinessList="eqReadinessList"
+                  :placeTypeList="placeTypeList"
                    :responsibleList="responsibleList"
                   :lang="lang"
                   :hasExtended="true">
    </filter-equipment> 
 
       <div class="eqContent">
-      
-        <DataTable
+      <div>Выбрано оборудования: <b><span>{{eqData.length}}</span> ед. </b></div>
+          <DataTable
             :header-fields="headerFields"
             :data="eqData || []"
             :is-loading="isLoading"
@@ -78,9 +79,21 @@
                   <p name="devision" v-if="actionMode =='view' || activetab !== 0">{{eqCard.devision.name}}</p>
                 </div>
                  <div class="eq-card-col-25">
-                  <label for="invNum">Расположение</label>
-                   <input name="eqLocation" v-if="activetab === 0 && actionMode !=='view'" v-model="eqCard.eqLocation"></input>
-                    <p name="eqLocation" v-if="actionMode =='view' || activetab !== 0">{{eqCard.eqLocation}}</p>
+                  <label for="placeType">Местоположение</label>
+
+                   <div class="eq-card-dyn-select"  v-if="activetab === 0 && actionMode !=='view'">
+                      <dynamic-select 
+                        :options="placeTypeList"
+                        option-value="id"
+                        option-text="name"
+                        placeholder=''
+                        v-model="eqCard.placeType" />
+                    </div>
+                  <p name="placeType" v-if="actionMode =='view' || activetab !== 0">{{eqCard.placeType.name}}</p>
+               
+
+                   <!-- <input name="eqLocation" v-if="activetab === 0 && actionMode !=='view'" v-model="eqCard.eqLocation"></input>
+                    <p name="eqLocation" v-if="actionMode =='view' || activetab !== 0">{{eqCard.eqLocation}}</p> -->
                 </div>
               </div>
            </div>   
@@ -282,7 +295,7 @@
   import api from "../utils/api";
   import {endpoint} from '../utils/config'
   import {formatDate, dateFromString} from '../utils/date'
-  import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours, getFunId, noWorkable} from '../utils/dictionary'
+  import {getEqReadiness, getOrderTime, getDocType, getWorkingMode, getOrderTimeHours, getFunId, noWorkable, getPlaceType} from '../utils/dictionary'
   import Schedule from './Schedule'
   import CardQuery from './CardQuery'
   import HistoryQuery from './HistoryQuery'
@@ -337,6 +350,7 @@
         orderTimeList:[],
         workingModeList:[],
         docTypeList: [],
+        placeTypeList: [],
         responsibleList: [],
         hasAddButton: false,
         
@@ -353,7 +367,8 @@
           comDate: null,
           repDate: '',
           responsible: null,
-          eqReadiness: null
+          eqReadiness: null,
+          placeType: null
         },
 
         //список оборудования
@@ -472,6 +487,7 @@
                   this.orderTimeList = getOrderTime();
                   this.workingModeList = getWorkingMode();
                   this.docTypeList = getDocType();
+                  this.placeTypeList = getPlaceType();
                   this.isDictLoad = true;
                 })
                 .catch(error => {
@@ -542,7 +558,9 @@
                     eqItem.orderTimeName = this.orderTimeName(eqItem.orderTime);
                     eqItem.workingMode = item.eq_worktime; 
                     eqItem.workingModeName = this.workingModeName(eqItem.workingMode);
-                    eqItem.eqLocation = item.eq_place ? item.eq_place.trim() : '';
+                    eqItem.placeType = item.eq_placetype;
+                    eqItem.placeTypeName = this.placeTypeName(eqItem.placeType);
+                   eqItem.eqLocation = item.eq_place ? item.eq_place.trim() : '';
                     eqItem.eqNote = item.remark ? item.remark.trim() : '';
                     eqItem.repDate = item.repdate ? new Date(item.repdate): '';
                      eqItem.repDateFormat = eqItem.repDate ? eqItem.repDate.getFullYear(): '';
@@ -652,6 +670,8 @@
               repDate: this.eqCard.repDate,
               repDateFormat: this.eqCard.repDate? this.eqCard.repDate.getFullYear() : '',
               eqResValue: toFloat(this.eqCard.eqResValue),
+              placeType: this.eqCard.placeType ? this.eqCard.placeType.id : '',
+              placeTypeName: this.eqCard.placeType ? this.eqCard.placeType.name : '',
               eqLocation: this.eqCard.eqLocation,
               eqNote: this.eqCard.eqNote, 
               regNum: this.eqCard.regNum,
@@ -758,6 +778,11 @@
       eqDevisionName: function (_id){
         let devisionItem = _.find(this.eqDevisionList, {id: _id});
         return devisionItem ? devisionItem.name : '';
+      },
+
+      placeTypeName: function (_id){
+        let placeTypeItem = _.find(this.placeTypeList, {id: _id});
+        return placeTypeItem ? placeTypeItem.name : '';
       },
       eqTypeName: function (_id){
         let eqTypeItem = _.find(this.eqTypeList, {id: _id});
@@ -891,6 +916,10 @@
               id: params? params.workingMode : '',
               name: params? params.workingModeName : ''
             },
+            placeType: {
+              id: params? params.placeType : '',
+              name: params? params.placeTypeName : ''
+            },
             eqDocumentation: '',
             eqCostKeep: params? params.eqCostKeep : '',
             eqWorkLoad:  params? params.eqWorkLoad : '',
@@ -920,7 +949,10 @@
               api().
                 get('/equipment/imgList/' + idEq)
                 .then(response => {
+                      this.imagesEqList = [];
                       this.imagesEqList = response.data;
+                    
+                       this.imagesEq =  [];
                       this.imagesEqList.forEach((item, i) =>{
                           this.imagesEq.push(`${endpoint}${item.path}`);
                          // this.imagesEq.push(item.path);
@@ -940,7 +972,9 @@
             api().
               get('/equipment/locList/' + idEq)
               .then(response => {
+                    this.imagesLocList = [];
                     this.imagesLocList = response.data;
+                      this.imagesLoc = [];
                     this.imagesLocList.forEach((item, i) =>{
                           this.imagesLoc.push(`${endpoint}${item.path}`);
                           //this.imagesLoc.push(item.path);
@@ -959,6 +993,8 @@
             api().
               get('/equipment/docList/' + idEq)
               .then(response => {
+                 this.docList = [];
+
                     this.docList = response.data;
                     this.docList.forEach((item, i) =>{
                           item.path = item.path && item.path !== '' ? `${endpoint}${item.path}` : '';
@@ -995,7 +1031,8 @@
           comDate: null,
           repDate: null,
           responsible: null,
-          eqReadiness: null
+          eqReadiness: null,
+          placeType: null,
         };
         this.sortList = [];
 
@@ -1032,8 +1069,10 @@
           this.eqData = _.filter(this.eqData, {'responsible': this.fData.responsible.id}) 
         if (this.fData.eqReadiness) 
           this.eqData = _.filter(this.eqData, {'eqReadiness': this.fData.eqReadiness.id})
+        if (this.fData.placeType) 
+          this.eqData = _.filter(this.eqData, {'placeType': this.fData.placeType.id})
         this.eqData.push({}); this.eqData.pop(); //костыль: без этого не обновлялись данные в таблице, если редактировала карточку для нового оборудования? 
-        
+       
       
         this.sortData();
        

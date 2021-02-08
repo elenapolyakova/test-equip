@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="filter-plan-container">
+  <div class="filter-plan-date-container">
       <div class="filter-item-container"> 
            <div class="filter-plan-date-label"><label class="mb-0">Подразделение</label></div>
            <div class="filter-item">
@@ -245,6 +245,7 @@
       padding-right: 15px;
       padding-bottom: .25em;
   }
+ 
      
 
 </style>

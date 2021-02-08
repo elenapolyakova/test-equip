@@ -1,6 +1,5 @@
 <template lang="html">
 <div>
-   
     <div class="eq-card-content eq-card-container">
         <div class="eq-card-col-50 eq-card-container">
             <div class="eq-card-label"><label class="mb-0">Наименование оборудования</label></div>
@@ -41,7 +40,13 @@
             </div>
         </div>
         <div class="eq-card-col-50 eq-card-container">
-            <div class="eq-card-col-30">
+
+             <div class="eq-card-label"><label class="mb-0">Расположение</label></div>
+            <div class="eq-card-item"> 
+                <input style="width:100%" type="text" name="eqLocation" v-model="eqCard.eqLocation" v-if="actionMode !=='view'"></input>
+                <p name="eqLocation" v-if="actionMode =='view'">{{eqCard.eqLocation}}</p>
+            </div>
+             <div class="eq-card-col-30">
                 <div class="eq-card-label eq-card-small"><label class="mb-0">Год выпуска</label></div>
                 <div class="eq-card-item eq-card-small">
                     <date-picker v-model="eqCard.factDate" 
@@ -307,250 +312,253 @@
 </div>
 </template>
 <script>
-  import DynamicSelect from 'vue-dynamic-select'
-  import DatePicker from 'vue2-datepicker'
-  import 'vue2-datepicker/locale/ru'
-  import VueGallerySlideshow from 'vue-gallery-slideshow'
-  import {toCost, toFloatView} from '../utils/commonJS'
-  import {formatDate} from '../utils/date'
-  
-  var _ = require('lodash');
+import DynamicSelect from "vue-dynamic-select";
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/locale/ru";
+import VueGallerySlideshow from "vue-gallery-slideshow";
+import { toCost, toFloatView } from "../utils/commonJS";
+import { formatDate } from "../utils/date";
 
-$(window).on('resize', function(){
+var _ = require("lodash");
 
-    let header = $('.eq-card-header').height();
-    let footer = $('.eq-card-footer').height();
-    let tabs = $('.tabs').height();
-     $('.content ').css("height", ($(window).height() - header - footer - tabs) -120 + 'px');
+$(window).on("resize", function () {
+  let header = $(".eq-card-header").height();
+  let footer = $(".eq-card-footer").height();
+  let tabs = $(".tabs").height();
+  $(".content ").css(
+    "height",
+    $(window).height() - header - footer - tabs - 120 + "px"
+  );
 
-     let img = $('.vgs__container__img');
-     if ( $('.vgs__close').length > 0  && img.length > 0)
-     {  
-        if ($('.vgs__container').length > 0) $('.vgs__container').css({top: 0, marginTop: 0});
-        $('.vgs__close').css({top: img.offset().top, left: img.offset().left + img.width() -  $('.vgs__close').width() - 12});
-     }
-      
-});
-  export default {
-    name:"card-equipment",
-    props:  {
-                eqId: {type: Number, required: true},
-                eqCard: {type: Object, required: true},
-                actionMode: {type: String},
-                eqDevisionList: {type: Array}, 
-                eqTypeList: {type: Array}, 
-                eqReadinessList: {type: Array},
-                docList: {type: Array}, 
-                docTypeList: {type: Array}, 
-                orderTimeList: {type: Array},
-                workingModeList: {type: Array},
-                responsibleList: {type: Array},
-                lang: {type: Object},
-                imagesEq: {type: Array},
-                 imagesLoc: {type: Array}
-                
-    },
-    data() { 
-            return { 
-                 indexEq: null,
-                 indexLoc: null,
-                 show: false,
-                 currentIdDoc: '',
-                 fileDoc: ''
-                }
-    },
-    components: {
-        DynamicSelect,
-        DatePicker,
-        VueGallerySlideshow
-    },
-    computed: {
-        addEnable: function()
-        {
-            return this.actionMode!=='view' && this.eqId != -1;
-        }
-    },
-    methods: {
-        showLoc(i){ 
-            this.indexLoc = i;
-            this.renderButtonVGSClose();
-        },
-         showImg(i){ 
-            this.indexEq = i;
-            this.renderButtonVGSClose();
-           
-         }, 
-         renderButtonVGSClose(){
-            setTimeout(() => { 
-            if ($('.vgs__container').length > 0) $('.vgs__container').css({top: 0, marginTop: 0});
-            let img = $('.vgs__container__img');
-             $('.vgs__close').css({top: img.offset().top, left: img.offset().left + img.width()-  $('.vgs__close').width() - 12});
-            $('.vgs__close').html('Закрыть')
-            
-            }, 100);
-         },
-
-        fileName: function (_id){
-        let docType = _.find(this.docTypeList, {id: _id});
-        if (docType) return docType.name;
-        return null;
-      },
-      toFloatView: function(target){
-            return toFloatView(target);
-      },
-      toCost: function(target){
-            return toCost(target);
-      },
-        addDocClick(params){
-            this.currentIdDoc = params.idDoc;
-       },
-       handleFileDocUpload(){
-           this.fileDoc = this.$refs.fileDoc.files[0];
-           if(this.fileDoc !== '')
-                this.$emit('handleFileDocUpload', {idDoc: this.currentIdDoc, ref: this.$refs.fileDoc});
-
-       },
-       formatDate: function(value){
-           return formatDate(value);
-       }
-
-
-    },
-    mounted: function(){
-        let header = $('.eq-card-header').height();
-        let footer = $('.eq-card-footer').height();
-        let tabs = $('.tabs').height();
-        $('.content ').css("height", ($(window).height() - header - footer - tabs) -120 + 'px');
-    }
+  let img = $(".vgs__container__img");
+  if ($(".vgs__close").length > 0 && img.length > 0) {
+    if ($(".vgs__container").length > 0)
+      $(".vgs__container").css({ top: 0, marginTop: 0 });
+    $(".vgs__close").css({
+      top: img.offset().top,
+      left: img.offset().left + img.width() - $(".vgs__close").width() - 12,
+    });
   }
+});
+export default {
+  name: "card-equipment",
+  props: {
+    eqId: { type: Number, required: true },
+    eqCard: { type: Object, required: true },
+    actionMode: { type: String },
+    eqDevisionList: { type: Array },
+    eqTypeList: { type: Array },
+    eqReadinessList: { type: Array },
+    docList: { type: Array },
+    docTypeList: { type: Array },
+    orderTimeList: { type: Array },
+    workingModeList: { type: Array },
+    responsibleList: { type: Array },
+    lang: { type: Object },
+    imagesEq: { type: Array },
+    imagesLoc: { type: Array },
+  },
+  data() {
+    return {
+      indexEq: null,
+      indexLoc: null,
+      show: false,
+      currentIdDoc: "",
+      fileDoc: "",
+    };
+  },
+  components: {
+    DynamicSelect,
+    DatePicker,
+    VueGallerySlideshow,
+  },
+  computed: {
+    addEnable: function () {
+      return this.actionMode !== "view" && this.eqId != -1;
+    },
+  },
+  methods: {
+    showLoc(i) {
+      this.indexLoc = i;
+      this.renderButtonVGSClose();
+    },
+    showImg(i) {
+      this.indexEq = i;
+      this.renderButtonVGSClose();
+    },
+    renderButtonVGSClose() {
+      setTimeout(() => {
+        if ($(".vgs__container").length > 0)
+          $(".vgs__container").css({ top: 0, marginTop: 0 });
+        let img = $(".vgs__container__img");
+        $(".vgs__close").css({
+          top: img.offset().top,
+          left: img.offset().left + img.width() - $(".vgs__close").width() - 12,
+        });
+        $(".vgs__close").html("Закрыть");
+      }, 100);
+    },
+
+    fileName: function (_id) {
+      let docType = _.find(this.docTypeList, { id: _id });
+      if (docType) return docType.name;
+      return null;
+    },
+    toFloatView: function (target) {
+      return toFloatView(target);
+    },
+    toCost: function (target) {
+      return toCost(target);
+    },
+    addDocClick(params) {
+      this.currentIdDoc = params.idDoc;
+    },
+    handleFileDocUpload() {
+      this.fileDoc = this.$refs.fileDoc.files[0];
+      if (this.fileDoc !== "")
+        this.$emit("handleFileDocUpload", {
+          idDoc: this.currentIdDoc,
+          ref: this.$refs.fileDoc,
+        });
+    },
+    formatDate: function (value) {
+      return formatDate(value);
+    },
+  },
+  mounted: function () {
+    let header = $(".eq-card-header").height();
+    let footer = $(".eq-card-footer").height();
+    let tabs = $(".tabs").height();
+    $(".content ").css(
+      "height",
+      $(window).height() - header - footer - tabs - 120 + "px"
+    );
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-.eq-card-content{
-    width: 100%;
-    text-align: center;
+.eq-card-content {
+  width: 100%;
+  text-align: center;
 }
 .eq-card-container,
 .eq-card-container-doc,
 .eq-card-container-single {
   display: flex;
-   flex-wrap: wrap;
-   align-items: flex-end;
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
-.eq-card-container-single{
-    align-items: flex-start
+.eq-card-container-single {
+  align-items: flex-start;
 }
 .eq-card-container-doc {
-    justify-content: left;
-    align-items:flex-start;
+  justify-content: left;
+  align-items: flex-start;
 }
 .eq-card-top-container {
   display: flex;
-   flex-wrap: wrap;
-   align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
-.eq-card-col-100{
-   width: 100%;//calc(100% - 1px);
-    text-align: center;
+.eq-card-col-100 {
+  width: 100%; //calc(100% - 1px);
+  text-align: center;
 }
-.eq-card-col-50{
-   
-   width: 50%;//calc(50% - 1px);
-   min-width: 360px;
-    text-align: center;
+.eq-card-col-50 {
+  width: 50%; //calc(50% - 1px);
+  min-width: 360px;
+  text-align: center;
 }
-.eq-card-col-30{
-   display: inline-block;
-   width: 33%;
-   min-width: 120px;
-    text-align: center;
+.eq-card-col-30 {
+  display: inline-block;
+  width: 33%;
+  min-width: 120px;
+  text-align: center;
 }
-.eq-card-col-30-doc{
-     display: inline-block;
-    width: 33%;
-     border: 1px solid #E21A1A;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    margin-bottom:.25em;
-    margin-left:.25em;
-    padding: .25em;
- 
+.eq-card-col-30-doc {
+  display: inline-block;
+  width: 33%;
+  border: 1px solid #e21a1a;
+  -moz-border-radius: 0.25em;
+  -webkit-border-radius: 0.25em;
+  border-radius: 0.25em;
+  margin-bottom: 0.25em;
+  margin-left: 0.25em;
+  padding: 0.25em;
 }
-.eq-card-col-25{
-   display: inline-block;
-   width: 25%;
-   min-width: 150px;
-    text-align: center;
+.eq-card-col-25 {
+  display: inline-block;
+  width: 25%;
+  min-width: 150px;
+  text-align: center;
 }
 .eq-card-label {
-    display: inline-block;
-    min-width: 300px;
-    width: 100%;
-    text-align: left;
-    color:#000000;
-    font-size: 12pt;
-    padding-top: .5em;
-    padding-left: 15px;
-  }
-  .eq-card-item,
-  .eq-card-item-image {
-      display: block;
-      width: 100%;
-      min-width: 300px;
-      padding-left: 15px;
-      padding-right: 15px;
-  }
+  display: inline-block;
+  min-width: 300px;
+  width: 100%;
+  text-align: left;
+  color: #000000;
+  font-size: 12pt;
+  padding-top: 0.5em;
+  padding-left: 15px;
+}
+.eq-card-item,
+.eq-card-item-image {
+  display: block;
+  width: 100%;
+  min-width: 300px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
 .eq-card-small {
-    min-width: 120px;
+  min-width: 120px;
 }
 
 .eq-card-item select,
-.eq-card-item input[type=text],
-.eq-card-item input[type=number],
+.eq-card-item input[type="text"],
+.eq-card-item input[type="number"],
 .eq-card-item textarea,
-.eq-card-item p
-  {
-    position: relative;
-    -moz-border-radius: .25em;
-    -webkit-border-radius:  .25em;
-    border-radius:  .25em;
-    cursor: text;
-    display: block;
-    text-align: left;
-    width: 100%;
-    min-height: 2.5em;
-     padding-left: 5px;
-  }
-.checkbox{
-    height: 40px;
+.eq-card-item p {
+  position: relative;
+  -moz-border-radius: 0.25em;
+  -webkit-border-radius: 0.25em;
+  border-radius: 0.25em;
+  cursor: text;
+  display: block;
+  text-align: left;
+  width: 100%;
+  min-height: 2.5em;
+  padding-left: 5px;
+}
+.checkbox {
+  height: 40px;
 }
 
-  .eq-card-item  p
-  {
-      margin: 0;
-      padding-left: 5px;
-      color: #000000;
-  }
-  .eq-card-image-button,
-  .eq-card-file-button{
-      width: 100%;
-      margin-right: .5em;
-      margin-left: auto;
-      text-align: right;
-      color:#E21A1A
-  }
-  .eq-card-image-button label:hover,
-  .eq-card-file-button label:hover{
-    cursor: pointer;
-    color: #000000;
-  }
- 
-.eq-textarea {
-    height: 100px;
+.eq-card-item p {
+  margin: 0;
+  padding-left: 5px;
+  color: #000000;
 }
-.note-textarea{
-    height: 2.5em;
+.eq-card-image-button,
+.eq-card-file-button {
+  width: 100%;
+  margin-right: 0.5em;
+  margin-left: auto;
+  text-align: right;
+  color: #e21a1a;
+}
+.eq-card-image-button label:hover,
+.eq-card-file-button label:hover {
+  cursor: pointer;
+  color: #000000;
+}
+
+.eq-textarea {
+  height: 100px;
+}
+.note-textarea {
+  height: 2.5em;
 }
 .eq-card-input-file {
   opacity: 0;
@@ -559,142 +567,126 @@ $(window).on('resize', function(){
   height: 0px;
 }
 
-  .image-container
-  {
-    display: flex;
-    overflow: auto;
-    flex-wrap: nowrap;
-    justify-content:flex-start;
-    align-items: flex-start;
-  }
-  .doc-container{
-    display: block;
-    overflow: auto;
-    width: 100%;
-  }
-  .image-item
-  {
-     margin-left: .5em;
-     width: 100%;
-     min-width: 350px;
-     display: inline-block;
-  }
-  .doc-item{
-     width: 100%;
-     min-width: 200px;
-     display: flex;
-    flex-wrap: nowrap;
-    justify-content:flex-start;
-    align-items: flex-start;
-  }
+.image-container {
+  display: flex;
+  overflow: auto;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.doc-container {
+  display: block;
+  overflow: auto;
+  width: 100%;
+}
+.image-item {
+  margin-left: 0.5em;
+  width: 100%;
+  min-width: 350px;
+  display: inline-block;
+}
+.doc-item {
+  width: 100%;
+  min-width: 200px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
 
-  .image
-  {
-    width: 90%;
-    min-width:300px;
-  }
-  .image-item i,
-  .doc-item
-  {
-    vertical-align: top;
-    color: #E21A1A
-  }
-  .image-item i:hover,
-  .doc-item:hover
-  {
-    cursor: pointer;
-     color: #000000;
-  }
+.image {
+  width: 90%;
+  min-width: 300px;
+}
+.image-item i,
+.doc-item {
+  vertical-align: top;
+  color: #e21a1a;
+}
+.image-item i:hover,
+.doc-item:hover {
+  cursor: pointer;
+  color: #000000;
+}
 
 .input__file {
   opacity: 0;
   display: none;
   position: absolute;
 }
-.doc-name{
-  width:80%;
-  min-width:150px;
+.doc-name {
+  width: 80%;
+  min-width: 150px;
   text-align: left;
 }
-.doc-button
-{
-    display: flex;
-    justify-content: flex-end;
-    margin-left: .5em;
+.doc-button {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 0.5em;
 }
-.doc-button i
-{
-  color: #E21A1A;
+.doc-button i {
+  color: #e21a1a;
   padding-right: 1.5em;
   padding-left: 1.5em;
 }
-.doc-button i:hover{
-    color: #000000
+.doc-button i:hover {
+  color: #000000;
 }
- img {
-    max-width: 100%;
-    height: auto;
-    width: auto\9; /* ie8 */
- }
-
+img {
+  max-width: 100%;
+  height: auto;
+  width: auto\9; /* ie8 */
+}
 
 @media screen and (max-width: 900px) {
-    .eq-card-col-50{
-        width: 100%;
-    }
-    .eq-card-col-100{
-        width: 100%;
-    }
-    .eq-textarea {
-        height: 50px;
-    }
-    .note-textarea{
-        height: 2.5em;
-    }
+  .eq-card-col-50 {
+    width: 100%;
+  }
+  .eq-card-col-100 {
+    width: 100%;
+  }
+  .eq-textarea {
+    height: 50px;
+  }
+  .note-textarea {
+    height: 2.5em;
+  }
   .eq-card-small label {
-     font-size: 10pt;
-    }
-    .eq-card-col-25{
-        width: 49%;
-    }
-    
-    
+    font-size: 10pt;
+  }
+  .eq-card-col-25 {
+    width: 49%;
+  }
 }
 @media screen and (max-width: 1200px) {
-    .image-container
-    {
-         flex-wrap: wrap;
-    }
-    .eq-card-col-30-doc{
-        width: 100%;
-    }
+  .image-container {
+    flex-wrap: wrap;
+  }
+  .eq-card-col-30-doc {
+    width: 100%;
+  }
 }
-@media (max-width: 767px){
-.vgs__container {
+@media (max-width: 767px) {
+  .vgs__container {
     top: 0% !important;
-}
+  }
 }
 
 @media screen and (max-width: 480px) {
-   html {
-      -webkit-text-size-adjust: none;
-   }
+  html {
+    -webkit-text-size-adjust: none;
+  }
 }
 
-// .eq-card-item select:focus, 
-// .eq-card-item textarea:focus, 
+// .eq-card-item select:focus,
+// .eq-card-item textarea:focus,
 // .eq-card-item input:focus {
 //     outline-style: solid;
 //     outline-width: .5px !important;
 //     outline-color: #337ab7 !important;
 // }
 
-
-  .mx-datepicker{
-    width: 100%;
-  }
-
-
-
-
+.mx-datepicker {
+  width: 100%;
+}
 </style>

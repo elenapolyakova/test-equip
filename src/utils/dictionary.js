@@ -42,6 +42,8 @@ const devisionFullNameList =[{id: 2, name:"Научный центр «Нетя�
 
 const eventType = {"INSERT": 1, "UPDATE": 2, "DELETE": 3}
 
+const placeType = [{id:1, name: "Москва-3"}, {id:2, name:"Щербинка"}]
+
 const getFunList = () => FunList
 const getFunId = (funShortName) => { let fun = FunList.find(fun => fun.shortName === funShortName); return fun ? fun.id : null};
 const getEqReadiness = () => eqReadinessList 
@@ -70,7 +72,8 @@ const getAttType = () => attTypeList
 const getMType = () => MTypeList
 const getDevFullName = () => devisionFullNameList
 const getEventType = () => eventType
+const getPlaceType = () => placeType
 
 
 export {getFunList, getEqReadiness, getOrderTime, getDocType, getRepType, getQueryType, 
-    getWorkingMode, getOrderTimeHours, getWorkingPeriod, getAttType, getMType, getDevFullName, getFunId, getEventType, noWorkable};
+    getWorkingMode, getOrderTimeHours, getWorkingPeriod, getAttType, getMType, getDevFullName, getFunId, getEventType, noWorkable, getPlaceType};

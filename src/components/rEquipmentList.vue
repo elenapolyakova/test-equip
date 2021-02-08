@@ -37,10 +37,10 @@
                   </div>
                   <div class="action-panel-filter-item-select">
                         <dynamic-select 
-                                :options="locationList"
+                                :options="placeTypeList"
                                 option-value="id"
                                 option-text="name"
-                                v-model="fData.location"
+                                v-model="fData.placeType"
                                 placeholder=''/>
                     </div>
               </div>
@@ -58,6 +58,7 @@
       </div>
       <div class="report-content">
         <div class='title'>{{report_name}}</div>
+        <div>Выбрано оборудования: <b><span>{{eqData.length}}</span> ед. </b></div>
         
              <DataTable
                 :header-fields="headerFields"
@@ -77,7 +78,7 @@
    import ExcelJS from 'exceljs'; 
    import Loading from 'vue-loading-overlay';
    import DynamicSelect from 'vue-dynamic-select'
-   import {getEqReadiness} from '../utils/dictionary'
+   import {getEqReadiness, getPlaceType} from '../utils/dictionary'
    import {toCost} from '../utils/commonJS'
    import { DataTable } from 'v-datatable-light'
    import pdfMake from 'pdfmake/build/pdfmake'
@@ -98,10 +99,12 @@
          devisionList: [],
          readinessList: [],
          locationList: [],
+         placeTypeList: [],
          fData: {
                 devision: null,
                 readiness: null,
-                location: null
+                location: null,
+                placeType: null
           },
          sort: 'asc',
         isLoading: false,
@@ -281,7 +284,8 @@
             this.fData = {
                 devision: null,
                 readiness: null,
-                location: null
+                location: null,
+                placeType: null
                 }
             this.getReport();
 
@@ -294,8 +298,10 @@
             if (this.fData.readiness) 
                 this.eqData = _.filter(this.eqData, {'eqReadiness': this.fData.readiness.id})
 
-            if (this.fData.location) 
-                this.eqData = _.filter(this.eqData, {'location': this.fData.location.name})
+            // if (this.fData.location) 
+            //     this.eqData = _.filter(this.eqData, {'location': this.fData.location.name})
+            if (this.fData.placeType) 
+                this.eqData = _.filter(this.eqData, {'placeType': this.fData.placeType.id})
 
             this.$emit('resizeHeader');
         },
@@ -327,6 +333,7 @@
                 this.responsibleList = dict.userList;
                 this.responsibleList.forEach(item => item.name =`${item.us_surname} ${item.us_name} ${item.us_patname}`);
                 this.readinessList = getEqReadiness();
+                this.placeTypeList = getPlaceType();
                 api().
                 get('/equipment')
                 .then(response => 
@@ -349,8 +356,10 @@
                         eqItem.note = item.remark ? item.remark.trim() : '';
                         eqItem.eqReadiness = item.is_ready;
                         eqItem.number = item.card_num;//++i;
+                        eqItem.placeType = item.eq_placetype;
                         this.eqInitialList.push(eqItem);
                     });
+                    
                     this.locationList = this.fillDict(this.locationList , 'location');
                     this.eqData = this.eqInitialList ;
                     this.$emit('resizeHeader');

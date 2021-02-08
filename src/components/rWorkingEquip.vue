@@ -6,7 +6,7 @@
       </div>
       
         <div class='title'>{{report_name}}</div>
-        
+        <div>Выбрано оборудования: <b><span>{{eqData.length}}</span> ед. </b></div>
              <DataTable
                 :header-fields="headerFields"
                 :data="eqData || []"
